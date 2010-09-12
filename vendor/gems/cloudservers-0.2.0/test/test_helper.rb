@@ -1,0 +1,5 @@
+require 'test/unit'
+$:.unshift File.dirname(__FILE__) + '/../lib'
+require 'cloudservers'
+require 'rubygems'
+require 'mocha'

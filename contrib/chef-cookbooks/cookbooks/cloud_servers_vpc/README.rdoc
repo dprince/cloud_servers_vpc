@@ -1,0 +1,48 @@
+= DESCRIPTION:
+Recipe to install Cloud Servers VPC.
+
+By default the application is automatically configured to run on port
+80.  The recipe does NOT update or manage iptables rules to allow
+traffic to the configured ports.
+
+= REQUIREMENTS:
+Servers VPC RPMs must be available via Yum. Supports RHEL 5 nodes w/ EPEL.
+
+= ATTRIBUTES: 
+
+cloud_servers_vpc[:auth_username]= username that will be required to access
+ the web UI and REST interfaces.
+
+cloud_servers_vpc[:auth_password]= password that will be required to access
+ the web UI and REST interfaces.
+
+cloud_servers_vpc[:rackspace_cloud_username]= Rackspace Cloud account username
+
+cloud_servers_vpc[:rackspace_cloud_api_key]= Rackspace Cloud account api key
+
+Optional attributes:
+
+cloud_servers_vpc[:version]= version of the RPM to install
+
+cloud_servers_vpc[:rackspace_cloud_server_name_prefix]= the prefix that will
+be added to each cloud server that is created. Useful if you are
+using a Rackspace Cloud Servers account for multiple purposes and you want
+to quickly identify any servers created by Cloud Servers VPC via a prefix.
+This options is also required to call the cloud-servers-vpc-cleanup script.
+
+cloud_servers_vpc[:epel_base_url]= The base URL (http://<mirror_name) which
+will be used as the EPEL Yum repository for RHEL/Centos images. EPEL
+is used to obtain Openvpn packages.
+
+= USAGE:
+
+Example attributes in JSON:
+
+    "cloud_servers_vpc": {
+        "auth_username": "jimmy",
+        "auth_password": "admin123",
+        "rackspace_cloud_username": "test1",
+        "rackspace_cloud_api_key": "620ba3c2680ca1c26a0ca1c2",
+        "epel_base_url": "http://mirror.rackspace.com"
+    }
+

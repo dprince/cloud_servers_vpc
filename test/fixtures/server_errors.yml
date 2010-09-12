@@ -1,0 +1,10 @@
+# Read about fixtures at http://ar.rubyonrails.org/classes/Fixtures.html
+one:
+  error_message: First failure.
+  server: one
+  cloud_server_id_number: 1
+
+two:
+  error_message: Second failure.
+  server: one
+  cloud_server_id_number: 1

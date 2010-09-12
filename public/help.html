@@ -1,0 +1,182 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+  <head>
+    <meta http-equiv="Content-type" content="text/html; charset=utf-8" />
+    <title>Cloud Servers VPC</title>
+	<script src="/javascripts/jquery-1.4.2.min.js" type="text/javascript"></script>
+	<script src="/javascripts/jquery-ui-1.8.1.custom.min.js" type="text/javascript"></script>
+	<script src="/javascripts/application.js" type="text/javascript"></script>
+	<link href="/stylesheets/jquery-ui-1.8.custom.css" media="all" rel="stylesheet" type="text/css" />
+	<link href="/stylesheets/default.css" media="all" rel="stylesheet" type="text/css" />
+
+<script type="text/javascript">
+	$(function() {
+
+		$("a.button").button();
+
+	});
+</script>
+
+  </head>
+<body>
+
+<div id="header_font_div">Cloud Servers VPC: Online Help</div>
+<br class="clear"/>
+
+<table class="ui-widget ui-widget-content data" width="100%">
+  <tr class="ui-widget-header">
+    <th>&nbsp;</th>
+  </tr>
+  <tr>
+    <td>
+
+<a href="/main" class="button">Back to Cloud Servers VPC</a>
+<hr/>
+
+<div>
+<b>Summary:</b>
+<p>
+A web application with a REST based HTTP interface to create groups of servers in the cloud using secure OpenVPN networks. Each server group is created on a unique OpenVPN network that is accessible via SSH. OpenVPN may optionally be used to connect external clients (workstations) to the cloud server group. A simple web UI is also available to view, monitor, and delete existing server groups.
+</p>
+</div>
+<hr/>
+
+<div>
+<b>Features:</b>
+<p>
+
+<ul>
+<li>Supports Centos,Fedora,RHEL, and Ubuntu. Windows is not supported at this time.</li>
+<li>Communication between servers is secured with OpenVPN</li>
+<li>The eth0 network interface is disabled on VPN clients. Only the gateway VPN Server node can be used to connect to the server group.</li>
+<li>Create a group of servers with a single XML HTTP POST request.</li>
+<li>Validates network access to and between servers</li>
+<li>Easy (scriptable) access to the server group via SSH using public keys. The machine which acts as the OpenVPN server for the network acts as the SSH gateway.</li>
+<li>Automatically sets hostnames for each machine.</li>
+<li>Unique hostname namespace for each server group. Useful when creating dev/test groups in parallel.</li>
+</ul>
+
+</p>
+</div>
+<hr/>
+
+
+<div>
+<b>Access</b>
+<p>
+Cloud Servers VPC requires a username:password to view the web application and submit REST API requests.
+</p>
+</div>
+<hr/>
+
+<div>
+<b>API:</b>
+<p>
+
+<ul>
+<li><b>GET /server_groups.xml</b>: get a list of existing server groups</li>
+<li><b>GET /server_groups/1.xml</b>: show information for a specific server group</li>
+<li><b>POST /server_groups.xml</b>: create a new server group (see example below)</li>
+<li><b>DELETE /server_groups/1.xml</b>: destroy a server group</li>
+<li><b>GET /servers.xml</b>: get a list of existing servers</li>
+<li><b>GET /server/1.xml</b>: show information for a specific server</li>
+<li><b>GET /server_errors.xml</b>: get a list of all server errors</li>
+</ul>
+
+</p>
+</div>
+<hr/>
+
+<div>
+<b>Example: creating a server group using Curl</b>
+<p>
+Create an XML file containing the following example data. Name the file example.xml.
+</p>
+
+<pre>
+	&lt;server-group&gt;
+	  &lt;name&gt;mail&lt;/name&gt;
+	  &lt;domain-name&gt;mydomain.net&lt;/domain-name&gt;
+	  &lt;description&gt;Mail Dev Group&lt;/description&gt;
+	  &lt;owner-name&gt;dan&lt;/owner-name&gt;
+	  &lt;vpn-network&gt;172.19.0.0&lt;/vpn-network&gt;
+	  &lt;vpn-subnet&gt;255.255.128.0&lt;/vpn-subnet&gt;
+		&lt;servers type="array"&gt;
+			&lt;server&gt;
+			  &lt;name&gt;boot1&lt;/name&gt;
+			  &lt;description&gt;Boot 1&lt;/description&gt;
+			  &lt;flavor-id type="integer"&gt;2&lt;/flavor-id&gt;
+			  &lt;image-id type="integer"&gt;14&lt;/image-id&gt;
+			  &lt;openvpn-server type="boolean"&gt;true&lt;/openvpn-server&gt;
+			&lt;/server&gt;
+			&lt;server&gt;
+			  &lt;name&gt;gate1&lt;/name&gt;
+			  &lt;description&gt;Gate 1&lt;/description&gt;
+			  &lt;flavor-id type="integer"&gt;2&lt;/flavor-id&gt;
+			  &lt;image-id type="integer"&gt;14&lt;/image-id&gt;
+			&lt;/server&gt;
+			&lt;server&gt;
+			  &lt;name&gt;relay1&lt;/name&gt;
+			  &lt;description&gt;Gate 1&lt;/description&gt;
+			  &lt;flavor-id type="integer"&gt;2&lt;/flavor-id&gt;
+			  &lt;image-id type="integer"&gt;14&lt;/image-id&gt;
+			&lt;/server&gt;
+		&lt;/servers&gt;
+		&lt;ssh-public-keys type="array"&gt;
+			&lt;ssh-public-key&gt;
+				&lt;description&gt;Dan's Key&lt;/description&gt;
+				&lt;public-key&gt;ssh-rsa AAAAB3NzaC1yc2EAAAABI...&lt;/public-key&gt;
+			&lt;/ssh-public-key&gt;
+		&lt;/ssh-public-keys&gt;
+	&lt;/server-group&gt;
+</pre>
+
+<p>
+
+Run the following example curl request:
+
+<pre>
+	curl -k -u username:password -d "@example.xml" https://cc1.autodev.iad1a.mlsrvr.com/server_groups.xml
+</pre>
+
+** Where the Server Groups XML data file is named example.xml in the current working directory
+
+</p>
+
+</div>
+<hr/>
+
+<div>
+<b>Example: SSH into the server group</b>
+<p>
+Using your own public SSH key you can configure server groups so that you can automatically SSH into the SSH gateway server for your server group. The server which is designated as the OpenVPN server for a specific server group also acts as the SSH gateway server for that network. The following set of instructions explains how to SSH generate ssh keys, add them to your server group when it is created, and then SSH into the gateway server.
+
+<ol>
+<li>Generate a SSH public key pair. This is a one time operation that should be performed on your workstation. Example:
+<pre>
+	$ ssh-keygen
+</pre>
+</li>
+<li>Obtain your SSH public key. Example:
+<pre>
+	$ cat ~/.ssh/id_rsa.pub
+</pre>
+</li>
+<li>Add your SSH public key into the &lt;public-keys&gt; section of your server groups XML requests. See the example.xml server groups request above for more information. The key will then automatically get installed into the authorized_keys file of the root user on the OpenVPN server machine. Multiple keys may be specified to allow multiple users access to a specific server group.</li>
+<li>Once the servers are online ssh into the machine using the public IP address of the SSH gateway (OpenVPN server) machine. Example:
+<pre>
+	$ ssh root@123.123.123.123
+</pre>
+</li>
+<li>From the root account on the gateway server you should automatically have SSH access to all the servers in your server group. The gateway server can SSH into all the clients however the clients cannot SSH into each other.</li>
+</ol>
+</p>
+</div>
+
+    </td>
+  </tr>
+</table>
+
+</body>
+</html>

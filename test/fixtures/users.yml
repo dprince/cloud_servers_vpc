@@ -1,0 +1,40 @@
+# Read about fixtures at http://ar.rubyonrails.org/classes/Fixtures.html
+
+admin:
+  username: admin
+  first_name: The
+  last_name: Administrator
+  is_active: true
+  is_admin: true
+  hashed_password: a8786bcf6d0259ad2996962b8352976028a3434b
+  salt: "703519147940400.809797250144066"
+  account: admin_account
+
+bob:
+  username: bob
+  first_name: Bobby
+  last_name: BlahBlah
+  is_active: true
+  is_admin: false
+  hashed_password: a8786bcf6d0259ad2996962b8352976028a3434b
+  salt: "703519147940400.809797250144066"
+  account: bob_account
+
+jim:
+  username: jim
+  first_name: Jimmy
+  last_name: BlahBlah
+  is_active: true
+  is_admin: false
+  hashed_password: a8786bcf6d0259ad2996962b8352976028a3434b
+  salt: "703519147940400.809797250144066"
+  account: jim_account
+
+inactive:
+  username: john
+  first_name: John
+  last_name: BlahBlah
+  is_active: false
+  is_admin: false
+  hashed_password: a8786bcf6d0259ad2996962b8352976028a3434b
+  salt: "703519147940400.809797250144066"

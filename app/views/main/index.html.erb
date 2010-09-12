@@ -1,0 +1,129 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+  <head>
+    <meta http-equiv="Content-type" content="text/html; charset=utf-8" />
+    <title>Cloud Servers VPC</title>
+	<script src="/javascripts/jquery-1.4.2.min.js" type="text/javascript"></script>
+	<script src="/javascripts/jquery-ui-1.8.1.custom.min.js" type="text/javascript"></script>
+    <%= javascript_include_tag "application" %>
+    <%= javascript_include_tag "users" %>
+	<link href="/stylesheets/jquery-ui-1.8.custom.css" media="all" rel="stylesheet" type="text/css" />
+	<link href="/stylesheets/default.css" media="all" rel="stylesheet" type="text/css" />
+  </head>
+<body>
+
+<div id="header_font_div">Cloud Servers VPC</div>
+
+<div id="login_header">
+<td><%= link_to 'Settings', "/users/#{session[:user_id]}", { :class => "user-show" } %></td>&nbsp;/&nbsp;<a id="help_link" href="/help.html" class="help_link">Help</a>&nbsp;/&nbsp;<a id="logout_link" href="/auth/logout" class="logout_link show">Log out</a>
+</div>
+
+
+<br class="clear"/>
+
+<script type="text/javascript">
+
+var globalSelectedTab=0;
+var globalRefreshDivId='';
+var globalRefreshURL='';
+
+function refreshDiv() {	
+	if (globalRefreshURL == "" || globalRefreshDivId == "") {
+		$("#tabs").tabs('load', globalSelectedTab);
+	} else {
+		$.get(globalRefreshURL, function(html_snippet) {
+			$(globalRefreshDivId).html(html_snippet);
+		});
+	}
+}
+
+var refreshId = setInterval(refreshDiv, 6000);
+
+$(document).ready(function() {
+
+	$("#tabs").tabs({
+		ajaxOptions: {
+			error: function(xhr, status, index, anchor) {
+				$(anchor.hash).html("Failed to load data.");
+			}
+		},
+		load: function(e, ui) {
+			reset_tab_anchors();
+		},
+		select: function(e, ui) {
+			globalSelectedTab=parseInt(ui.tab.href.charAt(ui.tab.href.length-1))-1;
+			globalRefreshDivId='';
+			globalRefreshURL='';
+		}
+			
+	});
+
+	$(".logout_link").click(function(e){
+
+		e.preventDefault();
+
+		$.post($(this).attr("href"), function(data) {
+			$("#logout_link").css('display', 'none');
+			$(location).attr('href','/');
+		});
+
+	});
+
+	$(".user-show").click(function(e){
+		 e.preventDefault();
+
+		 $.get($(this).attr("href"), function(html_snippet) {
+
+			$("#user-dialog").html(
+				html_snippet
+			);
+
+			$("#user-dialog").dialog({
+				modal: true,
+				height: 400,
+				width: 600,
+				buttons: {
+					Ok: function() {
+						$(this).dialog('close');
+					}
+				}
+			});
+
+		 });
+
+	   });
+
+});
+
+function reset_tab_anchors() {
+
+	$("#tabs").tabs("url", 0, "/server_groups?layout=true");
+	$("#tabs").tabs("url", 1, "/servers?layout=true");
+	$("#tabs").tabs("url", 2, "/servers?historical=1&layout=true");
+	<% if is_admin then %>
+	$("#tabs").tabs("url", 3, "/users?layout=true");
+	<% end %>
+
+}
+
+</script>
+
+<div id="server-errors-dialog"></div>
+<div id="user-dialog"></div>
+
+<div id="tabs">
+	<ul>
+		<li><a href="/server_groups">Groups</a></li>
+		<li><a href="/servers">Servers</a></li>
+		<li><a href="/servers?historical=1">History</a></li>
+		<% if is_admin then %>
+		<li><a href="/users">Users</a></li>
+		<% end %>
+	</ul>
+</div>
+<div id="footer_div">
+Version: <%= CLOUD_CONTROL_VERSION %>
+</div>
+</body>
+</html>

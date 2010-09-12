@@ -1,0 +1,103 @@
+= Cloud Servers VPC
+
+Secure cloud server groups
+
+== Description
+
+A web application with a REST based HTTP interface to create groups of servers in the cloud using secure OpenVPN networks. Each server group is created on a unique OpenVPN network that is accessible via SSH or OpenVPN. A simple web UI is also available to view, monitor, and delete existing server groups.
+
+== Features
+
+-Supports Centos, Fedora, RHEL, and Ubuntu.
+-Communication between servers is secured with OpenVPN
+-The eth0 network interface is disabled on VPN clients. Only the gateway VPN Server node can be used to connect to the server group.
+-Create a group of servers with a single XML HTTP POST request.
+-Validates network access between servers
+-Easy (scriptable) access to the server group via SSH using public keys. The machine which acts as the OpenVPN server for the network acts as the SSH gateway.
+-Automatically sets hostnames for each machine.
+-Unique hostname namespace within each server group. Useful when creating dev/test groups in parallel.
+
+== Installation
+
+Requires a Ruby on Rails 2.3.8. A database is required (MySQL highly recommended).
+
+The following gems are required:
+
+-mysql
+-deamons (1.1.0)
+-json (> 1.4.3)
+
+Unpack the rails app and run the following commands to setup a working
+development application:
+
+rake db:create
+rake db:migrate
+./script/delayed_job start
+./script/server
+
+At this point try to hit the web application with a web browser. The default
+username:password is admin:cloud.
+
+== API
+
+GET /server_groups.xml
+GET /server_groups/1.xml
+POST /server_groups.xml
+DELETE /server_groups/1.xml
+GET /servers.xml
+GET /server/1.xml
+GET /server_errors.xml
+
+== Examples
+
+Example: creating a server group using Curl
+Create an XML file containing the following example data. Name the file example.xml.
+
+	<server-group>
+	  <name>mail</name>
+	  <domain-name>mydomain.net</domain-name>
+	  <description>Mail Dev Group</description>
+	  <owner-name>dan</owner-name>
+	  <vpn-network>172.19.0.0</vpn-network>
+	  <vpn-subnet>255.255.128.0</vpn-subnet>
+		<servers type="array">
+			<server>
+			  <name>boot1</name>
+			  <description>Boot 1</description>
+			  <flavor-id type="integer">2</flavor-id>
+			  <image-id type="integer">14</image-id>
+			  <openvpn-server type="boolean">true</openvpn-server>
+			</server>
+			<server>
+			  <name>gate1</name>
+			  <description>Gate 1</description>
+			  <flavor-id type="integer">2</flavor-id>
+			  <image-id type="integer">14</image-id>
+			</server>
+			<server>
+			  <name>relay1</name>
+			  <description>Gate 1</description>
+			  <flavor-id type="integer">2</flavor-id>
+			  <image-id type="integer">14</image-id>
+			</server>
+		</servers>
+		<ssh-public-keys type="array">
+			<ssh-public-key>
+				<description>My SSH Key</description>
+				<public-key>ssh-rsa AAAAB3NzaC1yc2EAAAABI...</public-key>
+			</ssh-public-key>
+		</ssh-public-keys>
+	</server-group>
+Run the following example curl request:
+
+	curl -k -u username:password -d "@example.xml" https://cc1.autodev.iad1a.mlsrvr.com/server_groups.xml
+** Where the Server Groups XML data file is named example.xml in the current working directory
+
+== Author
+
+Dan Prince <dan.prince@rackspace.com>
+
+== License
+
+See COPYING for license information.
+Copyright (c) 2010, Rackspace US, Inc.

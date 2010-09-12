@@ -1,0 +1,22 @@
+<div id="users" class="ui-widget">
+
+<script>
+
+    globalRefreshURL="/users"
+    globalRefreshDivId="#users-table"
+
+    $(document).ready(function() {
+        user_selectors();
+    });
+
+</script>
+
+<div class="title">
+<h3>Users</h3>
+</div>
+
+<div id="users-table">
+    <%= render :partial => 'table' %>
+</div>
+
+</div>

@@ -1,0 +1,3 @@
+#!/bin/sh
+
+cd /opt/cloud-servers-vpc; RAILS_ENV=production /usr/bin/rails-stack-ruby ./script/runner ./runner_scripts/cleanup_servers.rb

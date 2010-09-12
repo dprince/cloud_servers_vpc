@@ -1,0 +1,32 @@
+<h1>Editing server_group</h1>
+
+<% form_for(@server_group) do |f| %>
+  <%= f.error_messages %>
+
+  <p>
+    <%= f.label :name %><br />
+    <%= f.text_field :name %>
+  </p>
+  <p>
+    <%= f.label :description %><br />
+    <%= f.text_field :description %>
+  </p>
+  <p>
+    <%= f.label :vpn_network %><br />
+    <%= f.text_field :vpn_network %>
+  </p>
+  <p>
+    <%= f.label :vpn_subnet %><br />
+    <%= f.text_field :vpn_subnet %>
+  </p>
+  <p>
+    <%= f.label :last_used_ip_address %><br />
+    <%= f.text_field :last_used_ip_address %>
+  </p>
+  <p>
+    <%= f.submit 'Update' %>
+  </p>
+<% end %>
+
+<%= link_to 'Show', @server_group %> |
+<%= link_to 'Back', server_groups_path %>

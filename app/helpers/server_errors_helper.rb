@@ -1,0 +1,2 @@
+module ServerErrorsHelper
+end

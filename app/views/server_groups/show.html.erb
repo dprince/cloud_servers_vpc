@@ -1,0 +1,28 @@
+<p>
+  <b>Name:</b>
+  <%=h @server_group.name %>
+</p>
+
+<p>
+  <b>Description:</b>
+  <%=h @server_group.description %>
+</p>
+
+<p>
+  <b>Vpn network:</b>
+  <%=h @server_group.vpn_network %>
+</p>
+
+<p>
+  <b>Vpn subnet:</b>
+  <%=h @server_group.vpn_subnet %>
+</p>
+
+<p>
+  <b>Last used ip address:</b>
+  <%=h @server_group.last_used_ip_address %>
+</p>
+
+
+<%= link_to 'Edit', edit_server_group_path(@server_group) %> |
+<%= link_to 'Back', server_groups_path %>

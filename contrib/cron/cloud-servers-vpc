@@ -1,0 +1,1 @@
+*/15 * * * * cloud_servers_vpc /usr/bin/cloud-servers-vpc-cleanup

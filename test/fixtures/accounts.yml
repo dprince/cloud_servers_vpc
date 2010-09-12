@@ -1,0 +1,13 @@
+# Read about fixtures at http://ar.rubyonrails.org/classes/Fixtures.html
+
+admin_account:
+  cloud_servers_username: blahblah
+  cloud_servers_api_key: ABABABABABA
+
+bob_account:
+  cloud_servers_username: blahblah
+  cloud_servers_api_key: ABABABABABA
+
+jim_account:
+  cloud_servers_username: blahblah
+  cloud_servers_api_key: ABABABABABA

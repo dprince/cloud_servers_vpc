@@ -1,0 +1,69 @@
+= OpenVPN Configuration API -- Configure a group of servers with OpenVPN
+
+This API includes a set of classes that allow you automatically configure
+a set of servers to use a secure OpenVPN network.
+
+== Prerequisites
+
+The API is written in Ruby and Bash. Bash is used for all server side commands
+ (ruby is not required to be installed on each server). The API requires
+that you have setup ssh keys for root access on each server.
+To setup SSH keys perform the following steps on each server:
+
+1) ssh into th server as root
+ssh root@<server_name>
+
+2) Create a .ssh directory in /root (if it doesn't already exist). Set
+ ownership as directed below.
+
+mkdir .ssh
+chmod 700 .ssh
+
+3) Add your id_rsa.pub key into a file called /root/.ssh/authorized_keys.
+ Set ownership as directed below:
+
+chmod 600 .ssh/authorized_keys
+
+** NOTE: Cloud Servers "Personalities" can be used to automatically
+ create the .ssh/authorized_keys on each server.
+
+== API Example:
+
+From the 'lib' directory run the following.
+
+require 'logger'
+require 'openvpn_config/server'
+require 'openvpn_config/client'
+
+# create an optional logger that send output to STDOUT
+logger = Logger.new(STDOUT)
+
+# Using one Server instance create an OpenVPN Server
+# create a server object public IP (eth0) and LAN IP (eth1)
+server=OpenvpnConfig::Server.new("173.203.194.190", "10.177.72.18")
+server.logger=logger
+# install EPEL and OpenVPN RPM's on the node
+server.install_openvpn
+
+# configure the OpenVPN Server
+server.configure_vpn_server "test_ca"
+
+# Configure a different Server as an OpenVPN client
+client=OpenvpnConfig::Client.new(server, "173.203.198.15")
+client.logger=logger
+# install EPEL and OpenVPN RPM's on the node
+client.install_openvpn
+client.configure_client_vpn("client1", "172.19.0.3", "172.19.0.4")
+
+== API Notes
+
+By default the VPN uses the 172.19.0.0/255.255.128.0 network. This is in
+the Class B private address range.
+
+The API Server object automatically tracks and increments new VPN client
+IP addresses as clients get added. If the server object is destroyed or
+recreated you will need to manually call server.init_ip with the largest
+IP address that was given to a client (the last one created).
+
+For a given address range the OpenVPN server itself always uses the
+.1 and .2 addresses. See the openvpn man page for details.

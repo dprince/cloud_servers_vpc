@@ -1,0 +1,33 @@
+<p>
+  <b>Name:</b>
+  <%=h @server.name %>
+</p>
+
+<p>
+  <b>External ip addr:</b>
+  <%=h @server.external_ip_addr %>
+</p>
+
+<p>
+  <b>Internal ip addr:</b>
+  <%=h @server.internal_ip_addr %>
+</p>
+
+<p>
+  <b>Flavor:</b>
+  <%=h @server.flavor_id %>
+</p>
+
+<p>
+  <b>Image:</b>
+  <%=h @server.image_id %>
+</p>
+
+<p>
+  <b>Group:</b>
+  <%=h @server.server_group_id %>
+</p>
+
+
+<%= link_to 'Edit', edit_server_path(@server) %> |
+<%= link_to 'Back', servers_path %>
