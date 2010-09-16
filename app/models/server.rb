@@ -188,7 +188,7 @@ class Server < ActiveRecord::Base
 			cs_conn=self.cloud_server_init
 
 			retry_suffix=self.retry_count > 0 ? "#{rand(10)}-#{self.retry_count}" : "#{rand(10)}"
-			cs=cs_conn.create_cloud_server("#{server_name_prefix}#{self.name}-#{self.server_group_id}-#{retry_suffix}", self.image_id, self.flavor_id, generate_personalities(self.openvpn_server))
+			cs=cs_conn.create_cloud_server("#{server_name_prefix}#{self.name}-#{self.server_group_id}-#{retry_suffix}", self.image_id, self.flavor_id, generate_personalities)
 			@tmp_files.each {|f| f.close(true)} #Remove tmp personalities files
 			#harvest server ID and IP information
 			self.cloud_server_id_number = cs.id
@@ -348,11 +348,8 @@ class Server < ActiveRecord::Base
 	end
 
 	# Generates a personalities hash (See Cloud Servers API docs for details)
-	# By default only the authorized keys files is written.
-	# For open_vpn servers we also write the id_rsa from the Server Group
-	# so that it can access the other nodes.
 	private
-	def generate_personalities(include_ssh_private_key=false)
+	def generate_personalities
 
 		# add keys from the Server Group (added via XML API)
 		authorized_keys=self.server_group.ssh_public_keys.inject("") { |sum, k| sum + k.public_key + "\n"}
@@ -383,10 +380,6 @@ api_key: #{ENV['RACKSPACE_CLOUD_API_KEY']}
 		tmp_cloud_key.flush
 		@tmp_files << tmp_auth_keys
 		personalities.store(tmp_cloud_key.path, "/root/.rackspace_cloud")
-
-		if include_ssh_private_key then
-			personalities.store(self.server_group.ssh_key_basepath,"/root/.ssh/id_rsa")
-		end
 
 		return personalities
 

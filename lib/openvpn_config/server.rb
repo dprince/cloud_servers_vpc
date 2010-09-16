@@ -55,6 +55,10 @@ class Server
 
 		script=<<-SCRIPT_EOF
 			#{IO.read(File.join(File.dirname(__FILE__), "server_functions.bash"))}
+			cat > /root/.ssh/id_rsa <<-"EOF_CAT"
+			#{IO.read(@ssh_identity_file)}
+			EOF_CAT
+			chmod 600 /root/.ssh/id_rsa
 			/etc/init.d/openvpn stop
 			clean
 			create_ca '#{hostname}'
