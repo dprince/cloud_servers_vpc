@@ -2,8 +2,6 @@
   then list available servers, the new one will not show up.).  That needs to be corrected on the API end before
   data will be accurate.
 
-* Add pagination in object listing.
-
 * Allow some sort of flag to get the stack trace when an exception is thrown.
 
 * Shared IP group modification code.

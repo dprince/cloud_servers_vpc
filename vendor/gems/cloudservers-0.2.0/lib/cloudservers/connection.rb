@@ -32,8 +32,8 @@ module CloudServers
     #
     #   cf = CloudServers::Connection.new(:username => 'YOUR_USERNAME', :api_key => 'YOUR_API_KEY')
     def initialize(options = {:retry_auth => true}) 
-      @authuser = options[:username] || (raise Authentication, "Must supply a :username")
-      @authkey = options[:api_key] || (raise Authentication, "Must supply an :api_key")
+      @authuser = options[:username] || (raise Exception::Authentication, "Must supply a :username")
+      @authkey = options[:api_key] || (raise Exception::Authentication, "Must supply an :api_key")
       @retry_auth = options[:retry_auth]
       @proxy_host = options[:proxy_host]
       @proxy_port = options[:proxy_port]
@@ -64,9 +64,8 @@ module CloudServers
       # Server closed the connection, retry
       raise CloudServers::Exception::Connection, "Unable to reconnect to #{server} after #{attempts} attempts" if attempts >= 5
       attempts += 1
-      @http[server].finish if @http[server] and @http[server].started?
-      @http[server]=nil
-      start_http(server,path,port,scheme,hdrhash)
+      @http[server].finish
+      start_http(server,path,port,scheme,headers)
       retry
     rescue CloudServers::Exception::ExpiredAuthToken
       raise CloudServers::Exception::Connection, "Authentication token expired and you have requested not to retry" if @retry_auth == false
@@ -87,11 +86,17 @@ module CloudServers
     
     # Returns an array of hashes, one for each server that exists under this account.  The hash keys are :name and :id.
     #
+    # You can also provide :limit and :offset parameters to handle pagination.
+    #
     #   >> cs.list_servers
     #   => [{:name=>"MyServer", :id=>110917}]
+    #
+    #   >> cs.list_servers(:limit => 2, :offset => 3)
+    #   => [{:name=>"demo-standingcloud-lts", :id=>168867}, 
+    #       {:name=>"demo-aicache1", :id=>187853}]
     def list_servers(options = {})
-      url_params = "?limit=#{URI.escape(options[:limit].to_s)}&offset=#{URI.escape(options[:offset].to_s)}" if options[:limit] && options[:offset]
-      response = csreq("GET",svrmgmthost,"#{svrmgmtpath}/servers",svrmgmtport,svrmgmtscheme)
+      path = CloudServers.paginate(options).empty? ? "#{svrmgmtpath}/servers" : "#{svrmgmtpath}/servers?#{CloudServers.paginate(options)}"
+      response = csreq("GET",svrmgmthost,path,svrmgmtport,svrmgmtscheme)
       CloudServers::Exception.raise_exception(response) unless response.code.match(/^20.$/)
       CloudServers.symbolize_keys(JSON.parse(response.body)["servers"])
     end
@@ -101,10 +106,16 @@ module CloudServers
     # includes public and private IP addresses, status, hostID, and more.  All hash keys are symbols except for the metadata
     # hash, which are verbatim strings.
     #
+    # You can also provide :limit and :offset parameters to handle pagination.
     #   >> cs.list_servers_detail
     #   => [{:name=>"MyServer", :addresses=>{:public=>["67.23.42.37"], :private=>["10.176.241.237"]}, :metadata=>{"MyData" => "Valid"}, :imageId=>10, :progress=>100, :hostId=>"36143b12e9e48998c2aef79b50e144d2", :flavorId=>1, :id=>110917, :status=>"ACTIVE"}]
-    def list_servers_detail
-      response = csreq("GET",svrmgmthost,"#{svrmgmtpath}/servers/detail",svrmgmtport,svrmgmtscheme)
+    #
+    #   >> cs.list_servers_detail(:limit => 2, :offset => 3)
+    #   => [{:status=>"ACTIVE", :imageId=>10, :progress=>100, :metadata=>{}, :addresses=>{:public=>["x.x.x.x"], :private=>["x.x.x.x"]}, :name=>"demo-standingcloud-lts", :id=>168867, :flavorId=>1, :hostId=>"xxxxxx"}, 
+    #       {:status=>"ACTIVE", :imageId=>8, :progress=>100, :metadata=>{}, :addresses=>{:public=>["x.x.x.x"], :private=>["x.x.x.x"]}, :name=>"demo-aicache1", :id=>187853, :flavorId=>3, :hostId=>"xxxxxx"}]
+    def list_servers_detail(options = {})
+      path = CloudServers.paginate(options).empty? ? "#{svrmgmtpath}/servers/detail" : "#{svrmgmtpath}/servers/detail?#{CloudServers.paginate(options)}"
+      response = csreq("GET",svrmgmthost,path,svrmgmtport,svrmgmtscheme)
       CloudServers::Exception.raise_exception(response) unless response.code.match(/^20.$/)
       CloudServers.symbolize_keys(JSON.parse(response.body)["servers"])
     end
@@ -150,11 +161,19 @@ module CloudServers
     # Returns an array of hashes listing available server images that you have access too, including stock Cloud Servers images and 
     # any that you have created.  The "id" key in the hash can be used where imageId is required.
     #
+    # You can also provide :limit and :offset parameters to handle pagination.
+    #
     #   >> cs.list_images
     #   => [{:name=>"CentOS 5.2", :id=>2, :updated=>"2009-07-20T09:16:57-05:00", :status=>"ACTIVE", :created=>"2009-07-20T09:16:57-05:00"}, 
     #       {:name=>"Gentoo 2008.0", :id=>3, :updated=>"2009-07-20T09:16:57-05:00", :status=>"ACTIVE", :created=>"2009-07-20T09:16:57-05:00"},...
-    def list_images
-      response = csreq("GET",svrmgmthost,"#{svrmgmtpath}/images/detail",svrmgmtport,svrmgmtscheme)
+    #
+    #   >> cs.list_images(:limit => 3, :offset => 2) 
+    #   => [{:status=>"ACTIVE", :name=>"Fedora 11 (Leonidas)", :updated=>"2009-12-08T13:50:45-06:00", :id=>13}, 
+    #       {:status=>"ACTIVE", :name=>"CentOS 5.3", :updated=>"2009-08-26T14:59:52-05:00", :id=>7}, 
+    #       {:status=>"ACTIVE", :name=>"CentOS 5.4", :updated=>"2009-12-16T01:02:17-06:00", :id=>187811}]
+    def list_images(options = {})
+      path = CloudServers.paginate(options).empty? ? "#{svrmgmtpath}/images/detail" : "#{svrmgmtpath}/images/detail?#{CloudServers.paginate(options)}"
+      response = csreq("GET",svrmgmthost,path,svrmgmtport,svrmgmtscheme)
       CloudServers::Exception.raise_exception(response) unless response.code.match(/^20.$/)
       CloudServers.symbolize_keys(JSON.parse(response.body)['images'])
     end
@@ -171,11 +190,19 @@ module CloudServers
     
     # Returns an array of hashes listing all available server flavors.  The :id key in the hash can be used when flavorId is required.
     #
+    # You can also provide :limit and :offset parameters to handle pagination.
+    #
     #   >> cs.list_flavors
     #   => [{:name=>"256 server", :id=>1, :ram=>256, :disk=>10}, 
     #       {:name=>"512 server", :id=>2, :ram=>512, :disk=>20},...
-    def list_flavors
-      response = csreq("GET",svrmgmthost,"#{svrmgmtpath}/flavors/detail",svrmgmtport,svrmgmtscheme)
+    #
+    #   >> cs.list_flavors(:limit => 3, :offset => 2)
+    #   => [{:ram=>1024, :disk=>40, :name=>"1GB server", :id=>3}, 
+    #       {:ram=>2048, :disk=>80, :name=>"2GB server", :id=>4}, 
+    #       {:ram=>4096, :disk=>160, :name=>"4GB server", :id=>5}]       
+    def list_flavors(options = {})
+      path = CloudServers.paginate(options).empty? ? "#{svrmgmtpath}/flavors/detail" : "#{svrmgmtpath}/flavors/detail?#{CloudServers.paginate(options)}"
+      response = csreq("GET",svrmgmthost,path,svrmgmtport,svrmgmtscheme)
       CloudServers::Exception.raise_exception(response) unless response.code.match(/^20.$/)
       CloudServers.symbolize_keys(JSON.parse(response.body)['flavors'])
     end
@@ -192,10 +219,13 @@ module CloudServers
     
     # Returns an array of hashes for all Shared IP Groups that are available.  The :id key can be used to find that specific object.
     #
+    # You can also provide :limit and :offset parameters to handle pagination.
+    #
     #   >> cs.list_shared_ip_groups
     #   => [{:name=>"New Group", :id=>127}]
-    def list_shared_ip_groups
-      response = csreq("GET",svrmgmthost,"#{svrmgmtpath}/shared_ip_groups/detail",svrmgmtport,svrmgmtscheme)
+    def list_shared_ip_groups(options = {})
+      path = CloudServers.paginate(options).empty? ? "#{svrmgmtpath}/shared_ip_groups/detail" : "#{svrmgmtpath}/shared_ip_groups/detail?#{CloudServers.paginate(options)}"
+      response = csreq("GET",svrmgmthost,path,svrmgmtport,svrmgmtscheme)
       CloudServers::Exception.raise_exception(response) unless response.code.match(/^20.$/)
       CloudServers.symbolize_keys(JSON.parse(response.body)['sharedIpGroups'])
     end
@@ -256,7 +286,7 @@ module CloudServers
       CloudServers::Exception.raise_exception(response) unless response.code.match(/^20.$/)
       CloudServers.symbolize_keys(JSON.parse(response.body)['limits'])
     end
-   
+    
     private
     
     # Sets up standard HTTP headers

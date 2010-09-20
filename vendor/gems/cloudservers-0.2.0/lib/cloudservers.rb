@@ -2,7 +2,7 @@
 # 
 # == Cloud Servers API
 # ==== Connects Ruby Applications to Rackspace's {Cloud Servers service}[http://www.rackspacecloud.com/cloud_hosting_products/servers]
-# By H. Wade Minter <wade.minter@rackspace.com> and Mike Mayo <mike.mayo@rackspace.com>
+# By H. Wade Minter <minter@lunenburg.org> and Mike Mayo <mike.mayo@rackspace.com>
 #
 # See COPYING for license information.
 # Copyright (c) 2009, Rackspace US, Inc.
@@ -23,6 +23,7 @@ module CloudServers
   require 'uri'
   require 'rubygems'
   require 'json'
+  require 'date'
 
   unless "".respond_to? :each_char
     require "jcode"
@@ -77,6 +78,13 @@ module CloudServers
     else
       obj
     end
+  end
+  
+  def self.paginate(options = {})
+    path_args = []
+    path_args.push(URI.encode("limit=#{options[:limit]}")) if options[:limit]
+    path_args.push(URI.encode("offset=#{options[:offset]}")) if options[:offset]
+    path_args.join("&")
   end
   
 
