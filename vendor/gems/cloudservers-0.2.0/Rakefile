@@ -1,5 +1,6 @@
 require 'rubygems'
 require './lib/cloudservers.rb'
+require 'rake/testtask'
 
 begin
   require 'jeweler'
@@ -15,3 +16,9 @@ begin
 rescue LoadError
   puts "Jeweler not available. Install it with: sudo gem install jeweler"
 end
+
+  Rake::TestTask.new(:test) do |t|
+    t.pattern = 'test/*_test.rb'
+    t.verbose = true
+  end
+  Rake::Task['test'].comment = "Unit"

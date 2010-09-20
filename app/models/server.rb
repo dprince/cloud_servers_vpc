@@ -211,7 +211,7 @@ class Server < ActiveRecord::Base
 
 			long_error_message=nil
 			begin
-				long_error_message="#{e.inspect}: #{e.http_body}"
+				long_error_message="#{e.message}: #{e.response_body}"
 			rescue
 			end
 

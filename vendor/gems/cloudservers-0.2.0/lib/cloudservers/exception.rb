@@ -40,11 +40,11 @@ module CloudServers
     end
     class NotImplemented              < CloudServersError # :nodoc:
     end
+    class Other                       < CloudServersError # :nodoc:
+    end
     
     # Plus some others that we define here
     
-    class Other                       < CloudServersError # :nodoc:
-    end
     class ExpiredAuthToken            < StandardError # :nodoc:
     end
     class MissingArgument             < StandardError # :nodoc:
