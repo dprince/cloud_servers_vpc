@@ -24,7 +24,7 @@ git checkout $UNDERSCORE_VERSION || fail "Failed to checkout branch."
 sed -e "s|^Version:.*|Version: $VERSION|" -e "s|^Release:.*|Release: 1|" \
  -i contrib/rpmbuild/SPECS/cloud-servers-vpc.spec \
   || fail "Failed to update SPEC file with version: $VERSION."
-sed -e "s|^CLOUD_CONTROL_VERSION.*|CLOUD_CONTROL_VERSION=\"$VERSION\"|" \
+sed -e "s|^CLOUD_SERVERS_VPC_VERSION.*|CLOUD_SERVERS_VPC_VERSION=\"$VERSION\"|" \
  -i config/environment.rb \
   || fail "Failed to update environment.rb file with version: $VERSION."
 git commit -a -m "Updating version information for tag: $VERSION" \
