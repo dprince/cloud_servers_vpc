@@ -1,0 +1,2 @@
+output_dir: contrib/rpmbuild/SRPMS
+build_command: cd contrib; sh build.sh
