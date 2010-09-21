@@ -78,7 +78,7 @@ rm ../cloud-servers-vpc.filelist.%{name}
 %doc
 
 %changelog
-* Tue Sep 31 2010 Dan Prince <dan.prince@rackspace.com> - 1.6.0
+* Tue Sep 21 2010 Dan Prince <dan.prince@rackspace.com> - 1.6.0
 - Rename to Cloud Servers VPC.
 - Updated to use ruby-cloudservers API.
 - Add support for Ubuntu and Fedora.
