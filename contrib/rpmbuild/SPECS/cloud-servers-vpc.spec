@@ -78,7 +78,7 @@ rm ../cloud-servers-vpc.filelist.%{name}
 %doc
 
 %changelog
-* Sat Sep 11 2010 Dan Prince <dan.prince@rackspace.com> - 1.6.0
+* Tue Sep 31 2010 Dan Prince <dan.prince@rackspace.com> - 1.6.0
 - Rename to Cloud Servers VPC.
 - Updated to use ruby-cloudservers API.
 - Add support for Ubuntu and Fedora.
@@ -89,6 +89,9 @@ rm ../cloud-servers-vpc.filelist.%{name}
 - Display the account on the servers page.
 - Attempt to ifdown eth0 up to 5 times when initially configuring a client.
 - Allow at least 2 minutes to perform the server online check.
+- Back to TCP for OpenVPN. Some distros (Ubuntu) seem to get connection errors with UDP.
+- Updated to use rackspace/ruby-cloudservers instead of the rackspace-cloud gem.
+- Write out the SSH identity file using OpenVPN lib.
 * Tue Sep 3 2010 Dan Prince <dan.prince@rackspace.com> - 1.5.1
 - Fix an issue where account credentials were being cached in
   the Rackspace::Connection class.
