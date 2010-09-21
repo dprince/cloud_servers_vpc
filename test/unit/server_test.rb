@@ -28,6 +28,28 @@ class ServerTest < ActiveSupport::TestCase
 
 	end
 
+	test "create server with dash and dot" do
+
+		server=Server.new(
+			:name => "test1-.",
+			:description => "test description",
+			:flavor_id => 1,
+			:image_id => 1,
+			:account_id => users(:bob).account_id
+		)
+
+		group=server_groups(:one)
+		group.servers << server
+
+		assert server.valid?, "Server should be valid."
+		assert server.save, "Server should have been saved."
+
+		server=Server.find(server.id)
+
+		assert_equal users(:bob).account, server.account
+
+	end
+
 	test "missing name" do
 
 		server=Server.new(
@@ -126,7 +148,7 @@ class ServerTest < ActiveSupport::TestCase
 	test "create server with invalid name" do
 
 		server=Server.new(
-			:name => "test 1_.*",
+			:name => "test 1_*",
 			:description => "test description",
 			:flavor_id => 1,
 			:image_id => 1,

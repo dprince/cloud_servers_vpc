@@ -21,7 +21,7 @@ class Server < ActiveRecord::Base
 	validates_uniqueness_of :name, :scope => :server_group_id
 	has_many :vpn_network_interfaces, :dependent => :destroy
 	has_many :server_errors
-	validates_format_of :name, :with => /^[A-Za-z0-9-]+$/, :message => "Server name must use valid hostname characters (A-Z, a-z, 0-9, dash)."
+	validates_format_of :name, :with => /^[A-Za-z0-9\-\.]+$/, :message => "Server name must use valid hostname characters (A-Z, a-z, 0-9, dash)."
 	validates_length_of :name, :maximum => 255
 	validates_length_of :description, :maximum => 255
 
