@@ -49,7 +49,7 @@ class Client
 			tar xzf /etc/openvpn/cert.tar.gz
 			#{IO.read(File.join(File.dirname(__FILE__), "client_functions.bash"))}
 			init_client_etc_hosts '#{client_hostname}' '#{@server.domain_name}' '#{internal_vpn_ip}'
-			create_client_config #{@server.internal_ip_addr} #{@server.vpn_ipaddr} #{client_hostname}
+			create_client_config #{@server.internal_ip_addr} #{@server.vpn_ipaddr} #{client_hostname} #{@server.domain_name}
 		SCRIPT_EOF
 		return Util::Ssh.run_cmd(@external_ip_addr, script, @ssh_as_user, @ssh_identity_file, @logger)
 

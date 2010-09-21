@@ -10,7 +10,7 @@ function fail {
 
 function create_client_config {
 
-	if (( $# != 3 )); then
+	if (( $# != 4 )); then
 		echo "Failed to configure client for OpenVPN."
 		echo "usage: create_client_config <server_ip> <vpn_ip> <client_name>."
 		exit 1
@@ -19,13 +19,14 @@ function create_client_config {
 local SERVER_IP=$1 #Example: 10.0.0.1
 local VPN_IP=$2 #Example: 172.19.0.22
 local CLIENT_NAME=$3 #Example client1
+local DOMAIN_NAME=$4 #Example mydomain.net
 
 mkdir -p "$OPENVPN_CONFIG_DIR/" 2> /dev/null
 echo -n "Creating openvpn client config file..."
 cat > "$OPENVPN_CONFIG_DIR/$CLIENT_NAME.conf" <<-EOF_CAT
 client
 dev tun
-proto udp
+proto tcp
 
 #Change my.publicdomain.com to your public domain or IP address
 remote $SERVER_IP 1194
@@ -54,7 +55,10 @@ echo -n "Creating openvpn client up.bash..."
 cat > "$OPENVPN_CONFIG_DIR/up.bash" <<-EOF_CAT
 #!/bin/bash
 mv /etc/resolv.conf /etc/resolv.conf.bak
-echo "nameserver $VPN_IP" > /etc/resolv.conf
+cat > /etc/resolv.conf <<-"EOF_RESOLV_CONF"
+search $DOMAIN_NAME
+nameserver $VPN_IP
+EOF_RESOLV_CONF
 EOF_CAT
 [[ $? == 0 ]] || fail "Failed to create up.bash."
 chmod 755 $OPENVPN_CONFIG_DIR/up.bash

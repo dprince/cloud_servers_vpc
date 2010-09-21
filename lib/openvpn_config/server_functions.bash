@@ -140,8 +140,8 @@ function create_client_key {
 	if ! grep "$CLIENT_INTERNAL_IP" /etc/hosts > /dev/null; then
 		echo "$CLIENT_INTERNAL_IP	$CLIENT_NAME.$CLIENT_DOMAIN $CLIENT_NAME" >> /etc/hosts
 	fi
-	#/sbin/service dnsmasq reload
-	/etc/init.d/dnsmasq reload
+
+	/etc/init.d/dnsmasq reload || /etc/init.d/dnsmasq restart
 
 }
 
@@ -210,7 +210,7 @@ function create_server_config {
 
 cat > "$OPENVPN_CONFIG_DIR/server.conf" <<-EOF_CAT
 port 1194
-proto udp
+proto tcp
 dev tun
 ca keys/ca.crt
 cert keys/$SERVER_KEY_NAME.crt
