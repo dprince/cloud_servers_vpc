@@ -10,15 +10,9 @@ Servers VPC RPMs must be available via Yum. Supports RHEL 5 nodes w/ EPEL.
 
 = ATTRIBUTES: 
 
-cloud_servers_vpc[:auth_username]= username that will be required to access
- the web UI and REST interfaces.
+cloud_servers_vpc[:rackspace_cloud_username]= Optional. If specified a /root/.rackspace_cloud config file is writting into the cloud server group that contains this username.
 
-cloud_servers_vpc[:auth_password]= password that will be required to access
- the web UI and REST interfaces.
-
-cloud_servers_vpc[:rackspace_cloud_username]= Rackspace Cloud account username
-
-cloud_servers_vpc[:rackspace_cloud_api_key]= Rackspace Cloud account api key
+cloud_servers_vpc[:rackspace_cloud_api_key]= Optional. If specified a /root/.rackspace_cloud config file is writting into the cloud server group that contains this api key.
 
 Optional attributes:
 
@@ -39,8 +33,6 @@ is used to obtain Openvpn packages.
 Example attributes in JSON:
 
     "cloud_servers_vpc": {
-        "auth_username": "jimmy",
-        "auth_password": "admin123",
         "rackspace_cloud_username": "test1",
         "rackspace_cloud_api_key": "620ba3c2680ca1c26a0ca1c2",
         "epel_base_url": "http://mirror.rackspace.com"
