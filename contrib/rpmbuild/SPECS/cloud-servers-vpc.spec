@@ -1,8 +1,8 @@
 %define debug_package %{nil}
 
 Name: cloud-servers-vpc
-Version: 0.0
-Release: trunk
+Version: 1.6.0
+Release: 1
 Summary: Rackspace Cloud Servers Virtual Private Cloud application
 Packager: Dan Prince <dan.prince@rackspace.com>
 Group: Applications/Internet
