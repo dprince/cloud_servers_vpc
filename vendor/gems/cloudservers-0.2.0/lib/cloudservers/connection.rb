@@ -95,7 +95,8 @@ module CloudServers
     #   => [{:name=>"demo-standingcloud-lts", :id=>168867}, 
     #       {:name=>"demo-aicache1", :id=>187853}]
     def list_servers(options = {})
-      path = CloudServers.paginate(options).empty? ? "#{svrmgmtpath}/servers" : "#{svrmgmtpath}/servers?#{CloudServers.paginate(options)}"
+      anti_cache_param="cacheid=#{Time.now.to_i}"
+      path = CloudServers.paginate(options).empty? ? "#{svrmgmtpath}/servers?#{anti_cache_param}" : "#{svrmgmtpath}/servers?#{CloudServers.paginate(options)}&#{anti_cache_param}"
       response = csreq("GET",svrmgmthost,path,svrmgmtport,svrmgmtscheme)
       CloudServers::Exception.raise_exception(response) unless response.code.match(/^20.$/)
       CloudServers.symbolize_keys(JSON.parse(response.body)["servers"])
