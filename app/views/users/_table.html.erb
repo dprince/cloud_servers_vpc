@@ -6,7 +6,7 @@
 
 </script>
 
-<%= will_paginate @users, :class => "user-paginate" %>
+<%= will_paginate @users, :params => {:layout => false}, :class => "user-paginate" %>
 
 <table class="ui-widget ui-widget-content data">
   <tr class="ui-widget-header">

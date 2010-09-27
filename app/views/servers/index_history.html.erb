@@ -1,0 +1,24 @@
+<div id="server-history" class="ui-widget">
+
+<script>
+
+    globalRefreshURL="/servers?historical=1"
+    globalRefreshDivId="#server-history-table"
+
+    $(document).ready(function() {
+        server_history_selectors();
+    });
+
+</script>
+
+<div class="title">
+<h3>Server History</h3>
+</div>
+
+<div id="server-history-errors-dialog"></div>
+
+<div id="server-history-table">
+    <%= render :partial => 'table_history' %>
+</div>
+
+</div>

@@ -56,9 +56,23 @@ class ServersController < ApplicationController
       @server_groups=ServerGroup.find(:all, :conditions => ["historical = 0 AND user_id = ?", session[:user_id]], :order => "name")
     end
 
-    respond_to do |format|
-      format.html # index.html.erb
-      format.xml  { render :xml => @servers }
+    if params[:layout] then
+        respond_to do |format|
+          if @historical == "1" then
+            format.html { render :action => "index_history" }
+          else
+            format.html # index.html.erb
+          end
+        end
+    else
+      respond_to do |format|
+        if @historical == "1" then
+          format.html { render :partial => "table_history" }
+        else
+          format.html { render :partial => "table" }
+        end
+        format.xml  { render :xml => @servers }
+      end
     end
 
   end

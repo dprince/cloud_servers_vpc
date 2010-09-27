@@ -1,90 +1,21 @@
-<% div_name = @historical == "1" ? "server_history" : "servers" %>
-<div id="<%= div_name %>" class="ui-widget">
+<div id="servers" class="ui-widget">
 
 <script>
 
-$(".server-paginate a").click(function(e){
-     e.preventDefault();
+    globalRefreshURL="/servers"
+    globalRefreshDivId="#servers-table"
 
-    globalRefreshURL=$(this).attr("href");
-    globalRefreshDivId="#<%= div_name %>"
-
-     $.get($(this).attr("href"), function(html_snippet) {
-
-       $("#<%= div_name %>").html(
-            html_snippet
-       );
-
-     });
-
-   });
-
-<%if @historical == "0" %>
-$("select").change(function(){
-
-	if ($('#server_group_select').attr('name') !== undefined) {
-		server_group_id=document.form_server_group_<%= div_name %>.elements['server_group_id'].value;
-		globalRefreshURL="/servers?server_group_id="+server_group_id
-    }
-
-    globalRefreshDivId="#<%= div_name %>"
-
-     $.get(globalRefreshURL, function(html_snippet) {
-
-       $("#<%= div_name %>").html(
-            html_snippet
-       );
-
-     });
-
-   });
-<% end %>
-
-$("#server-errors-dialog").dialog({
-    autoOpen: false,
-    modal: true,
-    height: 250,
-    width: 300,
-    buttons: {
-        Close: function() {
-            $(this).dialog('close');
-        }
-    }
-});
-
-$(".show-server-errors").click(function(e){
-
-    e.preventDefault();
-
-    id=(e.target+"").replace(/.*:.*\//,'');
-    $("#server-errors-dialog").dialog('open');
-
-    $.get("/server_errors.xml?server_id="+id, function(xml) {
-
-			dialog_html="<b>Server Errors:</b><ul>";
-            $("server-error", xml).each(function(index) {
-
-                dialog_html+="<li>"+$(this).find("error-message").text()+"</li>";
-
-            });
-			dialog_html+="</ul>";
-            $("#server-errors-dialog").html(dialog_html);
-
+    $(document).ready(function() {
+        server_selectors();
     });
-
-   });
 
 </script>
 
-<%if @historical == "1" %>
-<h3>Server History</h3>
-<% else %>
+<div class="title">
 <h3>Servers</h3>
-<% end %>
+</div>
 
-<form name="form_server_group_<%= div_name %>">
-	<input name="historical" type="hidden" value="<%= @historical %>" />
-<%if @historical == "0" %>
+<form name="form_server_group_servers">
 	Select a group:
 	<select id="server_group_select" name="server_group_id">
 	<%= 
@@ -95,72 +26,12 @@ $(".show-server-errors").click(function(e){
 	%>
 	<%= options_for_select(sg_arr, :selected => @server_group_id) %>
 	</select>
-<% end %>
 </form>
 
-<%= will_paginate @servers, :class => "server-paginate" %>
+<div id="server-errors-dialog"></div>
 
-<table class="ui-widget ui-widget-content data">
-  <tr class="ui-widget-header">
-    <th>Group (ID)</th>
-	<th>Owner</th>
-	<th>Account</th>
-    <th>Server Name</th>
-    <th>IP addr(ext/int)</th>
-    <th>CS ID</th>
-    <th>Flavor</th>
-    <th>Image</th>
-    <th>VPN Server</th>
-<%if @historical == "1" %>
-    <th>Historical Status</th>
-<% else %>
-    <th>Status</th>
-<% end %>
-    <th>Retries</th>
-    <th>Last Error Msg</th>
-  <!--  <th colspan="3">&nbsp;</th> -->
-  </tr>
-
-<% @servers.each do |server| %>
-  <tr id="tr-<%= server.id %>" class="<%= cycle "tr0", "tr1" %>">
-    <td><%= chop_for_html(server.server_group.name, 20) %>(<%= server.server_group.id %>)</td>
-    <td><%= chop_for_html(server.server_group.owner_name) %></td>
-    <td><%= chop_for_html(server.account.cloud_servers_username) %></td>
-    <td><%= chop_for_html(server.name) %></td>
-	<% if server.external_ip_addr or server.internal_ip_addr %> 
-		<td><%=h server.external_ip_addr %>/<%=h server.internal_ip_addr %></td>
-	<% else %>
-		<td>N/A</td>
-	<% end %>
-    <td><%=h server.cloud_server_id_number %></td>
-    <td><%=h flavor_name(server.flavor_id) %></td>
-    <td><%= chop_for_html(image_name(server.image_id), 15) %></td>
-    <td><%=h server.openvpn_server %></td>
-    <td nowrap><%= status_image(server.status) %></td>
-    <td>
-		<% if server.retry_count > 0 then %>
-		<%= link_to "#{server.retry_count}&nbsp;(view)", server, { :class => "show-server-errors" } %>
-		<% else %>
-			<%=h server.retry_count %>
-		<% end %>
-	</td>
-	<% if server.error_message then %>
-		<td><%= chop_for_html(server.error_message) %></td>
-	<% else %>
-		<td>&nbsp;</td>
-	<% end %>
-<!--
-    <td><%= link_to 'Show', server %></td>
-    <td><%= link_to 'Edit', edit_server_path(server) %></td>
-    <td><%= link_to 'Destroy', server, :confirm => 'Are you sure?', :method => :delete %></td>
--->
-  </tr>
-<% end %>
-
-<% if @servers.size == 0 then %>
-	<td colspan="11">No servers.</td>
-<% end %>
-
-</table>
+<div id="servers-table">
+    <%= render :partial => 'table' %>
+</div>
 
 </div>
