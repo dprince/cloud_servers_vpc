@@ -1,0 +1,11 @@
+# Read about fixtures at http://ar.rubyonrails.org/classes/Fixtures.html
+
+bob_ssh_public_key:
+  public_key: AABBCCDD112233
+  description: Bob Home
+  user: bob
+
+jim_ssh_public_key:
+  public_key: AABBCCDD112233
+  description: Jim Home
+  user: jim

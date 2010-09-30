@@ -9,6 +9,8 @@ ActionController::Routing::Routes.draw do |map|
 
   map.resources :server_errors
 
+  map.resources :ssh_public_keys
+
   map.resources :users, :member => { :password => :get }
 
   map.root :controller => "auth"
