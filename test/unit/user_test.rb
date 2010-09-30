@@ -43,6 +43,32 @@ class ServerTest < ActiveSupport::TestCase
 
 	end
 
+	test "user with ssh keys" do
+
+		user=User.new(
+			:username => "testsshkey",
+			:first_name => "Test",
+			:last_name => "SshKey",
+			:password => "test123"
+		)
+		assert_equal true, user.save, "User should save."
+
+		user.ssh_public_keys << SshPublicKey.create(:description => "Work", :public_key => "AABBCCDD112233")
+
+		assert_equal true, user.save, "User should save."
+
+		assert_equal "Work", user.ssh_public_keys[0].description
+		assert_equal "AABBCCDD112233", user.ssh_public_keys[0].public_key
+
+		user.ssh_public_keys << SshPublicKey.create(:description => "Home", :public_key => "AABBCCDD11223344")
+
+		assert_equal true, user.save, "User should save."
+
+		assert_equal 2, user.ssh_public_keys.size, "User should have two keys."
+
+
+	end
+
 	test "user authenticate" do
 		assert User.authenticate(users(:admin).username, "cloud")
 	end

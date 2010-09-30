@@ -9,6 +9,7 @@ class User < ActiveRecord::Base
     validates_confirmation_of :password, :message => "Passwords do not match.", :if => :password
     validates_length_of :password, :in => 6..32, :allow_blank => false, :message => "Password must be between 6 and 32 characters.", :if => :password
     belongs_to :account
+    has_many :ssh_public_keys, :dependent => :destroy
 
     attr_accessor :password_confirmation
 
