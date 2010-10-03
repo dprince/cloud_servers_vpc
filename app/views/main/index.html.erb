@@ -9,6 +9,7 @@
     <%= javascript_include_tag "application" %>
     <%= javascript_include_tag "users" %>
     <%= javascript_include_tag "servers" %>
+    <%= javascript_include_tag "server_groups" %>
     <%= javascript_include_tag "server_history" %>
 	<link href="/stylesheets/jquery-ui-1.8.custom.css" media="all" rel="stylesheet" type="text/css" />
 	<link href="/stylesheets/default.css" media="all" rel="stylesheet" type="text/css" />
@@ -115,7 +116,7 @@ function reset_tab_anchors() {
 
 <div id="tabs">
 	<ul>
-		<li><a href="/server_groups">Groups</a></li>
+		<li><a href="/server_groups?layout=true">Groups</a></li>
 		<li><a href="/servers">Servers</a></li>
 		<li><a href="/servers?historical=1">History</a></li>
 		<% if is_admin then %>

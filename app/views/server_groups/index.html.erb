@@ -2,94 +2,21 @@
 
 <script>
 
-$(".servergroup-paginate a").click(function(e){
-     e.preventDefault();
+    globalRefreshURL="/server_groups"
+    globalRefreshDivId="#server-groups-table"
 
-    globalRefreshURL=$(this).attr("href");
-    globalRefreshDivId="#server_groups"
-
-     $.get($(this).attr("href"), function(html_snippet) {
-
-       $("#server_groups").html(
-            html_snippet
-       );
-
-     });
-
-   });
-
-$(".server-group-delete").click(function(e){
-
-    e.preventDefault();
-
-    if (!confirm("Delete group?")) {
-        return;
-    }
-
-    $.ajax({
-        url: $(this).attr("href")+".xml",
-        type: 'POST',
-        data: { _method: 'delete' },
-        success: function(data) {
-            id=$("id", data).text();
-            $("#tr-"+id).remove();
-        },
-        error: function(data) {
-            alert('Error: Failed to delete record.');
-        }
+    $(document).ready(function() {
+        server_group_selectors();
     });
-
-   });
 
 </script>
 
 <h3>Groups</h3>
 
-<!--<%= link_to 'Create New Group', new_server_group_path %>-->
+<!--<%= link_to 'New Group', { :controller => "server_groups", :action => "new"}, { :id => "server-group-new-link" } %><br/><br/>-->
 
-<%= will_paginate @server_groups, :class => "servergroup-paginate" %>
-
-<table class="ui-widget ui-widget-content data">
-  <tr class="ui-widget-header">
-    <th>ID</th>
-    <th>Name</th>
-    <th>Description</th>
-    <th>Account</th>
-    <th>Owner</th>
-    <th>VPN network</th>
-    <th>VPN subnet</th>
-    <th>Created at</th>
-    <th>Size</th>
-    <th colspan="1">&nbsp;</th>
-  </tr>
-
-<% @server_groups.each do |server_group| %>
-  <tr id="tr-<%= server_group.id %>" class="<%= cycle "tr0", "tr1" %>">
-    <td><%= server_group.id %></td>
-    <td><%= chop_for_html(server_group.name) %></td>
-    <td><%= chop_for_html(server_group.description) %></td>
-<% if server_group.user.account.cloud_servers_username then %>
-    <td><%= chop_for_html(server_group.user.account.cloud_servers_username) %></td>
-<% else %>
-    <td>&nbsp;</td>
-<% end %>
-    <td><%= chop_for_html(server_group.owner_name) %></td>
-    <td><%=h server_group.vpn_network %></td>
-    <td><%=h server_group.vpn_subnet %></td>
-    <td><%= timestamp(server_group.created_at.in_time_zone) %></td>
-    <td><%= server_group.servers.size %></td>
-<!--
-    <td><%= link_to 'Show', server_group %></td>
-    <td><%= link_to 'Edit', edit_server_group_path(server_group) %></td>
--->
-    <td><%= link_to 'Destroy', server_group, { :class => "server-group-delete" } %></td>
-  </tr>
-<% end %>
-
-<% if @server_groups.size == 0 then %>
-    <td colspan="5">No server groups.</td>
-<% end %>
-
-</table>
+<div id="server-groups-table">
+    <%= render :partial => 'table' %>
+</div>
 
 </div>

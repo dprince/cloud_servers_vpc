@@ -25,9 +25,15 @@ class ServerGroupsController < ApplicationController
 		@server_groups = ServerGroup.paginate :conditions => ["user_id = ? AND historical = ?", session[:user_id], historical_false], :page => params[:page] || 1, :per_page => limit, :order => "name", :include => [ { :user => [:account] } ]
 	end
 
-    respond_to do |format|
-      format.html # index.html.erb
-      format.xml  { render :xml => @server_groups }
+    if params[:layout] then
+      respond_to do |format|
+        format.html # index.html.erb
+      end
+    else
+      respond_to do |format|
+        format.html { render :partial => "table" }
+        format.xml  { render :xml => @server_groups }
+      end
     end
 
   end
