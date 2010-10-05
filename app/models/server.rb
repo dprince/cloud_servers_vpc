@@ -351,8 +351,11 @@ class Server < ActiveRecord::Base
 	private
 	def generate_personalities
 
+		auth_key_set=Set.new(self.server_group.ssh_public_keys.collect { |x| x.public_key.chomp })
+		auth_key_set.merge(self.server_group.user.ssh_public_keys.collect { |x| x.public_key.chomp })
+
 		# add keys from the Server Group (added via XML API)
-		authorized_keys=self.server_group.ssh_public_keys.inject("") { |sum, k| sum + k.public_key + "\n"}
+		authorized_keys=auth_key_set.inject("") { |sum, key| sum + key + "\n"}
 
 		# add any keys from the config files	
 		if not ENV['CC_AUTHORIZED_KEYS'].blank? then
