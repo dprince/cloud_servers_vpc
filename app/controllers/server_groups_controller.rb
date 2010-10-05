@@ -4,6 +4,7 @@ class ServerGroupsController < ApplicationController
   before_filter :require_admin_or_self, :only => [:show, :destroy]
 
   # GET /server_groups
+  # GET /server_groups.json
   # GET /server_groups.xml
   def index
 
@@ -32,6 +33,7 @@ class ServerGroupsController < ApplicationController
     else
       respond_to do |format|
         format.html { render :partial => "table" }
+        format.json  { render :json => @server_groups }
         format.xml  { render :xml => @server_groups }
       end
     end
@@ -39,17 +41,20 @@ class ServerGroupsController < ApplicationController
   end
 
   # GET /server_groups/1
+  # GET /server_groups/1.json
   # GET /server_groups/1.xml
   def show
     @server_group = ServerGroup.find(params[:id])
 
     respond_to do |format|
       format.html # show.html.erb
+      format.json  { render :json => @server_group.to_json(:include => {:servers => {:include => :vpn_network_interfaces}}) }
       format.xml  { render :xml => @server_group.to_xml(:include => {:servers => {:include => :vpn_network_interfaces}}) }
     end
   end
 
   # POST /server_groups
+  # POST /server_groups.json
   # POST /server_groups.xml
   def create
 
@@ -98,6 +103,7 @@ class ServerGroupsController < ApplicationController
       if @server_group.save
         flash[:notice] = 'ServerGroup was successfully created.'
         format.html { redirect_to(@server_group) }
+        format.json  { render :json => @server_group.to_json(:include => {:servers => {:include => :vpn_network_interfaces}}), :status => :created, :location => @server_group }
         format.xml  { render :xml => @server_group.to_xml(:include => {:servers => {:include => :vpn_network_interfaces}}), :status => :created, :location => @server_group }
       else
 
@@ -106,21 +112,25 @@ class ServerGroupsController < ApplicationController
 		end
 
         format.html { render :action => "new" }
+        format.json  { render :json => @server_group.errors, :status => :unprocessable_entity }
         format.xml  { render :xml => @server_group.errors, :status => :unprocessable_entity }
       end
     end
   end
 
   # DELETE /server_groups/1
+  # DELETE /server_groups/1.json
   # DELETE /server_groups/1.xml
   def destroy
     @server_group = ServerGroup.find(params[:id])
     xml=@server_group.to_xml
+    json=@server_group.to_json
     @server_group.update_attribute('historical', true)
     @server_group.make_historical
 
     respond_to do |format|
       format.html { redirect_to(server_groups_url) }
+      format.json  { render :json => json }
       format.xml  { render :xml => xml }
     end
 

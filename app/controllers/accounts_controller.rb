@@ -4,6 +4,7 @@ class AccountsController < ApplicationController
   before_filter :require_admin_or_self, :only => [:update]
 
   # POST /accounts
+  # POST /accounts.json
   # POST /accounts.xml
   def create
     @account = Account.new(params[:account])
@@ -11,15 +12,18 @@ class AccountsController < ApplicationController
     respond_to do |format|
       if @account.save
         #format.html { redirect_to(@account, :notice => 'Account was successfully created.') }
+        format.json  { render :json => @account, :status => :created, :location => @account }
         format.xml  { render :xml => @account, :status => :created, :location => @account }
       else
         #format.html { render :action => "new" }
+        format.json  { render :json => @account.errors, :status => :unprocessable_entity }
         format.xml  { render :xml => @account.errors, :status => :unprocessable_entity }
       end
     end
   end
 
   # PUT /accounts/1
+  # PUT /accounts/1.json
   # PUT /accounts/1.xml
   def update
     @account = Account.find(params[:id])
@@ -28,9 +32,11 @@ class AccountsController < ApplicationController
       if @account.update_attributes(params[:account])
         format.html { redirect_to(@account, :notice => 'Account was successfully updated.') }
         #format.xml  { head :ok }
+        format.json  { render :json => @account }
         format.xml  { render :xml => @account }
       else
         #format.html { render :action => "edit" }
+        format.json  { render :json => @account.errors, :status => :unprocessable_entity }
         format.xml  { render :xml => @account.errors, :status => :unprocessable_entity }
       end
     end

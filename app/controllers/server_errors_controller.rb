@@ -3,6 +3,7 @@ class ServerErrorsController < ApplicationController
   before_filter :authorize
 
   # GET /server_errors
+  # GET /server_errors.json
   # GET /server_errors.xml
   def index
 
@@ -38,6 +39,7 @@ class ServerErrorsController < ApplicationController
 
     respond_to do |format|
       #format.html # index.html.erb
+      format.json  { render :json => @server_errors }
       format.xml  { render :xml => @server_errors }
     end
   end

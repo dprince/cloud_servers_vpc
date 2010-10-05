@@ -1,190 +1,63 @@
 <% if @user.id == session[:user_id] then %>
-<h2>User Settings</h2>
+<h2>Settings</h2>
 <% else %>
-<h1>User Settings: <%= @user.username %></h1>
+<h1>Settings: <%= @user.username %></h1>
 <% end %>
 
-<% blank_div_display=@account.cloud_servers_username.blank? ? "inline" : "none"  %>
-<div id="my-account-blank-messages" class="ui-widget" style="display: <%= blank_div_display %>">
+<div id="my-settings-messages" class="ui-widget" style="display: none">
     <div class="ui-state-highlight ui-corner-all" style="padding: .25em .25em .25em 2.5em;">
 <p><span class="ui-icon ui-icon-alert" style="float: left; margin-right: .3em;"></span>
-Note: Cloud Servers Account information is empty.
+<div id="my-settings-messages-content"></div>
 </p>
     </div>
 </div>
 
 <script type="text/javascript">
+
+function reset_settings_message() {
+
+$("#my-settings-messages").hide();
+$("#my-settings-messages-content").html("");
+
+}
+
+function append_settings_message(msg) {
+
+$("#my-settings-messages").show();
+$("#my-settings-messages-content").append(msg);
+
+}
 
 $(document).ready(function() {
 
-    $(".my-password-link").click(function(e){
-         e.preventDefault();
-         $("#my-change-password-div").show();
-         $('.my-links').hide();
-    });
-
-    $(".my-password-cancel").click(function(e){
-         e.preventDefault();
-		 $("#my-password-error-messages").css("display", "none");
-         $("#my-password-error-messages-content").html("");
-         $("#my-change-password-div").hide();
-         $('.my-links').show();
-    });
-
-    $('input.mypassword').keydown(function(e){
-        if (e.keyCode == 13) {
-            my_password();
-            return false;
-        }
-    });
-
-    $(".my-account-link").click(function(e){
-         e.preventDefault();
-         $("#my-account-div").show();
-         $('.my-links').hide();
-    });
-
-    $(".my-account-cancel").click(function(e){
-         e.preventDefault();
-		 $("#my-account-error-messages").css("display", "none");
-         $("#my-account-error-messages-content").html("");
-         $("#my-account-div").hide();
-         $('.my-links').show();
-    });
-
-    $('input.myaccount').keydown(function(e){
-        if (e.keyCode == 13) {
-            my_account();
-            return false;
-        }
-    });
-
+  $("#settings-accordion").accordion({
+    autoHeight: false,
+    change: function(event, ui) {
+      reset_my_account_divs();
+      reset_my_password_divs();
+      reset_my_ssh_public_keys_divs();
+      reset_settings_message();
+    }
+  });
 });
 
-function my_password() {
-
-    var post_data = $("#my-password-form").serialize();
-    $.ajax({
-        url: $("#my-password-form").attr("action")+".xml",
-        type: 'POST',
-        data: post_data,
-        success: function(data) {
-		    $("#my-password-error-messages").css("display", "none");
-            $("#my-password-error-messages-content").html("");
-            $("#my-change-password-div").hide();
-            $('.my-links').show();
-        },
-        error: function(data) {
-            $("#my-password-error-messages").css("display", "inline");
-            err_html="<ul>";
-            $("error", data.responseXML).each (function() {
-                err_html+="<li>"+$(this).text()+"</li>";
-            });
-            err_html+="</ul>";
-            $("#my-password-error-messages-content").html(err_html);
-        }
-    });
-
-}
-
-function my_account() {
-
-    var post_data = $("#my-account-form").serialize();
-    $.ajax({
-        url: $("#my-account-form").attr("action")+".xml",
-        type: 'POST',
-        data: post_data,
-        success: function(data) {
-		    $("#my-account-error-messages").css("display", "none");
-            $("#my-account-error-messages-content").html("");
-            $("#my-account-div").hide();
-            $('.my-links').show();
-            if ($("cloud-servers-username", data).text() != "") {
-				$("#my-account-blank-messages").hide();
-			} else {
-				$("#my-account-blank-messages").show();
-			}
-        },
-        error: function(data) {
-            $("#my-account-error-messages").css("display", "inline");
-            err_html="<ul>";
-            $("error", data.responseXML).each (function() {
-                err_html+="<li>"+$(this).text()+"</li>";
-            });
-            err_html+="</ul>";
-            $("#my-account-error-messages-content").html(err_html);
-        }
-    });
-
-}
-
 </script>
 
-<p>
-<b>Username</b>: <%= @user.username %>
-<br/>
-<b>First Name</b>: <%= @user.first_name %>
-<br/>
-<b>Last Name</b>: <%= @user.last_name %>
-</p>
+<div id="settings-accordion">
 
-<div id="my-change-password-div" style="display: none;">
-<hr/>
-<div id="my-password-error-messages" class="ui-widget" style="display: none">
-    <div class="ui-state-error ui-corner-all" style="padding: .25em .25em .25em 2.5em;">
-<p><span class="ui-icon ui-icon-alert" style="float: left; margin-right: .3em;"></span>
-<div id="my-password-error-messages-content"></div>
-</p>
+    <h3><a href="#">Cloud Servers Account</a></h3>
+    <div>
+<%= render :partial => 'account' %>
     </div>
-</div>
 
-<script type="text/javascript">
-
-</script>
-
-<% form_for(@user, :html => { :id => "my-password-form", :onsubmit => "my_password(); return false;"}) do |f| %>
-
-  <p>
-    <%= f.label :password %><br />
-    <%= f.password_field :password, :class => "mypassword" %><br />
-    <%= f.label :password_confirmation %><br />
-    <%= f.password_field :password_confirmation, :class => "mypassword" %><br />
-    <%= f.submit 'Change Password' %> <%= link_to 'Cancel', "#", { :class => "my-password-cancel" } %>
-  </p>
-
-<% end %>
-<hr/>
-</div>
-
-<div id="my-account-div" style="display: none;">
-<hr/>
-<div id="my-account-error-messages" class="ui-widget" style="display: none">
-    <div class="ui-state-error ui-corner-all" style="padding: .25em .25em .25em 2.5em;">
-<p><span class="ui-icon ui-icon-alert" style="float: left; margin-right: .3em;"></span>
-<div id="my-account-error-messages-content"></div>
-</p>
+    <h3><a href="#">SSH Public Keys</a></h3>
+    <div>
+<%= render :partial => 'ssh_public_keys' %>
     </div>
-</div>
 
-<script type="text/javascript">
+    <h3><a href="#">Change Password</a></h3>
+    <div>
+<%= render :partial => 'password' %>
+    </div>
 
-</script>
-
-<% form_for(@account, :html => { :id => "my-account-form", :onsubmit => "my_account(); return false;"}) do |f| %>
-
-  <p>
-    <%= f.label :cloud_servers_username %><br />
-    <%= f.text_field :cloud_servers_username, :class => "myaccount" %><br />
-    <%= f.label :cloud_servers_api_key %><br />
-    <%= f.text_field :cloud_servers_api_key, :class => "myaccount" %><br />
-    <%= f.submit 'Update Account' %> <%= link_to 'Cancel', "#", { :class => "my-account-cancel" } %>
-  </p>
-
-<% end %>
-<hr/>
-</div>
-
-<div class="my-links">
-<%= link_to 'Update Cloud Servers Account', "#", { :class => "my-account-link" } %><br/>
-<%= link_to 'Change Password', "#", { :class => "my-password-link" } %>
 </div>

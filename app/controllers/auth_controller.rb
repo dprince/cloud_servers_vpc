@@ -3,9 +3,9 @@ class AuthController < ApplicationController
     before_filter :authorize, :only => :logout
 
     def index
-		respond_to do |format|
-		  format.html # show.html.erb
-		end
+        respond_to do |format|
+          format.html # show.html.erb
+        end
     end
 
     def login
@@ -16,7 +16,7 @@ class AuthController < ApplicationController
                 flash[:notice] = nil
                 redirect_to("/main")
             else
-				render :text => "Authentication failed.", :status => 401
+                render :text => "Authentication failed.", :status => 401
             end
         end
     end

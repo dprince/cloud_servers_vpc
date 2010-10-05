@@ -42,7 +42,7 @@ $(".server-group-delete").click(function(e){
         data: { _method: 'delete' },
         success: function(data) {
             id=$("id", data).text();
-            $("#tr-"+id).remove();
+            $("#server-group-tr-"+id).remove();
         },
         error: function(data) {
             alert('Error: Failed to delete record.');

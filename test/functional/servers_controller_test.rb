@@ -62,6 +62,15 @@ class ServersControllerTest < ActionController::TestCase
 
   end
 
+  test "should get JSON index for historical records as user" do
+
+	login_as(:bob)
+    get :index, :historical => "1", :format => "json"
+    assert_response :success
+    assert_not_nil assigns(:servers)
+
+  end
+
   test "should show server as admin" do
 	login_as(:admin)
     get :show, :id => servers(:one).to_param

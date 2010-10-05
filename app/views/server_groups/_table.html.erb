@@ -23,7 +23,7 @@
   </tr>
 
 <% @server_groups.each do |server_group| %>
-  <tr id="tr-<%= server_group.id %>" class="<%= cycle "tr0", "tr1" %>">
+  <tr id="server-group-tr-<%= server_group.id %>" class="<%= cycle "tr0", "tr1" %>">
     <td><%= server_group.id %></td>
     <td><%= chop_for_html(server_group.name) %></td>
     <td><%= chop_for_html(server_group.description) %></td>

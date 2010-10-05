@@ -4,6 +4,7 @@ class ServersController < ApplicationController
   before_filter :require_admin_or_self, :except => :index
 
   # GET /servers
+  # GET /servers.json
   # GET /servers.xml
   def index
 
@@ -71,6 +72,7 @@ class ServersController < ApplicationController
         else
           format.html { render :partial => "table" }
         end
+        format.json  { render :json => @servers }
         format.xml  { render :xml => @servers }
       end
     end
@@ -78,12 +80,14 @@ class ServersController < ApplicationController
   end
 
   # GET /servers/1
+  # GET /servers/1.json
   # GET /servers/1.xml
   def show
     @server = Server.find(params[:id])
 
     respond_to do |format|
       format.html # show.html.erb
+      format.json  { render :json => @servers }
       format.xml  { render :xml => @server }
     end
   end
@@ -102,7 +106,10 @@ class ServersController < ApplicationController
     @server.retry_count = 0
     @server.status = "Rebuilding"
     if @server.save and @server.rebuild then
-      render :xml => @server
+      respond_to do |format|
+        format.json  { render :xml => @server }
+        format.xml  { render :xml => @server }
+      end 
     else
       render :text => "Failed to rebuild cloud server.", :status => 500
     end

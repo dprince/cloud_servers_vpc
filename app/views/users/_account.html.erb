@@ -1,0 +1,69 @@
+<script type="text/javascript">
+
+$(document).ready(function() {
+
+    $('input.myaccount').keydown(function(e){
+        if (e.keyCode == 13) {
+            my_account();
+            return false;
+        }
+    });
+
+});
+
+function reset_my_account_divs() {
+  $("#my-account-error-messages").css("display", "none");
+  $("#my-account-error-messages-content").html("");
+}
+
+function my_account() {
+
+    var post_data = $("#my-account-form").serialize();
+    $.ajax({
+        url: $("#my-account-form").attr("action")+".xml",
+        type: 'POST',
+        data: post_data,
+        success: function(data) {
+            $("#my-account-error-messages").css("display", "none");
+            $("#my-account-error-messages-content").html("");
+            if ($("cloud-servers-username", data).text() != "") {
+                reset_settings_message();
+                append_settings_message('Cloud Servers Account information updated.');
+            } else {
+                append_settings_message('Warning: Cloud Servers Account information is empty.');
+            }
+        },
+        error: function(data) {
+            $("#my-account-error-messages").css("display", "inline");
+            err_html="<ul>";
+            $("error", data.responseXML).each (function() {
+                err_html+="<li>"+$(this).text()+"</li>";
+            });
+            err_html+="</ul>";
+            $("#my-account-error-messages-content").html(err_html);
+        }
+    });
+
+}
+
+</script>
+
+<div id="my-account-error-messages" class="ui-widget" style="display: none">
+    <div class="ui-state-error ui-corner-all" style="padding: .25em .25em .25em 2.5em;">
+<p><span class="ui-icon ui-icon-alert" style="float: left; margin-right: .3em;"></span>
+<div id="my-account-error-messages-content"></div>
+</p>
+    </div>
+</div>
+
+<% form_for(@account, :html => { :id => "my-account-form", :onsubmit => "my_account(); return false;"}) do |f| %>
+
+  <p>
+    <%= f.label :cloud_servers_username %><br />
+    <%= f.text_field :cloud_servers_username, :class => "myaccount" %><br />
+    <%= f.label :cloud_servers_api_key %><br />
+    <%= f.text_field :cloud_servers_api_key, :class => "myaccount" %><br />
+    <%= f.submit 'Update Account' %>
+  </p>
+
+<% end %>
