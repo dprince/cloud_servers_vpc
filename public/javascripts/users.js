@@ -123,8 +123,8 @@ function user_selectors() {
 
 			$("#user-dialog").dialog({
 				modal: true,
-                height: 450,
-                width: 700,
+                height: 400,
+                width: 600,
 				buttons: {
 					Save: function() { user_create() }
 				}

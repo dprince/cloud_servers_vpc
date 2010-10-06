@@ -19,7 +19,7 @@
 <div id="header_font_div">Cloud Servers VPC</div>
 
 <div id="login_header">
-<%= link_to 'Settings', "/users/#{session[:user_id]}", { :class => "user-show" } %>&nbsp;/&nbsp;<a id="help_link" href="/help.html" class="help_link">Help</a>&nbsp;/&nbsp;<a id="logout_link" href="/auth/logout" class="logout_link show">Log out</a>
+<%= link_to 'Settings', "/users/#{session[:user_id]}", { :class => "settings-show" } %>&nbsp;/&nbsp;<a id="help_link" href="/help.html" class="help_link">Help</a>&nbsp;/&nbsp;<a id="logout_link" href="/auth/logout" class="logout_link show">Log out</a>
 </div>
 
 <br class="clear"/>
@@ -73,18 +73,18 @@ $(document).ready(function() {
 
 	});
 
-	$(".user-show").click(function(e){
+	$(".settings-show").click(function(e){
 		 e.preventDefault();
 
 		 $.get($(this).attr("href"), function(html_snippet) {
 
-			$("#user-dialog").html(
+			$("#settings-dialog").html(
 				html_snippet
 			);
 
-			$("#user-dialog").dialog({
+			$("#settings-dialog").dialog({
 				modal: true,
-				height: 450,
+				height: 500,
 				width: 700,
 				buttons: {
 					Ok: function() {
@@ -112,7 +112,7 @@ function reset_tab_anchors() {
 
 </script>
 
-<div id="user-dialog"></div>
+<div id="settings-dialog"></div>
 
 <div id="tabs">
 	<ul>
