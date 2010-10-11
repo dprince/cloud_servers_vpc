@@ -22,6 +22,18 @@ class SshPublicKeysController < ApplicationController
     end
   end
 
+  # GET /ssh_public_keys/1
+  # GET /ssh_public_keys/1.json
+  # GET /ssh_public_keys/1.xml
+  def show
+    @ssh_public_key = SshPublicKey.find(params[:id])
+
+    respond_to do |format|
+      format.html # show.html.erb
+      format.json  { render :json => @ssh_public_key }
+      format.xml  { render :xml => @ssh_public_key }
+    end
+  end
 
   # POST /ssh_public_keys
   # POST /ssh_public_keys.json
