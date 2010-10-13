@@ -40,6 +40,18 @@ class ServerGroupsController < ApplicationController
 
   end
 
+  # GET /server_groups/new
+  # GET /server_groups/new.xml
+  def new
+    @server_group = ServerGroup.new
+    @account = User.find(session[:user_id]).account
+
+    respond_to do |format|
+      format.html # new.html.erb
+      format.xml  { render :xml => @server_group }
+    end
+  end
+
   # GET /server_groups/1
   # GET /server_groups/1.json
   # GET /server_groups/1.xml
@@ -60,58 +72,52 @@ class ServerGroupsController < ApplicationController
 
     respond_to do |format|
 			format.html {
-    			@server_group = ServerGroup.new(params[:server_group])
+				sg_params=params[:server_group]
+    			@server_group = ServerGroup.create({
+					:description => sg_params[:description],
+					:name => sg_params[:name],
+					:vpn_network => sg_params[:vpn_network],
+					:vpn_subnet => sg_params[:vpn_subnet],
+					:domain_name => sg_params[:domain_name],
+					:owner_name => sg_params[:owner_name],
+					:user_id => session[:user_id]
+				})
+    			#@server_group = ServerGroup.create(params[:server_group])
     			@server_group.user_id = session[:user_id]
+    			@server_group.update_attributes(params[:server_group])
 			}
 			format.xml {
-					#NOTE: investigate why the from_xml fails with:
-					# 'Server expected, got Hash'
-					# Example: @server_group = @server_group.from_xml(request.raw_post)
-					#
-					# Below is a work around which manually handles the
-					# deserialization from XML
-					hash=Hash.from_xml(request.raw_post)
-
-					servers=[]
-					ssh_public_keys=[]
-					if hash["server_group"]["servers"] then
-						hash["server_group"]["servers"].each do |server_hash|
-							server = Server.new(server_hash)
-							user=User.find(session[:user_id])
-							server.account_id = user.account_id
-							servers << server
-						end
-					end
-
-					if hash["server_group"]["ssh_public_keys"] then
-						hash["server_group"]["ssh_public_keys"].each do |ssh_key_hash|
-							ssh_public_keys << SshPublicKey.new(ssh_key_hash)
-						end
-					end
-
-					group_hash=hash["server_group"]
-					group_hash.delete("servers")
-					group_hash.delete("ssh_public_keys")
-					group_hash[:user_id] = session[:user_id]
-					@server_group = ServerGroup.create(group_hash)
-					@server_group.servers << servers
-					@server_group.ssh_public_keys << ssh_public_keys
+				hash=Hash.from_xml(request.raw_post)
+				@server_group=server_group_from_hash(hash)
+			}
+			format.json {
+				hash=JSON.parse(request.raw_post)
+				hash={"server_group" => hash}
+				@server_group=server_group_from_hash(hash)
 			}
 	end
 
     respond_to do |format|
       if @server_group.save
         flash[:notice] = 'ServerGroup was successfully created.'
-        format.html { redirect_to(@server_group) }
+        #format.html { redirect_to(@server_group) }
+        format.html  { render :xml => @server_group.to_xml(:include => {:servers => {:include => :vpn_network_interfaces}}), :status => :created, :location => @server_group }
         format.json  { render :json => @server_group.to_json(:include => {:servers => {:include => :vpn_network_interfaces}}), :status => :created, :location => @server_group }
         format.xml  { render :xml => @server_group.to_xml(:include => {:servers => {:include => :vpn_network_interfaces}}), :status => :created, :location => @server_group }
       else
 
-		@server_group.errors.each do |error|
-			puts error.to_s
+		#@server_group.errors.each do |error|
+		#	puts error.to_s
+		#end
+		if not @server_group.new_record? then
+			@server_group.servers.each do |server|
+				server.delete
+			end
+			@server_group.delete
 		end
 
-        format.html { render :action => "new" }
+        #format.html { render :action => "new" }
+        format.html  { render :text => @server_group.errors.to_xml, :status => :unprocessable_entity }
         format.json  { render :json => @server_group.errors, :status => :unprocessable_entity }
         format.xml  { render :xml => @server_group.errors, :status => :unprocessable_entity }
       end
@@ -143,6 +149,36 @@ private
 		return true if session[:user_id] and server_group and session[:user_id] == server_group.user_id
 		render :text => "Attempt to view an unauthorized record.", :status => "401"
 		return false
+	end
+
+	def server_group_from_hash(hash)
+
+		servers=[]
+		ssh_public_keys=[]
+		if hash["server_group"]["servers"] then
+			hash["server_group"]["servers"].each do |server_hash|
+
+				server = Server.new(server_hash)
+				user=User.find(session[:user_id])
+				server.account_id = user.account_id
+				servers << server
+			end
+		end
+
+		if hash["server_group"]["ssh_public_keys"] then
+			hash["server_group"]["ssh_public_keys"].each do |ssh_key_hash|
+				ssh_public_keys << SshPublicKey.new(ssh_key_hash)
+			end
+		end
+
+		group_hash=hash["server_group"]
+		group_hash.delete("servers")
+		group_hash.delete("ssh_public_keys")
+		group_hash[:user_id] = session[:user_id]
+		server_group = ServerGroup.create(group_hash)
+		server_group.servers << servers
+		server_group.ssh_public_keys << ssh_public_keys
+		return server_group
 	end
 
 end

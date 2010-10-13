@@ -1,31 +1,76 @@
-<h1>New server_group</h1>
+<script>
 
-<% form_for(@server_group) do |f| %>
+$(document).ready(function() {
+
+  $(".create-server-group-add-button").button({
+      icons: {
+          primary: 'ui-icon-circle-plus'
+      },
+          text: true
+      }
+  );
+
+<% if @account.cloud_servers_api_key.blank? then %>
+  $("#server-group-error-messages").css("display", "inline");
+  $("#server-group-error-messages-content").html("Please enter your cloud servers account credentials under 'settings'.");
+<% end %>
+
+});
+
+</script>
+
+<h1>New Server Group</h1>
+
+<div id="server-group-error-messages" class="ui-widget" style="display: none">
+    <div class="ui-state-error ui-corner-all" style="padding: .25em .25em .25em 2.5em;">
+<p><span class="ui-icon ui-icon-alert" style="float: left; margin-right: .3em;"></span>
+<div id="server-group-error-messages-content"></div>
+</p>
+    </div>
+</div>
+
+<% form_for(@server_group, :html => { :id => "server-group-create-form", :onsubmit => "create_server_group(); return false;" } ) do |f| %>
   <%= f.error_messages %>
 
+  <input id="server-group-create-form-row-count" type="hidden" name="server_tr_count" value="0"/>
+
+  <%= f.hidden_field :vpn_network, :value => "172.19.0.0" %>
+  <%= f.hidden_field :vpn_subnet, :value => "255.255.128.0" %>
+  <%= f.hidden_field :owner_name, :value => User.find(session[:user_id]).username %>
   <p>
     <%= f.label :name %><br />
     <%= f.text_field :name %>
   </p>
+
   <p>
     <%= f.label :description %><br />
     <%= f.text_field :description %>
   </p>
-  <p>
-    <%= f.label :vpn_network %><br />
-    <%= f.text_field :vpn_network %>
-  </p>
-  <p>
-    <%= f.label :vpn_subnet %><br />
-    <%= f.text_field :vpn_subnet %>
-  </p>
-  <p>
-    <%= f.label :last_used_ip_address %><br />
-    <%= f.text_field :last_used_ip_address %>
-  </p>
-  <p>
-    <%= f.submit 'Create' %>
-  </p>
-<% end %>
 
-<%= link_to 'Back', server_groups_path %>
+  <p>
+    <%= f.label :domain_name %><br />
+    <%= f.text_field :domain_name %>
+  </p>
+
+<button class="create-server-group-add-button" onclick="create_server_group_add_row(); return false;">Add Server</button>
+
+<table id="create-server-group-table" class="ui-widget ui-widget-content data">
+  <tr class="ui-widget-header">
+    <th>&nbsp;</th>
+    <th>Server Name</th>
+    <th>Image</th>
+    <th>Flavor</th>
+    <th>VPN Server</th>
+  </tr>
+
+  <tr class="tr0">
+    <td>&nbsp;</td>
+    <td><input type="text" value="" name="server_group[servers_attributes][0][name]" /><input type="hidden" value="N/A" name="server_group[servers_attributes][0][description]" /><input id="server-group-create-account-input" type="hidden" value="<%= @account.id %>" name="server_group[servers_attributes][0][account_id]" /></td>
+    <td><%= select_for_images("server_group[servers_attributes][0][image_id]") %></td>
+    <td><%= select_for_flavors("server_group[servers_attributes][0][flavor_id]") %></td>
+    <td align="center"><input type="hidden" name="server_group[servers_attributes][0][openvpn_server]" value="true"/><img src="images/check.png"/></td>
+  </tr>
+
+</table>
+
+<% end %>

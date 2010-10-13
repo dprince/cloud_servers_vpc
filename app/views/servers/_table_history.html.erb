@@ -18,14 +18,14 @@
     <th>CS ID</th>
     <th>Flavor</th>
     <th>Image</th>
-    <th>VPN Server</th>
+    <th>VPN<br/>Server</th>
     <th>Historical<br/>Status</th>
     <th>Retries</th>
     <th>Last Error Msg</th>
   </tr>
 
 <% @servers.each do |server| %>
-  <tr id="tr-<%= server.id %>" class="<%= cycle "tr0", "tr1" %>">
+  <tr class="<%= cycle "tr0", "tr1" %>">
     <td><%= chop_for_html(server.server_group.name, 20) %>(<%= server.server_group.id %>)</td>
     <td><%= chop_for_html(server.server_group.owner_name) %></td>
     <td><%= chop_for_html(server.account.cloud_servers_username) %></td>
@@ -38,7 +38,7 @@
     <td><%=h server.cloud_server_id_number %></td>
     <td><%=h flavor_name(server.flavor_id) %></td>
     <td><%= chop_for_html(image_name(server.image_id), 15) %></td>
-    <td><%=h server.openvpn_server %></td>
+    <td align="center"><%= check_or_blank(server.openvpn_server) %></td>
     <td nowrap><%= status_image(server.status) %></td>
     <td>
 		<% if server.retry_count > 0 then %>

@@ -111,4 +111,30 @@ class ServerGroupTest < ActiveSupport::TestCase
 		assert !group.save, "Server groups cannot have more than one VPN server."
 	end
 
+	test "create with a single server" do
+
+		sg=ServerGroup.create(
+			:name => "test1",
+			:user_id => users(:admin).id,
+			:owner_name => "dan",
+			:domain_name => "test.rsapps.net",
+			:description => "test1",
+			:vpn_network => "172.19.0.0",
+			:vpn_subnet => "255.255.128.0"
+		)
+		sg.update_attributes(
+			:servers_attributes => [{
+				:name => "test1",
+				:description => "test description",
+				:flavor_id => 1,
+				:image_id => 1,
+				:account_id => users(:bob).account_id
+			}]
+		)
+		assert sg.valid?, "Server group should be valid."
+		assert sg.save!, "Server group should have saved."
+		assert_equal 1, sg.servers.size
+
+	end
+
 end

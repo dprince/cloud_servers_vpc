@@ -13,6 +13,7 @@ class ServerGroup < ActiveRecord::Base
 	validates_length_of :owner_name, :maximum => 255
 	validates_length_of :domain_name, :maximum => 255
 	has_many :servers
+    accepts_nested_attributes_for :servers, :update_only => true
 	has_many :ssh_public_keys, :dependent => :destroy
 	belongs_to :user
 

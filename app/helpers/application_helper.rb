@@ -5,6 +5,10 @@ module ApplicationHelper
 		val ? "Yes" : "No"
 	end
 
+	def check_or_blank(val)
+		val ? "<img class=\"check_image\" src=\"images/check.png\" />" : "&nbsp;"
+	end
+
 	def status_image(status, show_image=true)
 
 		image_name = case status
@@ -14,7 +18,7 @@ module ApplicationHelper
 		end
 
 		if show_image then
-			return "<img class\"status_image\" src=\"/images/#{image_name}.png\"/>&nbsp;#{status}"
+			return "<img class=\"status_image\" src=\"/images/#{image_name}.png\"/>&nbsp;#{status}"
 		else
 			return status
 		end
@@ -46,6 +50,55 @@ module ApplicationHelper
 		else
 			string
 		end
+	end
+
+	def select_for_images(name)
+
+		image_arr=[
+			[51, "CentOS 5.5"],
+			[187811, "Centos 5.4"],
+			[53, "Fedora 13 (Goddard)"],
+			[17, "Fedora 12 (Constantine)"],
+			[12, "Red Hat EL 5.3"],
+			[14, "Red Hat EL 5.4"],
+			[49, "Ubuntu 10.04 LTS (lucid)"],
+			[14362, "Ubuntu 9.10 (karmic)"],
+			[8, "Ubuntu 9.04 (jaunty)"],
+			[10, "Ubuntu 8.04.2 LTS (hardy)"]
+		]
+
+		select_str="<select name=\"#{name}\">"
+
+		image_arr.each do |image|
+			select_str+="<option value=\"#{image[0]}\">#{image[1]}</option>"
+		end
+
+		select_str+="</select>"
+		return select_str
+
+	end
+
+	def select_for_flavors(name)
+
+		flavor_arr=[
+			[1, "256"],
+			[2, "512"],
+			[3, "1GB"],
+			[4, "2GB"],
+			[5, "4GB"],
+			[6, "8GB"],
+			[7, "15.5GB"]
+		]
+
+		select_str="<select name=\"#{name}\">"
+
+		flavor_arr.each do |image|
+			select_str+="<option value=\"#{image[0]}\">#{image[1]}</option>"
+		end
+
+		select_str+="</select>"
+		return select_str
+
 	end
 
 end

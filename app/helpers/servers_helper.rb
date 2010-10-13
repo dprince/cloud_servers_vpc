@@ -9,7 +9,7 @@ module ServersHelper
 			"CentOS 5.4"
 		when 53
 			"Fedora 13 (Goddard)"
-		when 12
+		when 17
 			"Fedora 12 (Constantine)"
 		when 12
 			"Red Hat EL 5.3"

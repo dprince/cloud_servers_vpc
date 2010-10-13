@@ -90,8 +90,8 @@ rm ../cloud-servers-vpc.filelist.%{name}
 - Attempt to ifdown eth0 up to 5 times when initially configuring a client.
 - Allow at least 2 minutes to perform the server online check.
 - Back to TCP for OpenVPN. Some distros (Ubuntu) seem to get connection errors with UDP.
-- Updated to use rackspace/ruby-cloudservers instead of the rackspace-cloud gem.
 - Write out the SSH identity file using OpenVPN lib.
+- Server names now support dots.
 * Tue Sep 3 2010 Dan Prince <dan.prince@rackspace.com> - 1.5.1
 - Fix an issue where account credentials were being cached in
   the Rackspace::Connection class.
