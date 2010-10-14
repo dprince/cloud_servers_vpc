@@ -96,7 +96,7 @@ function my_ssh_public_key_create() {
 				  "&nbsp;<a href=\"ssh_public_keys/" + $("id", data).text() +
 				  "\" onclick=\"edit_my_ssh_key_link('" + $("id", data).text() +
 				  "'); return false;\">Edit</a>"+
-				  "/<a href=\"ssh_public_keys/" + $("id", data).text() +
+				  "&nbsp;/&nbsp;<a href=\"ssh_public_keys/" + $("id", data).text() +
 				  "\" class=\"my-ssh-public-key-delete\">Delete</a></li>"
 				);
 			}
@@ -108,7 +108,7 @@ function my_ssh_public_key_create() {
 				  "&nbsp;<a href=\"ssh_public_keys/" + $("id", data).text() +
 				  "\" onclick=\"edit_my_ssh_key_link('" + $("id", data).text() +
 				  "'); return false;\">Edit</a>"+
-				  "/<a href=\"ssh_public_keys/" + $("id", data).text() +
+				  "&nbsp;/&nbsp;<a href=\"ssh_public_keys/" + $("id", data).text() +
 				  "\" class=\"my-ssh-public-key-delete\">Delete</a>"
 				);
 			}
@@ -165,7 +165,7 @@ function my_ssh_public_key_delete(href) {
 
 <ul id="my-ssh-public-keys-list">
 <% @user.ssh_public_keys.each do |key| %>
-    <li id="ssh-public-key-li-<%= key.id %>"><%= chop_for_html(key.description) %>&nbsp;<a href="/ssh_public_keys/<%= key.id %>" onclick="edit_my_ssh_key_link('<%= key.id %>'); return false;">Edit</a>/<a href="/ssh_public_keys/<%= key.id %>" class="my-ssh-public-key-delete">Delete</a></li>
+    <li id="ssh-public-key-li-<%= key.id %>"><%= chop_for_html(key.description) %>&nbsp;<a href="/ssh_public_keys/<%= key.id %>" onclick="edit_my_ssh_key_link('<%= key.id %>'); return false;">Edit</a>&nbsp;/&nbsp;<a href="/ssh_public_keys/<%= key.id %>" class="my-ssh-public-key-delete">Delete</a></li>
 <% end %>
 <% if @user.ssh_public_keys.empty? then %>
     <li id="ssh-public-key-li-none">No SSH public keys.</li>

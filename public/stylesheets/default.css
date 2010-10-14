@@ -63,3 +63,12 @@ table.data tr.inactive {
   color: #333;
   font-style: italic;
 }
+
+#my-ssh-public-keys-list li {
+	font-style:   italic;
+	font-size:   14px;
+}
+#my-ssh-public-keys-list li a {
+	font-style:   normal;
+	font-weight:   normal;
+}
