@@ -37,6 +37,10 @@ $(document).ready(function() {
       reset_my_password_divs();
       reset_my_ssh_public_keys_divs();
       reset_settings_message();
+      reset_my_account_limit_divs();
+      if (ui.newHeader.text() === "API Limits") {
+        load_my_api_limits();
+      }
     }
   });
 });
@@ -48,6 +52,11 @@ $(document).ready(function() {
     <h3><a href="#">Cloud Servers Account</a></h3>
     <div>
 <%= render :partial => 'account' %>
+    </div>
+
+    <h3><a href="#">API Limits</a></h3>
+    <div>
+<%= render :partial => 'api_limits' %>
     </div>
 
     <h3><a href="#">SSH Public Keys</a></h3>

@@ -33,4 +33,13 @@ class CloudServersUtil
 		return true
 	end
 
+	def all_servers
+		return []
+	end
+
+	def account_limits
+		return %{{"absolute":{"maxIPGroups":25,"maxIPGroupMembers":25,"maxTotalRAMSize":51200},"rate":[{"remaining":10,"URI":"*","unit":"MINUTE","resetTime":1287082645,"value":10,"regex":".*","verb":"PUT"},{"remaining":3,"URI":"*changes-since*","unit":"MINUTE","resetTime":1287082645,"value":3,"regex":"changes-since","verb":"GET"},{"remaining":600,"URI":"*","unit":"MINUTE","resetTime":1287082645,"value":600,"regex":".*","verb":"DELETE"},{"remaining":58,"URI":"/servers*","unit":"HOUR","resetTime":1287083964,"value":60,"regex":"^/servers","verb":"POST"}]}
+}
+	end
+
 end

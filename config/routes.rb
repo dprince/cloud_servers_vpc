@@ -1,6 +1,7 @@
 ActionController::Routing::Routes.draw do |map|
 
   map.resources :accounts
+  map.resources :accounts, :member => { :limits => :get }
 
   map.resources :servers
   map.resources :servers, :member => { :rebuild => :post }

@@ -33,4 +33,10 @@ class AccountsControllerTest < ActionController::TestCase
     assert_response 401
   end
 
+  test "user get account limits" do
+    login_as(:jim)
+    get :limits, :id => accounts(:jim_account).to_param
+    assert_response 200
+  end
+
 end

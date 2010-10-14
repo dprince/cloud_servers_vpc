@@ -49,4 +49,8 @@ class CloudServersUtil
 
 	end
 
+	def account_limits
+		@cs_conn.limits
+	end
+
 end

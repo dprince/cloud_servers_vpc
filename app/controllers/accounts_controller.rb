@@ -1,7 +1,7 @@
 class AccountsController < ApplicationController
 
   before_filter :authorize
-  before_filter :require_admin_or_self, :only => [:update]
+  before_filter :require_admin_or_self, :only => [:update, :limits]
 
   # POST /accounts
   # POST /accounts.json
@@ -40,6 +40,14 @@ class AccountsController < ApplicationController
         format.xml  { render :xml => @account.errors, :status => :unprocessable_entity }
       end
     end
+  end
+
+  def limits
+
+    @account = Account.find(params[:id])
+    cs=CloudServersUtil.new(@account.cloud_servers_username, @account.cloud_servers_api_key)
+    render :text => cs.account_limits.to_json, :status => "200"
+
   end
 
   private
