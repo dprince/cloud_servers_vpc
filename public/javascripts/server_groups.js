@@ -22,7 +22,7 @@ function server_group_selectors() {
                 height: 515,
                 width: 700,
                 buttons: {
-                    Save: function() { create_server_group() }
+                    Create: function() { create_server_group() }
                 }
             });
 
@@ -79,9 +79,10 @@ function create_server_group_add_row() {
 	var count=parseInt($("#server-group-create-form-row-count").attr("value"));
 	count++;
 	$("#server-group-create-form-row-count").attr("value", ""+count);
+	var first_row=$("#create-server-group-table tr:nth-child(2)");
+	var image_opts=first_row.find("td:nth-child(3) select").html();
+	var flavor_opts=first_row.find("td:nth-child(4) select").html();
 
-	var image_opts=$("#create-server-group-table tr:nth-child(2) td:nth-child(3) select").html();
-	var flavor_opts=$("#create-server-group-table tr:nth-child(2) td:nth-child(4) select").html();
 	var account_id=$("#server-group-create-account-input").attr("value");
 
 	tr_html='<tr class="tr' + count%2 + '">';
