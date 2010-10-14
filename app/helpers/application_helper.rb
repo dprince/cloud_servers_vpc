@@ -59,12 +59,11 @@ module ApplicationHelper
 			[187811, "Centos 5.4"],
 			[53, "Fedora 13 (Goddard)"],
 			[17, "Fedora 12 (Constantine)"],
-			[12, "Red Hat EL 5.3"],
 			[14, "Red Hat EL 5.4"],
+			[62, "Red Hat EL 5.5"],
 			[49, "Ubuntu 10.04 LTS (lucid)"],
 			[14362, "Ubuntu 9.10 (karmic)"],
-			[8, "Ubuntu 9.04 (jaunty)"],
-			[10, "Ubuntu 8.04.2 LTS (hardy)"]
+			[8, "Ubuntu 9.04 (jaunty)"]
 		]
 
 		select_str="<select name=\"#{name}\">"
