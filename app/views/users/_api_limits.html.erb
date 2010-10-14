@@ -2,7 +2,7 @@
 
 function load_my_api_limits() {
 
-	$("#my_account_limits").html("<b>Loading API Limit...</b>");
+	$("#my_account_limits").html("<b>Loading API Limits...</b>");
 
     $.ajax({
         url: '/accounts/<%= @account.id %>/limits',
@@ -14,6 +14,21 @@ function load_my_api_limits() {
 			limit_html+="<li>Max number of shared IP groups: <b>"+obj.absolute.maxIPGroups+"</b></li>";
 			limit_html+="<li>Max number of members per shared IP group: <b>"+obj.absolute.maxIPGroupMembers+"</b></li>";
 			limit_html+="</ul>";
+			limit_html+="<table style=\"margin-left: 20px;\" border=\"1\">";
+			limit_html+="<tr>";
+			limit_html+="<th>Type/URL</th>";
+			limit_html+="<th>Limit</th>";
+			limit_html+="</tr>";
+
+			for (i=0; i<obj.rate.length; i++) {
+				limit_html+="<tr>";
+				limit_html+="<td>"+obj.rate[i].verb+" "+obj.rate[i].regex+"</td>";
+				limit_html+="<td><b>"+obj.rate[i].value+"</b> per "+obj.rate[i].unit+"</td>";
+				limit_html+="</tr>";
+
+			}
+
+			limit_html+="</table>";
 
 			$("#my_account_limits").html(limit_html);
         },
