@@ -100,6 +100,9 @@ class ServerGroupsController < ApplicationController
     respond_to do |format|
       if @server_group.save
         flash[:notice] = 'ServerGroup was successfully created.'
+		@server_group.servers.each do |server|
+			server.create_cloud_server
+		end
         #format.html { redirect_to(@server_group) }
         format.html  { render :xml => @server_group.to_xml(:include => {:servers => {:include => :vpn_network_interfaces}}), :status => :created, :location => @server_group }
         format.json  { render :json => @server_group.to_json(:include => {:servers => {:include => :vpn_network_interfaces}}), :status => :created, :location => @server_group }

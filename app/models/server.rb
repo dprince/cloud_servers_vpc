@@ -48,8 +48,6 @@ class Server < ActiveRecord::Base
 			)
 		end
 
-		create_cloud_server
-
 	end
 
 	def make_historical
