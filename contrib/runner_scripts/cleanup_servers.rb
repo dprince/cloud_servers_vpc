@@ -21,7 +21,9 @@ Account.find(:all, :conditions => ["cloud_servers_username IS NOT NULL AND cloud
 				begin
 					puts "Account: #{acct.cloud_servers_username}, Deleting cloud server ID: #{cs[:id]} #{cs[:name]}"
 					Timeout::timeout(30) do
-						cs_conn.destroy_server(cs[:id])
+						cs_server=cs_conn.find_server(cs[:id])
+						cs_server.update(:name => "deleted_#{cs[:id]}")
+						cs_server.delete!
 					end
 				rescue
 				end
