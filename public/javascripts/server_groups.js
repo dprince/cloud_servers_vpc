@@ -118,7 +118,6 @@ function create_server_group_add_row() {
 
 function create_server_group() {
 
-
     var post_data = $("#server-group-create-form").serialize();
     $.ajax({
         url: $("#server-group-create-form").attr("action"),
@@ -127,14 +126,14 @@ function create_server_group() {
         dataType: 'html',
         success: function(data) {
             id=$("id", data).text();
-			$("#server-group-dialog").html("");
+            $("#server-group-dialog").html("");
             $("#server-group-dialog").dialog('close');
             $("#tabs").tabs('load', 0);
         },
         error: function(data) {
             $("#server-group-error-messages").css("display", "inline");
             err_html="<ul>";
-            $(data.responseText).find("error").each (function() {
+            $("error", data.responseXML).each (function() {
                 err_html+="<li>"+$(this).text()+"</li>";
             });
             err_html+="</ul>";

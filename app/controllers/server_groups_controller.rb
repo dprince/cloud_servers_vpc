@@ -104,7 +104,7 @@ class ServerGroupsController < ApplicationController
 			server.create_cloud_server
 		end
         #format.html { redirect_to(@server_group) }
-        format.html  { render :xml => @server_group.to_xml(:include => {:servers => {:include => :vpn_network_interfaces}}), :status => :created, :location => @server_group }
+        format.html  { render :xml => @server_group.to_xml(:include => {:servers => {:include => :vpn_network_interfaces}}), :status => :created, :location => @server_group, :content_type => "application/xml" }
         format.json  { render :json => @server_group.to_json(:include => {:servers => {:include => :vpn_network_interfaces}}), :status => :created, :location => @server_group }
         format.xml  { render :xml => @server_group.to_xml(:include => {:servers => {:include => :vpn_network_interfaces}}), :status => :created, :location => @server_group }
       else
@@ -120,7 +120,7 @@ class ServerGroupsController < ApplicationController
 		end
 
         #format.html { render :action => "new" }
-        format.html  { render :text => @server_group.errors.to_xml, :status => :unprocessable_entity }
+        format.html  { render :xml => @server_group.errors.to_xml, :status => :unprocessable_entity, :content_type => "application/xml" }
         format.json  { render :json => @server_group.errors, :status => :unprocessable_entity }
         format.xml  { render :xml => @server_group.errors, :status => :unprocessable_entity }
       end
