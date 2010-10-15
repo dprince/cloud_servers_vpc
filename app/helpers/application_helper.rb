@@ -25,6 +25,33 @@ module ApplicationHelper
 
 	end
 
+    def status_image_for_group(server_group)
+
+		has_failure=false
+		all_success=true
+		server_group.servers.each do |server|
+			if server.status == "Failed" then
+				has_failure=true
+				all_success=false
+			elsif server.status == "Pending" then
+				all_success=false
+			end
+		end
+
+		image_name="pending"
+		status="Pending"
+		if has_failure then
+			image_name="failure"
+			status="Failure"
+		elsif all_success then
+			image_name="success"
+			status="Online"
+		end
+
+		return "<img class=\"status_image\" src=\"/images/#{image_name}.png\"/>&nbsp;#{status}"
+
+    end
+
 	def timestamp(dts)
 		return dts.strftime('%Y-%m-%d %I:%M%p')
 	end

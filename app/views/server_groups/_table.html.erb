@@ -15,8 +15,7 @@
     <th>Description</th>
     <th>Account</th>
     <th>Owner</th>
-    <th>VPN network</th>
-    <th>VPN subnet</th>
+    <th>Status</th>
     <th>Created at</th>
     <th>Size</th>
     <th colspan="1">&nbsp;</th>
@@ -33,8 +32,7 @@
     <td>&nbsp;</td>
 <% end %>
     <td><%= chop_for_html(server_group.owner_name) %></td>
-    <td><%=h server_group.vpn_network %></td>
-    <td><%=h server_group.vpn_subnet %></td>
+    <td><%= status_image_for_group(server_group) %></td>
     <td><%= timestamp(server_group.created_at.in_time_zone) %></td>
     <td><%= server_group.servers.size %></td>
 <!--
