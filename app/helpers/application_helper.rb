@@ -41,7 +41,7 @@ module ApplicationHelper
 		image_name="pending"
 		status="Pending"
 		if has_failure then
-			image_name="failure"
+			image_name="failed"
 			status="Failure"
 		elsif all_success then
 			image_name="success"
