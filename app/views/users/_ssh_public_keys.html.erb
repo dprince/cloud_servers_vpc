@@ -27,11 +27,19 @@ $(document).ready(function() {
 
     });
 
+    $(".my-ssh-public-key-edit").click(function(e){
+
+       e.preventDefault();
+       var id = $(this).attr("href").match(/[0-9]*$/);
+       edit_my_ssh_key_link(id);
+
+    });
+
 });
 
 function reset_my_ssh_key_form() {
 
-	 $("#my-ssh-public-keys-edit-form").attr("method", "POST");
+	 $("#my-ssh-public-keys-edit-form-method").attr("value", "POST");
 	  $("#my-ssh-public-keys-edit-form input[name='[ssh_public_key]id']").attr("value", "");
 	  $("#my-ssh-public-keys-edit-form input[name='[ssh_public_key]description']").attr("value", "");
 	  $("#my-ssh-public-keys-edit-form textarea[name='[ssh_public_key]public_key']").attr("value", "");
@@ -46,7 +54,7 @@ function edit_my_ssh_key_link(id) {
   $("#my-ssh-public-keys-edit-div").show();
   $("a.my-ssh-public-keys-add").hide();
 
-  $("#my-ssh-public-keys-edit-form").attr("method", "PUT");
+  $("#my-ssh-public-keys-edit-form-method").attr("value", "PUT");
   $("#my-ssh-public-keys-edit-form input[type=submit]").attr("value", 'Update Key');
   $("#my-ssh-public-keys-edit-form input[name='[ssh_public_key]id']").attr("value", id);
 
@@ -75,7 +83,7 @@ function reset_my_ssh_public_keys_divs() {
 }
 
 function my_ssh_public_key_create() {
-	method_type=$("#my-ssh-public-keys-edit-form").attr("method");
+	method_type=$("#my-ssh-public-keys-edit-form-method").attr("value");
 
     var post_data = $("#my-ssh-public-keys-edit-form").serialize();
     $.ajax({
@@ -89,25 +97,24 @@ function my_ssh_public_key_create() {
             $("a.my-ssh-public-keys-add").show();
 
 			if (method_type === 'POST') {
+
 				$("#my-ssh-public-keys-list").append(
 				  "<li id=\"ssh-public-key-li-" + $("id", data).text() +
 				  "\">" + $("description", data).text() +
 
 				  "&nbsp;<a href=\"ssh_public_keys/" + $("id", data).text() +
-				  "\" onclick=\"edit_my_ssh_key_link('" + $("id", data).text() +
-				  "'); return false;\">Edit</a>"+
+				  "\" class=\"my-ssh-public-key-edit\">Edit</a>"+
 				  "&nbsp;/&nbsp;<a href=\"ssh_public_keys/" + $("id", data).text() +
 				  "\" class=\"my-ssh-public-key-delete\">Delete</a></li>"
 				);
-			}
 
-			if (method_type === 'PUT') {
+			} else {
+
 				$("#ssh-public-key-li-" + $("id", data).text()).html(
 				  $("description", data).text() +
 
 				  "&nbsp;<a href=\"ssh_public_keys/" + $("id", data).text() +
-				  "\" onclick=\"edit_my_ssh_key_link('" + $("id", data).text() +
-				  "'); return false;\">Edit</a>"+
+				  "\" class=\"my-ssh-public-key-edit\">Edit</a>"+
 				  "&nbsp;/&nbsp;<a href=\"ssh_public_keys/" + $("id", data).text() +
 				  "\" class=\"my-ssh-public-key-delete\">Delete</a>"
 				);
@@ -118,6 +125,14 @@ function my_ssh_public_key_create() {
               e.preventDefault();
 
               my_ssh_public_key_delete(this);  
+
+           });
+
+           $("#ssh-public-key-li-" + $("id", data).text() + " a.my-ssh-public-key-edit").click(function(e){
+
+              e.preventDefault();
+              var id = $(this).attr("href").match(/[0-9]*$/);
+              edit_my_ssh_key_link(id);
 
            });
 
@@ -165,7 +180,7 @@ function my_ssh_public_key_delete(href) {
 
 <ul id="my-ssh-public-keys-list">
 <% @user.ssh_public_keys.each do |key| %>
-    <li id="ssh-public-key-li-<%= key.id %>"><%= chop_for_html(key.description) %>&nbsp;<a href="/ssh_public_keys/<%= key.id %>" onclick="edit_my_ssh_key_link('<%= key.id %>'); return false;">Edit</a>&nbsp;/&nbsp;<a href="/ssh_public_keys/<%= key.id %>" class="my-ssh-public-key-delete">Delete</a></li>
+    <li id="ssh-public-key-li-<%= key.id %>"><%= chop_for_html(key.description) %>&nbsp;<a href="/ssh_public_keys/<%= key.id %>" class="my-ssh-public-key-edit">Edit</a>&nbsp;/&nbsp;<a href="/ssh_public_keys/<%= key.id %>" class="my-ssh-public-key-delete">Delete</a></li>
 <% end %>
 <% if @user.ssh_public_keys.empty? then %>
     <li id="ssh-public-key-li-none">No SSH public keys.</li>
@@ -182,12 +197,13 @@ function my_ssh_public_key_delete(href) {
 
 <div id="my-ssh-public-keys-edit-div" style="display: none;">
     <form id="my-ssh-public-keys-edit-form" action="/ssh_public_keys" onsubmit="my_ssh_public_key_create(); return false;">
+    <input id="my-ssh-public-keys-edit-form-method" type="hidden" name="_method" value="POST"/>
     <input type="hidden" name="[ssh_public_key]id" value=""/>
 
     <label>Description:</label><br/>
     <input type="text" name="[ssh_public_key]description" value=""/><br/>
     <label>Public Key:</label><br/>
-    <textarea name="[ssh_public_key]public_key" cols="80" rows="6"/>
+    <textarea name="[ssh_public_key]public_key" cols="80" rows="6"/><br/>
     <input type="submit" name="submit" value="Create Key"/><%= link_to 'Cancel', "#", { :class => "my-ssh-public-keys-cancel" } %>
 
     </form>
