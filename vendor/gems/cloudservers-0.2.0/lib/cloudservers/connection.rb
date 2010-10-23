@@ -64,7 +64,7 @@ module CloudServers
       # Server closed the connection, retry
       raise CloudServers::Exception::Connection, "Unable to reconnect to #{server} after #{attempts} attempts" if attempts >= 5
       attempts += 1
-      @http[server].finish
+      @http[server].finish if @http[server].started?
       start_http(server,path,port,scheme,headers)
       retry
     rescue CloudServers::Exception::ExpiredAuthToken
