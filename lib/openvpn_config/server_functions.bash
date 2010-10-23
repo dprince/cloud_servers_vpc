@@ -32,7 +32,7 @@ function create_ca {
 	if [ -f /etc/redhat-release ]; then
 		EASY_RSA_LOC=$(rpm -qil openvpn | grep build-ca | tail -n 1)
 	elif [ -f /etc/debian_version ]; then
-		EASY_RSA_LOC=$(dpkg -L openvpn | grep build-ca | tail -n 1)
+		EASY_RSA_LOC=$(dpkg -L openvpn | grep build-ca | grep "2.0" | tail -n 1)
 	else
 		echo "Failed to locate openvpn 'build-ca'."
 		return 1
