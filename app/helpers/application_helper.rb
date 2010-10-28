@@ -88,9 +88,9 @@ module ApplicationHelper
 			[17, "Fedora 12 (Constantine)"],
 			[14, "Red Hat EL 5.4"],
 			[62, "Red Hat EL 5.5"],
+			[69, "Ubuntu 10.10 (maverick)"],
 			[49, "Ubuntu 10.04 LTS (lucid)"],
-			[14362, "Ubuntu 9.10 (karmic)"],
-			[8, "Ubuntu 9.04 (jaunty)"]
+			[14362, "Ubuntu 9.10 (karmic)"]
 		]
 
 		select_str="<select name=\"#{name}\">"

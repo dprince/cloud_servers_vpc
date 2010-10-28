@@ -17,6 +17,8 @@ module ServersHelper
 			"Red Hat EL 5.4"
 		when 62 
 			"Red Hat EL 5.5"
+		when 69
+			"Ubuntu 10.10 (maverick)"
 		when 49
 			"Ubuntu 10.04 LTS (lucid)"
 		when 14362
