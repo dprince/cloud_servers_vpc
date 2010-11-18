@@ -21,4 +21,3 @@ else
         echo "Failed to stop delayed job processes."
         exit 1
 fi
-
