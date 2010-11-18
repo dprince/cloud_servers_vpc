@@ -1,0 +1,19 @@
+<VirtualHost *:80>
+RewriteEngine On
+RewriteCond %{SERVER_PORT} !443
+RewriteRule (.*) https://client1.vpc/ [R]
+</VirtualHost>
+
+<VirtualHost *:443>
+ServerName <%= node[:fqdn] %>
+DocumentRoot /opt/cloud-servers-vpc/public
+<Directory /opt/cloud-servers-vpc/public>
+ AllowOverride all
+ Options -MultiViews
+</Directory>
+
+SSLEngine on
+SSLCertificateFile /etc/pki/tls/certs/ca.crt
+SSLCertificateKeyFile /etc/pki/tls/private/ca.key
+
+</VirtualHost>

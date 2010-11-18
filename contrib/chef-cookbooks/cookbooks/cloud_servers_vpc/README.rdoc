@@ -2,11 +2,14 @@
 Recipe to install Cloud Servers VPC.
 
 By default the application is automatically configured to run on port
-80.  The recipe does NOT update or manage iptables rules to allow
+443.  The recipe does NOT update or manage iptables rules to allow
 traffic to the configured ports.
 
 = REQUIREMENTS:
-Servers VPC RPMs must be available via Yum. Supports RHEL 5 nodes w/ EPEL.
+Requires several Opscode cookbooks including: ruby_enterprise, rails_enterprise, apache2, and passenger_enterprise.
+
+SSL certificates are not included with this cookbook. You will need to generate
+your own SSL certificates before deploying this cookbook.
 
 = ATTRIBUTES: 
 
@@ -16,7 +19,7 @@ cloud_servers_vpc[:rackspace_cloud_api_key]= Optional. If specified a /root/.rac
 
 Optional attributes:
 
-cloud_servers_vpc[:version]= version of the RPM to install
+cloud_servers_vpc[:version]= version or tag to install. Defaults to 'master'.
 
 cloud_servers_vpc[:rackspace_cloud_server_name_prefix]= the prefix that will
 be added to each cloud server that is created. Useful if you are
@@ -32,9 +35,22 @@ is used to obtain Openvpn packages.
 
 Example attributes in JSON:
 
-    "cloud_servers_vpc": {
-        "rackspace_cloud_username": "test1",
-        "rackspace_cloud_api_key": "620ba3c2680ca1c26a0ca1c2",
-        "epel_base_url": "http://mirror.rackspace.com"
-    }
+        "run_list": [
+            "recipe[ruby_enterprise]",
+            "recipe[rails_enterprise]",
+            "recipe[apache2]",
+            "recipe[apache2::mod_ssl]",
+            "recipe[apache2::mod_rewrite]",
+            "recipe[passenger_enterprise::apache2]",
+            "recipe[cloud_servers_vpc]"
+        ],
+        "passenger_enterprise": {
+            "version": "3.0.0"
+        },
+        "cloud_servers_vpc": {
+            "rackspace_cloud_username": "example_account_name",
+            "rackspace_cloud_api_key": "620ba3c2680ca1c26a0cb1c2",
+            "epel_base_url": "http://mirror.rackspace.com",
+            "delayed_job_workers": "8"
+        }
 
