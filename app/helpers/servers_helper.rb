@@ -7,6 +7,8 @@ module ServersHelper
 			"CentOS 5.5"
 		when 187811
 			"CentOS 5.4"
+		when 71
+			"Fedora 14 (Laughlin)"
 		when 53
 			"Fedora 13 (Goddard)"
 		when 17

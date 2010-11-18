@@ -84,6 +84,7 @@ module ApplicationHelper
 		image_arr=[
 			[51, "CentOS 5.5"],
 			[187811, "Centos 5.4"],
+			[71, "Fedora 14 (Laughlin)"],
 			[53, "Fedora 13 (Goddard)"],
 			[17, "Fedora 12 (Constantine)"],
 			[14, "Red Hat EL 5.4"],
