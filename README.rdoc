@@ -34,7 +34,7 @@ The application was developed with MySQL. The following gems are required:
 
 	mysql
 	daemons (1.1.0)
-	json (> 1.4.3)
+	json (1.4.3)
 
 Unpack the rails app and run the following commands to setup a working
 development application:
