@@ -1,0 +1,81 @@
+* Thu Nov 18 2010 Dan Prince <dan.prince@rackspace.com> - 1.7.0
+  - Add create group button/dialog in the UI.
+  - Custom SSH keys can now be managed within preferences and are automatically added to each cloud group that is created.
+  - Cloud Servers account limits are displayed in preferences.
+  - Support for most recent Ubuntu and Fedora distributions.
+  - Updated Chef deployment cookbook to deploy directly from Git Hub.
+
+* Tue Sep 31 2010 Dan Prince <dan.prince@rackspace.com> - 1.6.0
+  - Rename to Cloud Servers VPC.
+  - Updated to use ruby-cloudservers API.
+  - Add support for Ubuntu and Fedora.
+  - Security fix for issue where users could make themselves administrators.
+  - Add checkbox for is_admin on the edit users page (admin's only).
+  - Eager load accounts and users on the servers and server_groups pages. This improves page load time on the server history page.
+  - Display the account on the servers page.
+  - Attempt to ifdown eth0 up to 5 times when initially configuring a client.
+  - Allow at least 2 minutes to perform the server online check.
+  - Back to TCP for OpenVPN. Some distros (Ubuntu) seem to get connection errors with UDP.
+  - Write out the SSH identity file using OpenVPN lib.
+  - Server names now support dots.
+
+* Tue Sep 3 2010 Dan Prince <dan.prince@rackspace.com> - 1.5.1
+  - Fix an issue where account credentials were being cached in
+  the Rackspace::Connection class.
+  - Fix an issue where cloud servers failed to be deleted due to
+  cloud account initialization.
+
+* Tue Sep 2 2010 Dan Prince <dan.prince@rackspace.com> - 1.5.0
+  - Add support for multiple user accounts.
+  - OpenVPN now uses UDP instead of TCP.
+  - Display the number of servers in each group on the server groups page.
+  - Capture cloud server HTTP response body errors when they occur.
+  - Add a random number to the cloud server name on a retry.
+  - Disable the eth0 interface on OpenVPN clients on reboot.
+
+* Tue Aug 17 2010 Dan Prince <dan.prince@rackspace.com> - 1.4.0
+  - Updated to require Rails 2.3.8.
+  - Add API call to rebuild servers.
+
+* Wed Jul 13 2010 Dan Prince <dan.prince@rackspace.com> - 1.3.1
+  - Keep track of cloud server ID in server_errors table.
+  - Add cloud-servers-vpc-cleanup-servers script to cleanup/prune servers
+  unused servers that can accumulate over time.
+  - Move to /opt/cloud-servers-vpc.
+  - Cron job to run cloud-servers-vpc-cleanup every 15 minutes.
+
+* Wed Jun 30 2010 Dan Prince <dan.prince@rackspace.com> - 1.3.0
+  - Keep track of server history.
+  - Added server errors table to track individual errors for each retry.
+  - Select a single job at a time from the DJ queue.
+  - Added EPEL_BASE_URL setting to allow a custom EPEL base URL to
+  be specified.
+
+* Wed Jun 21 2010 Dan Prince <dan.prince@rackspace.com> - 1.2.1
+  - Retry CS delete commands that fail.
+  - Use updated_at time when determining the server online timeout.
+
+* Wed Jun 4 2010 Dan Prince <dan.prince@rackspace.com> - 1.2.0
+  - Add owner name to server groups.
+
+* Wed May 20 2010 Dan Prince <dan.prince@rackspace.com> - 1.1.3
+  - Set status to failed if it is the 3rd retry. DJ tuning.
+
+* Wed May 17 2010 Dan Prince <dan.prince@rackspace.com> - 1.1.2
+  - Exit OpenVPN client/server installs if server is already online.
+
+* Wed May 10 2010 Dan Prince <dan.prince@rackspace.com> - 1.1.1
+  - Fix: Open VPN server now installs on Centos 5.4.
+
+* Wed May 6 2010 Dan Prince <dan.prince@rackspace.com> - 1.1.0
+  - Server groups now support the ability to set domain name.
+
+* Wed Apr 29 2010 Dan Prince <dan.prince@rackspace.com> - 1.0.1
+  - Fix issue where an initially failed OpenVPN client might
+  cause a retry loop.
+
+* Wed Apr 24 2010 Dan Prince <dan.prince@rackspace.com> - 1.0.0
+  - Initial 1.0.0 tagged release
+
+* Wed Feb 17 2010 Dan Prince <dan.prince@rackspace.com>
+  - Initial dev release
