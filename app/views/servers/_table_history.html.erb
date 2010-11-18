@@ -14,7 +14,7 @@
 	<th>Owner</th>
 	<th>Account</th>
     <th>Server Name</th>
-    <th>IP addr(ext/int)</th>
+    <th>Created at</th>
     <th>CS ID</th>
     <th>Flavor</th>
     <th>Image</th>
@@ -30,11 +30,7 @@
     <td><%= chop_for_html(server.server_group.owner_name) %></td>
     <td><%= chop_for_html(server.account.cloud_servers_username) %></td>
     <td><%= chop_for_html(server.name) %></td>
-	<% if server.external_ip_addr or server.internal_ip_addr %> 
-		<td><%=h server.external_ip_addr %>/<%=h server.internal_ip_addr %></td>
-	<% else %>
-		<td>N/A</td>
-	<% end %>
+    <td><%= timestamp(server.created_at.in_time_zone) %></td>
     <td><%=h server.cloud_server_id_number %></td>
     <td><%=h flavor_name(server.flavor_id) %></td>
     <td><%= chop_for_html(image_name(server.image_id), 15) %></td>
