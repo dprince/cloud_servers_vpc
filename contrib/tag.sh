@@ -21,9 +21,6 @@ git branch $UNDERSCORE_VERSION $BRANCH || fail "Failed to create branch."
 git checkout $UNDERSCORE_VERSION || fail "Failed to checkout branch."
 
 #update version information
-sed -e "s|^Version:.*|Version: $VERSION|" -e "s|^Release:.*|Release: 1|" \
- -i contrib/rpmbuild/SPECS/cloud-servers-vpc.spec \
-  || fail "Failed to update SPEC file with version: $VERSION."
 sed -e "s|^CLOUD_SERVERS_VPC_VERSION.*|CLOUD_SERVERS_VPC_VERSION=\"$VERSION\"|" \
  -i config/environment.rb \
   || fail "Failed to update environment.rb file with version: $VERSION."
