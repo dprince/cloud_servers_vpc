@@ -50,11 +50,8 @@ module AuthTestHelper
 
 end
 
-# Disable transparent delayed_job methods in test mode
-=begin
-module Delayed::MessageSending
-  def send_later(method, *args)
-    send(method, *args)
+module Minion
+  def enqueue(jobs, data = {})
+    return
   end
 end
-=end

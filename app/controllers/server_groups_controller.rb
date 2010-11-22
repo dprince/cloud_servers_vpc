@@ -101,7 +101,11 @@ class ServerGroupsController < ApplicationController
       if @server_group.save
         flash[:notice] = 'ServerGroup was successfully created.'
 		@server_group.servers.each do |server|
-			server.create_cloud_server
+			if USE_MINION then
+				Minion.enqueue([ "create.cloud.server" ], {"server_id" => server.attributes["id"], "schedule_client_openvpn" => "false"})
+			else
+				server.send_later :create_cloud_server
+			end
 		end
         #format.html { redirect_to(@server_group) }
         format.html  { render :xml => @server_group.to_xml(:include => {:servers => {:include => :vpn_network_interfaces}}), :status => :created, :location => @server_group, :content_type => "application/xml" }
@@ -135,7 +139,11 @@ class ServerGroupsController < ApplicationController
     xml=@server_group.to_xml
     json=@server_group.to_json
     @server_group.update_attribute('historical', true)
-    @server_group.make_historical
+	if USE_MINION then
+		Minion.enqueue([ "server_group.make_historical" ], {"server_group_id" => @server_group.attributes["id"]})
+	else
+		@server_group.send_later :make_historical
+	end
 
     respond_to do |format|
       format.html { redirect_to(server_groups_url) }

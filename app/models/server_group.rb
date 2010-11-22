@@ -85,6 +85,6 @@ class ServerGroup < ActiveRecord::Base
 			server.make_historical
 		end
 	end
-	handle_asynchronously :make_historical
+	#handle_asynchronously :make_historical
 
 end

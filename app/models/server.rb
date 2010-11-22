@@ -44,7 +44,7 @@ class Server < ActiveRecord::Base
 			VpnNetworkInterface.create(
 				:vpn_ip_addr => self.server_group.save_next_ip,
 				:ptp_ip_addr => self.server_group.save_next_ip,
-				:server_id => self.id
+				:server_id => self.attributes["id"]
 			)
 		end
 
@@ -75,7 +75,11 @@ class Server < ActiveRecord::Base
 					delete_cloud_server(self.cloud_server_id_number)
 				end
 				sleep 10
-				create_cloud_server
+				if USE_MINION then
+					Minion.enqueue([ "create.cloud.server" ], {"server_id" => self.attributes["id"], "schedule_client_openvpn" => "false"})
+				else
+					self.send_later :create_cloud_server, false
+				end
 				return
 			end
 		end
@@ -93,14 +97,18 @@ class Server < ActiveRecord::Base
 				ovpn_server_val="f"
 			end
 			Server.find(:all, :conditions => ["server_group_id = ? AND openvpn_server = ?", self.server_group_id, ovpn_server_val]).each do |vpn_client|
-				vpn_client.create_openvpn_client
+				if USE_MINION then
+					Minion.enqueue([ "create.openvpn.client" ], {"server_id" => vpn_client.id})
+				else
+					vpn_client.send_later :create_openvpn_client
+				end
 			end
 		else
 			fail_and_raise "Failed to install OpenVPN on the server."
 		end
 
 	end
-	handle_asynchronously :create_openvpn_server
+	#handle_asynchronously :create_openvpn_server
 
 	# Configure this cloud server as a VPN client
 	def create_openvpn_client
@@ -125,7 +133,11 @@ class Server < ActiveRecord::Base
 				self.retry_count += 1
 				self.save
 				sleep 20
-				create_openvpn_client
+				if USE_MINION then
+					Minion.enqueue([ "create.openvpn.client" ], {"server_id" => self.attributes["id"]})
+				else
+					self.send_later :create_openvpn_client
+				end
 				return
 			end
 
@@ -141,7 +153,11 @@ class Server < ActiveRecord::Base
 					save!
 				end
 				sleep 10
-				create_cloud_server(true)
+				if USE_MINION then
+					Minion.enqueue([ "create.cloud.server" ], {"server_id" => self.attributes["id"], "schedule_client_openvpn" => "true"})
+				else
+					self.send_later :create_cloud_server, true
+				end
 				return
 			end
 		end
@@ -166,7 +182,7 @@ class Server < ActiveRecord::Base
 		save
 		
 	end
-	handle_asynchronously :create_openvpn_client
+	#handle_asynchronously :create_openvpn_client
 
 	def create_cloud_server(schedule_client_openvpn=false)
 
@@ -196,10 +212,18 @@ class Server < ActiveRecord::Base
 	
 			# if this server is an OpenVPN server create it now
 			if self.openvpn_server then
-				create_openvpn_server
+				if USE_MINION then
+					Minion.enqueue([ "create.openvpn.server" ], {"server_id" => self.attributes["id"]})
+				else
+					self.send_later :create_openvpn_server
+				end
 			else
 				if schedule_client_openvpn then
-					create_openvpn_client
+					if USE_MINION then
+						Minion.enqueue([ "create.openvpn.client" ], {"server_id" => self.attributes["id"]})
+					else
+						self.send_later :create_openvpn_client
+					end
 				end
 			end
 
@@ -222,11 +246,15 @@ class Server < ActiveRecord::Base
 			end
 			save!
 			sleep 10
-			create_cloud_server
+			if USE_MINION then
+				Minion.enqueue([ "create.cloud.server" ], {"server_id" => self.attributes["id"], "schedule_client_openvpn" => "false"})
+			else
+				self.send_later :create_cloud_server, false
+			end
 		end
 
 	end
-	handle_asynchronously :create_cloud_server
+	#handle_asynchronously :create_cloud_server
 
 	# class level function to delete cloud servers by their cloud_server ID's
 	def delete_cloud_server(cloud_server_id)
@@ -309,12 +337,16 @@ class Server < ActiveRecord::Base
 				delete_cloud_server(self.cloud_server_id_number)
 			end
 			sleep 10
-			create_cloud_server(true)
+			if USE_MINION then
+				Minion.enqueue([ "create.cloud.server" ], {"server_id" => self.attributes["id"], "schedule_client_openvpn" => "true"})
+			else
+				self.send_later :create_cloud_server, true
+			end
 		rescue Exception => e
 			fail_and_raise "Failed to rebuild cloud server.", e
 		end
 	end
-	handle_asynchronously :rebuild
+	#handle_asynchronously :rebuild
 
 	def ping_test(test_ip)
 
