@@ -28,6 +28,5 @@
   <%=h @server.server_group_id %>
 </p>
 
-
-<%= link_to 'Edit', edit_server_path(@server) %> |
+<%= link_to 'Edit', { :controller => "servers", :action => "edit", :id => @server.id } %> |
 <%= link_to 'Back', servers_path %>

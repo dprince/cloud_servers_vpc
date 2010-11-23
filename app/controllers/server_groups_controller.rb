@@ -169,7 +169,7 @@ private
 		if hash["server_group"]["servers"] then
 			hash["server_group"]["servers"].each do |server_hash|
 
-				server = Server.new(server_hash)
+				server = LinuxServer.new(server_hash)
 				user=User.find(session[:user_id])
 				server.account_id = user.account_id
 				servers << server
