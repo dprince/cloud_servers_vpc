@@ -27,6 +27,8 @@ config.log_level = :warn
 # Enable threaded mode
 # config.threadsafe!
 
+ENV['AMQP_URL'] = "amqp://cloud_servers_vpc:testing@localhost/cloud_servers_vpc"
+
 #ENV['RACKSPACE_CLOUD_USERNAME'] = "test"
 #ENV['RACKSPACE_CLOUD_API_KEY'] = "test"
 
