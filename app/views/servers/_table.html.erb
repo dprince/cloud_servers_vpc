@@ -43,7 +43,7 @@
     <td nowrap><%= status_image(server.status) %></td>
     <td>
 		<% if server.retry_count > 0 then %>
-		<%= link_to "#{server.retry_count}&nbsp;(view)", server, { :class => "show-server-errors" } %>
+		<%= link_to "#{server.retry_count}&nbsp;(view)", "/servers/#{server.id}", { :class => "show-server-errors" } %>
 		<% else %>
 			<%=h server.retry_count %>
 		<% end %>
