@@ -91,7 +91,8 @@ module ApplicationHelper
 			[62, "Red Hat EL 5.5"],
 			[69, "Ubuntu 10.10 (maverick)"],
 			[49, "Ubuntu 10.04 LTS (lucid)"],
-			[14362, "Ubuntu 9.10 (karmic)"]
+			[14362, "Ubuntu 9.10 (karmic)"],
+			[28, "Windows Server 2008 R2 x64"]
 		]
 
 		select_str="<select name=\"#{name}\">"

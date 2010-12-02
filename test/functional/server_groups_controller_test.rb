@@ -32,11 +32,12 @@ class ServerGroupsControllerTest < ActionController::TestCase
 
   test "should create server_group with server" do
     http_basic_authorize
+    assert_difference('Server.count') do
     assert_difference('ServerGroup.count') do
-      post :create, :server_group => { :name => "test1", :owner_name => "dan.prince", :domain_name => "test.rsapps.net", :description => "test1", :vpn_network => "172.19.0.0", :vpn_subnet => "255.255.128.0", :servers_attributes => [{ :name => "test1", :description => "test description", :flavor_id => 1, :image_id => 1, :account_id => users(:bob).account_id }] }
+      post :create, :server_group => { :name => "test1", :owner_name => "dan.prince", :domain_name => "test.rsapps.net", :description => "test1", :vpn_network => "172.19.0.0", :vpn_subnet => "255.255.128.0", :servers_attributes => {"0" => { :name => "test1", :description => "test description", :flavor_id => 1, :image_id => 1, :account_id => users(:bob).account_id }} }
+    end
     end
     assert_response :success
-    #assert_redirected_to server_group_path(assigns(:server_group))
 
   end
 

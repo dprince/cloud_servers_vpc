@@ -198,7 +198,7 @@ function create_server_config {
 
 	if (( $# != 3 )); then
 		echo "Failed to create server config."
-		echo "usage: create_server_key <server key name> <network> <subnet>"
+		echo "usage: create_server_config <server key name> <network> <subnet>"
 		exit 1
 	fi
 

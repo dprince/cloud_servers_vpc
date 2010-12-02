@@ -66,6 +66,17 @@ module Worker
           log "ERROR: Failed to make group historical: #{e.message}"
         end
       end
+
+      job "create.windows.vpn.credentials" do |args|
+        log "Creating Windows VPN credentials: #{args.inspect}"
+        begin
+          windows_server=Server.find(args["server_id"])
+          vpn_credentials=windows_server.create_vpn_credentials
+          Minion.enqueue([ "configure.windows.vpn.credentials" ], {"server_id" => self.attributes["id"], "client_key" => vpn_credentials[0], "client_cert" => vpn_credentials[1], "ca_cert" => vpn_credentials[2]})
+        rescue Exception => e
+          log "ERROR: Failed to create Windows VPN credentials: #{e.message}"
+        end
+      end
       
     end
       

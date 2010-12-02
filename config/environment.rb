@@ -5,8 +5,6 @@ RAILS_GEM_VERSION = '2.3.8' unless defined? RAILS_GEM_VERSION
 
 CLOUD_SERVERS_VPC_VERSION="0.0-master"
 
-USE_MINION=true
-
 # Bootstrap the Rails environment, frameworks, and default configuration
 require File.join(File.dirname(__FILE__), 'boot')
 
@@ -24,12 +22,12 @@ Rails::Initializer.run do |config|
   # config.gem "sqlite3-ruby", :lib => "sqlite3"
   config.gem "cloudservers", :version => '0.2', :lib => "cloudservers"
   config.gem 'mislav-will_paginate', :lib => 'will_paginate', :source => 'http://gems.github.com'
-  config.gem "minion", :version => "0.1.15" if USE_MINION
+  config.gem "minion", :version => "0.1.15"
 
   # Only load the plugins named here, in the order given (default is alphabetical).
   # :all can be used as a placeholder for all plugins not explicitly named
   #config.plugins = [ :exception_notification, :ssl_requirement, :all ]
-  config.plugins = [ :delayed_job ]
+  #config.plugins = [ :delayed_job ]
 
   # Skip frameworks you're not going to use. To use Rails without a database,
   # you must remove the Active Record framework.

@@ -55,6 +55,28 @@ class Client
 
 	end
 
+	def create_client_credentials(client_hostname, internal_vpn_ip, pptp_vpn_ip)
+
+		@hostname=client_hostname
+
+		# on the server we'll generate a new client cert
+		tmp_cert=@server.add_vpn_client(client_hostname, internal_vpn_ip, pptp_vpn_ip)
+		tmp_dir=Util::TmpDir.tmp_dir
+
+		system("cd #{tmp_dir}; tar xf #{tmp_cert}") or return false
+
+		client_key=%x{cat #{tmp_dir}/#{client_hostname}.key}
+		client_crt=%x{cat #{tmp_dir}/#{client_hostname}.crt}
+		ca_crt=%x{cat #{tmp_dir}/cat.crt}
+
+		if block_given? then
+			yield client_key, client_crt, ca_crt
+		else
+			return [client_key, client_crt, ca_crt]
+		end
+
+	end
+
 	def start_openvpn
 
 		script = "/sbin/chkconfig openvpn on\n/etc/init.d/openvpn start\n"

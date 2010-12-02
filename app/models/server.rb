@@ -1,15 +1,13 @@
 require 'logger'
 require 'cloud_servers_util'
-require 'openvpn_config/server'
-require 'openvpn_config/client'
-require 'util/ssh'
 require 'timeout'
-require 'tempfile'
 
 class Server < ActiveRecord::Base
 
-    cattr_accessor :server_online_timeout
+	cattr_accessor :server_online_timeout
+	cattr_accessor :windows_server_online_timeout
 	self.server_online_timeout = 360
+	self.windows_server_online_timeout = 720
 
 	attr_accessor :num_vpn_network_interfaces
 
@@ -24,6 +22,16 @@ class Server < ActiveRecord::Base
 	validates_format_of :name, :with => /^[A-Za-z0-9\-\.]+$/, :message => "Server name must use valid hostname characters (A-Z, a-z, 0-9, dash)."
 	validates_length_of :name, :maximum => 255
 	validates_length_of :description, :maximum => 255
+
+    def self.new_for_type(params)
+
+		if ["28","31","24","23","29"].include?(params[:image_id].to_s) then
+			WindowsServer.new(params)
+		else
+			LinuxServer.new(params)
+		end
+
+    end
 
     def after_initialize
         if new_record? then
@@ -81,21 +89,18 @@ class Server < ActiveRecord::Base
 			self.cloud_server_id_number = cs.id
 			self.external_ip_addr = cs.addresses[:public][0]
 			self.internal_ip_addr = cs.addresses[:private][0]
+			self.admin_password = cs.adminPass
 			save!
 	
 			# if this server is an OpenVPN server create it now
 			if self.openvpn_server then
-				if USE_MINION then
-					Minion.enqueue([ "create.openvpn.server" ], {"server_id" => self.attributes["id"]})
-				else
-					self.send_later :create_openvpn_server
-				end
+				Minion.enqueue([ "create.openvpn.server" ], {"server_id" => self.attributes["id"]})
 			else
 				if schedule_client_openvpn then
-					if USE_MINION then
-						Minion.enqueue([ "create.openvpn.client" ], {"server_id" => self.attributes["id"]})
+					if self.type == "WindowsServer" then
+						Minion.enqueue([ "create.windows.openvpn.client" ], {"server_id" => self.attributes["id"]})
 					else
-						self.send_later :create_openvpn_client
+						Minion.enqueue([ "create.openvpn.client" ], {"server_id" => self.attributes["id"]})
 					end
 				end
 			end
@@ -119,11 +124,7 @@ class Server < ActiveRecord::Base
 			end
 			save!
 			sleep 10
-			if USE_MINION then
-				Minion.enqueue([ "create.cloud.server" ], {"server_id" => self.attributes["id"], "schedule_client_openvpn" => "false"})
-			else
-				self.send_later :create_cloud_server, false
-			end
+			Minion.enqueue([ "create.cloud.server" ], {"server_id" => self.attributes["id"], "schedule_client_openvpn" => "false"})
 		end
 
 	end
@@ -166,11 +167,7 @@ class Server < ActiveRecord::Base
 				delete_cloud_server(self.cloud_server_id_number)
 			end
 			sleep 10
-			if USE_MINION then
-				Minion.enqueue([ "create.cloud.server" ], {"server_id" => self.attributes["id"], "schedule_client_openvpn" => "true"})
-			else
-				self.send_later :create_cloud_server, true
-			end
+			Minion.enqueue([ "create.cloud.server" ], {"server_id" => self.attributes["id"], "schedule_client_openvpn" => "true"})
 		rescue Exception => e
 			fail_and_raise "Failed to rebuild cloud server.", e
 		end

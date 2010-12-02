@@ -26,11 +26,7 @@ class LinuxServer < Server
 					delete_cloud_server(self.cloud_server_id_number)
 				end
 				sleep 10
-				if USE_MINION then
-					Minion.enqueue([ "create.cloud.server" ], {"server_id" => self.attributes["id"], "schedule_client_openvpn" => "false"})
-				else
-					self.send_later :create_cloud_server, false
-				end
+				Minion.enqueue([ "create.cloud.server" ], {"server_id" => self.attributes["id"], "schedule_client_openvpn" => "false"})
 				return
 			end
 		end
@@ -48,11 +44,7 @@ class LinuxServer < Server
 				ovpn_server_val="f"
 			end
 			Server.find(:all, :conditions => ["server_group_id = ? AND openvpn_server = ?", self.server_group_id, ovpn_server_val]).each do |vpn_client|
-				if USE_MINION then
-					Minion.enqueue([ "create.openvpn.client" ], {"server_id" => vpn_client.id})
-				else
-					vpn_client.send_later :create_openvpn_client
-				end
+				Minion.enqueue([ "create.openvpn.client" ], {"server_id" => vpn_client.id})
 			end
 		else
 			fail_and_raise "Failed to install OpenVPN on the server."
@@ -83,11 +75,7 @@ class LinuxServer < Server
 				self.retry_count += 1
 				self.save
 				sleep 20
-				if USE_MINION then
-					Minion.enqueue([ "create.openvpn.client" ], {"server_id" => self.attributes["id"]})
-				else
-					self.send_later :create_openvpn_client
-				end
+				Minion.enqueue([ "create.openvpn.client" ], {"server_id" => self.attributes["id"]})
 				return
 			end
 
@@ -103,11 +91,7 @@ class LinuxServer < Server
 					save!
 				end
 				sleep 10
-				if USE_MINION then
-					Minion.enqueue([ "create.cloud.server" ], {"server_id" => self.attributes["id"], "schedule_client_openvpn" => "true"})
-				else
-					self.send_later :create_cloud_server, true
-				end
+				Minion.enqueue([ "create.cloud.server" ], {"server_id" => self.attributes["id"], "schedule_client_openvpn" => "true"})
 				return
 			end
 		end
@@ -147,7 +131,7 @@ class LinuxServer < Server
 
 				# poll the server until progress is 100%
 				cs=cs_conn.find_server("#{self.cloud_server_id_number}")
-				until cs.progress == 100 do
+				until cs.progress == 100 and cs.status == "ACTIVE" do
 					cs=cs_conn.find_server("#{self.cloud_server_id_number}")
 					sleep 1
 				end
