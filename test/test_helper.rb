@@ -50,8 +50,8 @@ module AuthTestHelper
 
 end
 
-module Minion
-  def enqueue(jobs, data = {})
+module Resque
+  def enqueue(klass, *args)
     return
   end
 end

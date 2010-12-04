@@ -106,7 +106,7 @@ class ServersController < ApplicationController
     @server.retry_count = 0
     @server.status = "Rebuilding"
     if @server.save then
-      Minion.enqueue([ "server.rebuild" ], {"server_id" => @server.id})
+      Resque.enqueue(RebuildServer, @server.id)
       respond_to do |format|
         format.json  { render :xml => @server }
         format.xml  { render :xml => @server }

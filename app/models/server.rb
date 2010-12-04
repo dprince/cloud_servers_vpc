@@ -33,6 +33,16 @@ class Server < ActiveRecord::Base
 
     end
 
+    def Server.create_vpn_client_for_type(server)
+
+		if server.type == "WindowsServer" then
+			Resque.enqueue(CreateWindowsVPNClient, server.id)
+		else
+			Resque.enqueue(CreateLinuxVPNClient, server.id)
+		end
+
+    end
+
     def after_initialize
         if new_record? then
             self.historical = false
@@ -94,14 +104,10 @@ class Server < ActiveRecord::Base
 	
 			# if this server is an OpenVPN server create it now
 			if self.openvpn_server then
-				Minion.enqueue([ "create.openvpn.server" ], {"server_id" => self.attributes["id"]})
+				Resque.enqueue(CreateOpenVPNServer, self.id)
 			else
 				if schedule_client_openvpn then
-					if self.type == "WindowsServer" then
-						Minion.enqueue([ "create.windows.openvpn.client" ], {"server_id" => self.attributes["id"]})
-					else
-						Minion.enqueue([ "create.openvpn.client" ], {"server_id" => self.attributes["id"]})
-					end
+					Server.create_vpn_client_for_type(self)
 				end
 			end
 
@@ -124,11 +130,10 @@ class Server < ActiveRecord::Base
 			end
 			save!
 			sleep 10
-			Minion.enqueue([ "create.cloud.server" ], {"server_id" => self.attributes["id"], "schedule_client_openvpn" => "false"})
+			Resque.enqueue(CreateCloudServer, self.id, false)
 		end
 
 	end
-	#handle_asynchronously :create_cloud_server
 
 	# class level function to delete cloud servers by their cloud_server ID's
 	def delete_cloud_server(cloud_server_id)
@@ -167,12 +172,11 @@ class Server < ActiveRecord::Base
 				delete_cloud_server(self.cloud_server_id_number)
 			end
 			sleep 10
-			Minion.enqueue([ "create.cloud.server" ], {"server_id" => self.attributes["id"], "schedule_client_openvpn" => "true"})
+			Resque.enqueue(CreateCloudServer, self.id, true)
 		rescue Exception => e
 			fail_and_raise "Failed to rebuild cloud server.", e
 		end
 	end
-	#handle_asynchronously :rebuild
 
 	def cloud_server_init
 		acct=Account.find(self.account_id)

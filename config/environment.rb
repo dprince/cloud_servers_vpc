@@ -22,7 +22,7 @@ Rails::Initializer.run do |config|
   # config.gem "sqlite3-ruby", :lib => "sqlite3"
   config.gem "cloudservers", :version => '0.2', :lib => "cloudservers"
   config.gem 'mislav-will_paginate', :lib => 'will_paginate', :source => 'http://gems.github.com'
-  config.gem "minion", :version => "0.1.15"
+  config.gem "resque", :version => '1.10.0'
 
   # Only load the plugins named here, in the order given (default is alphabetical).
   # :all can be used as a placeholder for all plugins not explicitly named
@@ -43,4 +43,9 @@ Rails::Initializer.run do |config|
   # The default locale is :en and all translations from config/locales/*.rb,yml are auto loaded.
   # config.i18n.load_path += Dir[Rails.root.join('my', 'locales', '*.{rb,yml}')]
   # config.i18n.default_locale = :de
+end
+
+# load in the jobs classes
+Dir[File.join(File.dirname(__FILE__), '..', 'app', 'models', 'jobs', '*')].each do |job|
+require job
 end

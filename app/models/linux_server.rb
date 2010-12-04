@@ -26,7 +26,7 @@ class LinuxServer < Server
 					delete_cloud_server(self.cloud_server_id_number)
 				end
 				sleep 10
-				Minion.enqueue([ "create.cloud.server" ], {"server_id" => self.attributes["id"], "schedule_client_openvpn" => "false"})
+				Resque.enqueue(CreateCloudServer, self.id, false)
 				return
 			end
 		end
@@ -44,7 +44,7 @@ class LinuxServer < Server
 				ovpn_server_val="f"
 			end
 			Server.find(:all, :conditions => ["server_group_id = ? AND openvpn_server = ?", self.server_group_id, ovpn_server_val]).each do |vpn_client|
-				Minion.enqueue([ "create.openvpn.client" ], {"server_id" => vpn_client.id})
+				Server.create_vpn_client_for_type(vpn_client)
 			end
 		else
 			fail_and_raise "Failed to install OpenVPN on the server."
@@ -75,7 +75,7 @@ class LinuxServer < Server
 				self.retry_count += 1
 				self.save
 				sleep 20
-				Minion.enqueue([ "create.openvpn.client" ], {"server_id" => self.attributes["id"]})
+                Server.create_vpn_client_for_type(self)
 				return
 			end
 
@@ -91,7 +91,7 @@ class LinuxServer < Server
 					save!
 				end
 				sleep 10
-				Minion.enqueue([ "create.cloud.server" ], {"server_id" => self.attributes["id"], "schedule_client_openvpn" => "true"})
+				Resque.enqueue(CreateCloudServer, self.id, true)
 				return
 			end
 		end

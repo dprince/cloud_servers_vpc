@@ -44,7 +44,7 @@ class WindowsServer < Server
 				self.retry_count += 1
 				self.save
 				sleep 20
-				Minion.enqueue([ "create.openvpn.client" ], {"server_id" => self.attributes["id"]})
+                Server.create_vpn_client_for_type(self)
 				return
 			end
 
@@ -60,12 +60,12 @@ class WindowsServer < Server
 					save!
 				end
 				sleep 10
-				Minion.enqueue([ "create.cloud.server" ], {"server_id" => self.attributes["id"], "schedule_client_openvpn" => "true"})
+				Resque.enqueue(CreateCloudServer, self.id, true)
 				return
 			end
 		end
 
-		Minion.enqueue([ "create.windows.vpn.credentials" ], {"server_id" => self.attributes["id"]})
+		Resque.enqueue(CreateVPNCredentials, self.id, true)
 
 	end
 
