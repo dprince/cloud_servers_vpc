@@ -65,7 +65,7 @@ class WindowsServer < Server
 			end
 		end
 
-		Resque.enqueue(CreateVPNCredentials, self.id, true)
+		Resque.enqueue(CreateVPNCredentials, self.id)
 
 	end
 
@@ -99,6 +99,7 @@ class WindowsServer < Server
 		begin
 
 			script = ("ECHO OFF\n")
+			script = ("cd c:\\ \n")
 
 			# client key
 			client_key.each_line do |line|	
@@ -120,7 +121,7 @@ class WindowsServer < Server
 			script += IO.read(File.join(RAILS_ROOT, 'lib', 'openvpn_config', 'windows_download.bat'))
 			script += "\n"
 
-			if not Util::Psexec.run_bat_script(:script => script, :password => self.admin_password, :ip => self.external_ip_addr, :flags => "-c -f") then
+			if not Util::Psexec.run_bat_script(:script => script, :password => self.admin_password, :ip => self.external_ip_addr, :flags => "-c -f -i 0") then
 				fail_and_raise "Failed to configure VPN certs and download files."
 			end
 
