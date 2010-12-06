@@ -4,7 +4,7 @@ module Util
 
 		def self.run_cmd(server_name_ip, cmd, user="root", identity_file="#{ENV['HOME']}/.ssh/id_rsa", logger=nil)
 				output = ""
-				IO.popen("ssh -T -i \"#{identity_file}\" #{user}@#{server_name_ip}", "r+") do |io|
+				IO.popen("ssh -o \"StrictHostKeyChecking no\" -T -i \"#{identity_file}\" #{user}@#{server_name_ip}", "r+") do |io|
 				io.puts(cmd)
 				io.close_write
 				output = io.readlines

@@ -141,7 +141,7 @@ class LinuxServer < Server
 				if ! system(%{
 
 						COUNT=0
-						while ! ssh -i #{self.server_group.ssh_key_basepath} root@#{cs.addresses[:public][0]} /bin/true > /dev/null 2>&1; do
+						while ! ssh -o "StrictHostKeyChecking no" -i #{self.server_group.ssh_key_basepath} root@#{cs.addresses[:public][0]} /bin/true > /dev/null 2>&1; do
 							if (($COUNT > 23)); then
 								exit 1
 							fi
@@ -167,7 +167,7 @@ class LinuxServer < Server
 			Timeout::timeout(30) do
 
 				if system(%{
-						ssh -i #{self.server_group.ssh_key_basepath} root@#{self.external_ip_addr} ping -c 1 #{test_ip} > /dev/null 2>&1
+						ssh -o "StrictHostKeyChecking no" -i #{self.server_group.ssh_key_basepath} root@#{self.external_ip_addr} ping -c 1 #{test_ip} > /dev/null 2>&1
 				}) then
 					return true
 				end
