@@ -17,6 +17,6 @@ ECHO END Function >> script.vbs
 
 ECHO download "http://c2865862.cdn.cloudfiles.rackspacecloud.com/openvpn-2.1.3-install.exe", "openvpn-install.exe" >> script.vbs
 
-ECHO download "http://c2865862.cdn.cloudfiles.rackspacecloud.com/AutoIt3_x64.exe", "AutoIt3.exe" >> script.vbs
+ECHO download "http://c2865862.cdn.cloudfiles.rackspacecloud.com/openvpn.cer", "openvpn.cer" >> script.vbs
 
 cscript c:\script.vbs

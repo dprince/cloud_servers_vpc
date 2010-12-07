@@ -67,7 +67,7 @@ class Client
 
 		client_key=%x{cat #{tmp_dir}/#{client_hostname}.key}
 		client_crt=%x{cat #{tmp_dir}/#{client_hostname}.crt}
-		ca_crt=%x{cat #{tmp_dir}/cat.crt}
+		ca_crt=%x{cat #{tmp_dir}/ca.crt}
 
 		if block_given? then
 			yield client_key, client_crt, ca_crt

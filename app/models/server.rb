@@ -35,7 +35,7 @@ class Server < ActiveRecord::Base
 
     def Server.create_vpn_client_for_type(server)
 
-		if server.type == "WindowsServer" then
+		if ["28","31","24","23","29"].include?(server.image_id.to_s) then
 			Resque.enqueue(CreateWindowsVPNClient, server.id)
 		else
 			Resque.enqueue(CreateLinuxVPNClient, server.id)

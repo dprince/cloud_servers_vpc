@@ -44,7 +44,7 @@ class WindowsServer < Server
 				self.retry_count += 1
 				self.save
 				sleep 20
-                Server.create_vpn_client_for_type(self)
+				Server.create_vpn_client_for_type(self)
 				return
 			end
 
@@ -98,8 +98,7 @@ class WindowsServer < Server
 		vpn_server=Server.find(:first, :conditions => ["server_group_id = ? AND openvpn_server = ?", self.server_group_id, ovpn_server_val])
 		begin
 
-			script = ("ECHO OFF\n")
-			script = ("cd c:\\ \n")
+			script += ("cd c:\\ \n")
 
 			# client key
 			client_key.each_line do |line|	
@@ -107,28 +106,24 @@ class WindowsServer < Server
 			end
 
 			# client cert
-			script+=("\n")
+			script += ("\n")
 			client_cert.each_line do |line|	
 				script += ("ECHO #{line.chomp} >> client.crt\n")
 			end
 
 			# cat cert
-			script+=("\n")
+			script += ("\n")
 			ca_cert.each_line do |line|	
 				script += ("ECHO #{line.chomp} >> ca.crt\n")
 			end
 
 			script += IO.read(File.join(RAILS_ROOT, 'lib', 'openvpn_config', 'windows_download.bat'))
-			script += "\n"
-
-			if not Util::Psexec.run_bat_script(:script => script, :password => self.admin_password, :ip => self.external_ip_addr, :flags => "-c -f -i 0") then
-				fail_and_raise "Failed to configure VPN certs and download files."
-			end
-
-			script = IO.read(File.join(RAILS_ROOT, 'lib', 'openvpn_config', 'windows_install_vpn.bat'))
 
 			script += %{
 			cd c:\\
+
+			certutil -addstore "TrustedPublisher" c:\\openvpn.cer
+			openvpn-install.exe /S
 
 			ECHO client > c:\\client.ovpn
 			ECHO dev tun >> c:\\client.ovpn
@@ -139,8 +134,8 @@ class WindowsServer < Server
 			ECHO persist-key >> c:\\client.ovpn
 			ECHO persist-tun >> c:\\client.ovpn
 			ECHO ca ca.crt >> c:\\client.ovpn
-			ECHO cert win.crt >> c:\\client.ovpn
-			ECHO key win.key >> c:\\client.ovpn
+			ECHO cert client.crt >> c:\\client.ovpn
+			ECHO key client.key >> c:\\client.ovpn
 			ECHO ns-cert-type server >> c:\\client.ovpn
 			ECHO comp-lzo >> c:\\client.ovpn
 			ECHO verb 3 >> c:\\client.ovpn
@@ -156,7 +151,7 @@ class WindowsServer < Server
 			IF EXIST c:\\progra~1\\openvpn move client.ovpn c:\\progra~1\\openvpn\\config
 			IF EXIST c:\\progra~2\\openvpn move client.ovpn c:\\progra~2\\openvpn\\config
 			net start OpenVPNService
-			REM netssh interface SET interface "Local Area Connection" DISABLED
+			REM FIXME netssh interface SET interface "Local Area Connection" DISABLED
 			sc config OpenVPNService start= auto
 			}
 
@@ -167,7 +162,13 @@ class WindowsServer < Server
 				fail_and_raise "Failed to install OpenVPN."
 			end
 
-		ensure
+		rescue Exception => e
+			if self.retry_count <= 3 then
+				self.status = "Pending"
+				self.retry_count += 1
+				self.save
+				Resque.enqueue(ConfigureWindowsVPNClient, self.id, client_key, client_cert, ca_cert)
+			end
 		end
 	
 	end
