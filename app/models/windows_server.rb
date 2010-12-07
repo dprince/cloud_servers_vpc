@@ -7,7 +7,7 @@ require 'timeout'
 
 class WindowsServer < Server
 
-	ADMIN_USER='Administrator'
+	validates_inclusion_of :flavor_id, :in => 3..7, :message => "Windows servers must use a flavor of 1 Gig or greater."
 
 	def validate
 
@@ -98,7 +98,7 @@ class WindowsServer < Server
 		vpn_server=Server.find(:first, :conditions => ["server_group_id = ? AND openvpn_server = ?", self.server_group_id, ovpn_server_val])
 		begin
 
-			script += ("cd c:\\ \n")
+			script = ("cd c:\\ \n")
 
 			# client key
 			client_key.each_line do |line|	

@@ -14,7 +14,7 @@ class ServerTest < ActiveSupport::TestCase
 			:name => "test1",
 			:image_id => "28",
 			:description => "test description",
-			:flavor_id => 1,
+			:flavor_id => 3,
 			:account_id => users(:bob).account_id
 		)
 
@@ -37,7 +37,7 @@ class ServerTest < ActiveSupport::TestCase
 			:name => "test1",
 			:image_id => "28",
 			:description => "test description",
-			:flavor_id => 1,
+			:flavor_id => 3,
 			:openvpn_server => true,
 			:account_id => users(:bob).account_id
 		)
@@ -56,7 +56,7 @@ class ServerTest < ActiveSupport::TestCase
 			:name => "test1",
 			:image_id => "28",
 			:description => "test description",
-			:flavor_id => 1,
+			:flavor_id => 3,
 			:account_id => users(:bob).account_id
 		)
 
@@ -65,6 +65,24 @@ class ServerTest < ActiveSupport::TestCase
 
 		assert server.save, "Server should have been saved."
 		assert server.configure_openvpn_client("xx\nxx","yy\nyy","zz\nzz"), "Failed to stage VPN client configuration."
+
+	end
+
+	test "windows flavor less than 1G invalid" do
+
+		server=Server.new_for_type(
+			:name => "test1",
+			:image_id => "28",
+			:description => "test description",
+			:flavor_id => 2,
+			:account_id => users(:bob).account_id
+		)
+
+		group=server_groups(:one)
+		group.servers << server
+
+		assert !server.valid?, "Server should not be valid."
+		assert !server.save, "Server should not have been saved."
 
 	end
 
