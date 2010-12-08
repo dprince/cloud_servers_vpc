@@ -26,9 +26,19 @@ class Server < ActiveRecord::Base
 	validates_length_of :name, :maximum => 255
 	validates_length_of :description, :maximum => 255
 
+    def self.image_id_windows?(image_id)
+
+		if ["28","31","24","23","29"].include?(image_id.to_s) then
+			true
+		else
+			false
+		end
+
+    end
+
     def self.new_for_type(params)
 
-		if ["28","31","24","23","29"].include?(params[:image_id].to_s) then
+		if Server.image_id_windows?(params[:image_id]) then
 			WindowsServer.new(params)
 		else
 			LinuxServer.new(params)
@@ -38,7 +48,7 @@ class Server < ActiveRecord::Base
 
     def Server.create_vpn_client_for_type(server)
 
-		if ["28","31","24","23","29"].include?(server.image_id.to_s) then
+		if Server.image_id_windows?(server.image_id) then
 			Resque.enqueue(CreateWindowsVPNClient, server.id)
 		else
 			Resque.enqueue(CreateLinuxVPNClient, server.id)
@@ -65,8 +75,11 @@ class Server < ActiveRecord::Base
 			transaction do
 				sg=self.server_group
 				ips=[sg.next_ip, sg.next_ip]
-				if not subnets_match?(ips[0], ips[1], "255.255.255.252") then
-					ips=[ips[1], sg.next_ip]
+
+				if Server.image_id_windows?(self.image_id) then
+					until (!range_endpoint?(ips[0]) and !range_endpoint?(ips[1])) do
+						ips=[ips[1], sg.next_ip]
+					end
 				end
 				sg.last_used_ip_address = IPAddr.new(sg.ip_inc_last_used_ip_address.to_i, Socket::AF_INET).to_s
 				sg.save!

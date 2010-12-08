@@ -86,4 +86,29 @@ class ServerTest < ActiveSupport::TestCase
 
 	end
 
+    test "create windows server with 2 VPN network interfaces" do
+
+        server=Server.new(
+            :name => "test1",
+            :description => "test description",
+            :flavor_id => 3,
+            :image_id => 28,
+            :num_vpn_network_interfaces => 2,
+            :account_id => users(:bob).account_id
+        )   
+            
+        group=server_groups(:one)
+        group.servers << server
+
+        assert server.valid?, "Server should be valid."
+        assert server.save, "Server should have been saved."
+
+        assert_equal 2, server.vpn_network_interfaces.size, "3 VPN network interfaces should have been created."
+
+        # If 172.19.0.10 exists then we should be good.
+        vpn_ip_count=VpnNetworkInterface.count(:conditions => "ptp_ip_addr = '172.19.0.10'")
+        assert_equal 1, vpn_ip_count, "VPN interface IP are not getting properly incremented for Windows."
+
+    end
+
 end

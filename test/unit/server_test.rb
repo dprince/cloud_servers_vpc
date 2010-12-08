@@ -120,10 +120,9 @@ class ServerTest < ActiveSupport::TestCase
 
 		# Group :one's last used IP address is 172.19.0.2.
 		# This is the IP of the OpenVPN server itself.
-		# One IP address is popped to ensure they are on the same /30 subnets.
 		# We created a server with 3 VPN interfaces each of which use
-		# two IP's. If 172.19.0.9 exists then we should be good.
-		vpn_ip_count=VpnNetworkInterface.count(:conditions => "ptp_ip_addr = '172.19.0.9'")
+		# two IP's. If 172.19.0.8 exists then we should be good.
+		vpn_ip_count=VpnNetworkInterface.count(:conditions => "ptp_ip_addr = '172.19.0.8'")
 		assert_equal 1, vpn_ip_count, "VPN interface IP are not getting properly incremented."
 
 	end
