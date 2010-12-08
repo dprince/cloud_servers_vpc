@@ -27,11 +27,11 @@ class Client
 
 	# It is the job of the caller to track and ensure unique IP's get
 	# used for the internal_vpn_ip and pptp_vpn_ip options.
-	def configure_client_vpn(client_hostname, internal_vpn_ip, pptp_vpn_ip)
+	def configure_client_vpn(client_hostname, internal_vpn_ip, pptp_vpn_ip, client_type="linux")
 		@hostname=client_hostname
 
 		# on the server we'll generate a new client cert
-		tmp_cert=@server.add_vpn_client(client_hostname, internal_vpn_ip, pptp_vpn_ip)
+		tmp_cert=@server.add_vpn_client(client_hostname, internal_vpn_ip, pptp_vpn_ip, client_type)
 		# scp the client cert to the client machine	
 		retval=system("scp -i \"#{@ssh_identity_file}\" #{tmp_cert} #{@ssh_as_user}@#{@external_ip_addr}:/etc/openvpn/cert.tar.gz")
 		File.delete(tmp_cert) if File.exists?(tmp_cert)
@@ -55,12 +55,12 @@ class Client
 
 	end
 
-	def create_client_credentials(client_hostname, internal_vpn_ip, pptp_vpn_ip)
+	def create_client_credentials(client_hostname, internal_vpn_ip, pptp_vpn_ip, client_type="linux")
 
 		@hostname=client_hostname
 
 		# on the server we'll generate a new client cert
-		tmp_cert=@server.add_vpn_client(client_hostname, internal_vpn_ip, pptp_vpn_ip)
+		tmp_cert=@server.add_vpn_client(client_hostname, internal_vpn_ip, pptp_vpn_ip, client_type)
 		tmp_dir=Util::TmpDir.tmp_dir
 
 		system("cd #{tmp_dir}; tar xf #{tmp_cert}") or return false

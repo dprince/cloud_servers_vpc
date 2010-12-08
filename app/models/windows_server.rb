@@ -81,7 +81,7 @@ class WindowsServer < Server
 		vpn_creds=nil
 		self.vpn_network_interfaces.each_with_index do |vni, index|
 			client_name = (index == 0) ? self.name : "#{self.name}-#{index.to_s}"
-			vpn_creds=client.create_client_credentials(client_name, vni.vpn_ip_addr, vni.ptp_ip_addr)
+			vpn_creds=client.create_client_credentials(client_name, vni.vpn_ip_addr, vni.ptp_ip_addr, "windows")
 		end
 
 		return [vpn_creds[0], tail_cert(vpn_creds[1]), vpn_creds[2]]

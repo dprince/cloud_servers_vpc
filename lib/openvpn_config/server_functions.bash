@@ -100,9 +100,9 @@ function create_server_key {
 
 function create_client_key {
 
-	if (( $# != 4 )); then
+	if (( $# != 6 )); then
 		echo "Failed to create client key."
-		echo "usage: create_client_key <client name> <client ip> <client pptp ip>"
+		echo "usage: create_client_key <client name> <client domain> <client ip> <client pptp ip> <client type> <vpn_server_ip>"
 		exit 1
 	fi
 
@@ -110,6 +110,8 @@ function create_client_key {
 	local CLIENT_DOMAIN=$2
 	local CLIENT_INTERNAL_IP=$3
 	local CLIENT_INTERNAL_PTP_IP=$4
+	local CLIENT_TYPE=$5
+	local VPN_SERVER_IP=$6 #172.19.0.1 for example
 
 	echo -n "Creating client key for: $CLIENT_NAME..."
 	cd $OPENVPN_CONFIG_DIR/easy-rsa
@@ -134,6 +136,12 @@ function create_client_key {
 	cat > $OPENVPN_CONFIG_DIR/ccd/$CLIENT_NAME <<-EOF_CAT
 		ifconfig-push $CLIENT_INTERNAL_IP $CLIENT_INTERNAL_PTP_IP
 	EOF_CAT
+	if [[ "$CLIENT_TYPE" == "windows" ]]; then
+		cat >> $OPENVPN_CONFIG_DIR/ccd/$CLIENT_NAME <<-EOF_CAT
+			push "dhcp-option DNS $VPN_SERVER_IP"
+			push "dhcp-option WINS $VPN_SERVER_IP"
+		EOF_CAT
+	fi
 
 	# add the client name to /etc/hosts
 
