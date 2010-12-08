@@ -151,8 +151,14 @@ class WindowsServer < Server
 			IF EXIST c:\\progra~1\\openvpn move client.ovpn c:\\progra~1\\openvpn\\config
 			IF EXIST c:\\progra~2\\openvpn move client.ovpn c:\\progra~2\\openvpn\\config
 			net start OpenVPNService
-			REM FIXME netssh interface SET interface "Local Area Connection" DISABLED
 			sc config OpenVPNService start= auto
+
+			ping 127.0.0.1 -n 10 -w 1000 > NUL
+			ipconfig | FIND "#{self.internal_ip_addr}" > NUL
+			IF ERRORLEVEL 1 EXIT 1
+
+			netsh interface SET interface "Local Area Connection" DISABLED
+
 			}
 
 			if Util::Psexec.run_bat_script(:script => script, :password => self.admin_password, :ip => self.external_ip_addr, :flags => "-s -c -f -i 1") then
