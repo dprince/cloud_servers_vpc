@@ -139,6 +139,7 @@ function create_client_key {
 	if [[ "$CLIENT_TYPE" == "windows" ]]; then
 		cat >> $OPENVPN_CONFIG_DIR/ccd/$CLIENT_NAME <<-EOF_CAT
 			push "dhcp-option DNS $VPN_SERVER_IP"
+			push "dhcp-option DOMAIN $CLIENT_DOMAIN"
 			push "dhcp-option WINS $VPN_SERVER_IP"
 		EOF_CAT
 	fi
