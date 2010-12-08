@@ -24,7 +24,7 @@ class Server
 		@logger=logger
 	end
 
-	def initialize(external_ip_addr, internal_ip_addr, domain_name="rsapps.net", vpn_network="172.19.0.0", vpn_subnet="255.255.128.0", ssh_as_user="root", ssh_identity_file="#{ENV['HOME']}/.ssh/id_rsa")
+	def initialize(external_ip_addr, internal_ip_addr, domain_name="vpc", vpn_network="172.19.0.0", vpn_subnet="255.255.128.0", ssh_as_user="root", ssh_identity_file="#{ENV['HOME']}/.ssh/id_rsa")
 		@external_ip_addr=external_ip_addr
 		@internal_ip_addr=internal_ip_addr
 		@domain_name=domain_name
