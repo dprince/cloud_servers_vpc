@@ -1,8 +1,11 @@
 require 'logger'
 require 'cloud_servers_util'
 require 'timeout'
+require 'util/ip_validator'
 
 class Server < ActiveRecord::Base
+
+	include Util::IpValidator
 
 	cattr_accessor :server_online_timeout
 	cattr_accessor :windows_server_online_timeout
@@ -59,11 +62,20 @@ class Server < ActiveRecord::Base
 		end
 
 		self.num_vpn_network_interfaces.to_i.times do |i|
-			VpnNetworkInterface.create(
-				:vpn_ip_addr => self.server_group.save_next_ip,
-				:ptp_ip_addr => self.server_group.save_next_ip,
-				:server_id => self.attributes["id"]
-			)
+			transaction do
+				sg=self.server_group
+				ips=[sg.next_ip, sg.next_ip]
+				if not subnets_match?(ips[0], ips[1], "255.255.255.252") then
+					ips=[ips[1], sg.next_ip]
+				end
+				sg.last_used_ip_address = IPAddr.new(sg.ip_inc_last_used_ip_address.to_i, Socket::AF_INET).to_s
+				sg.save!
+				VpnNetworkInterface.create(
+					:vpn_ip_addr => ips[0],
+					:ptp_ip_addr => ips[1],
+					:server_id => self.attributes["id"]
+				)
+			end
 		end
 
 	end

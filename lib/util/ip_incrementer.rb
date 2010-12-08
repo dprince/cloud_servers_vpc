@@ -4,6 +4,8 @@ module Util
 
 	module IpIncrementer
 
+		attr_reader :ip_inc_last_used_ip_address
+
 		@ip_inc_last_used_ip_address=nil
 
 		# initialize the starting IP address
