@@ -150,7 +150,7 @@ function create_client_key {
 		echo "$CLIENT_INTERNAL_IP	$CLIENT_NAME.$CLIENT_DOMAIN $CLIENT_NAME" >> /etc/hosts
 	fi
 
-	/etc/init.d/dnsmasq reload || /etc/init.d/dnsmasq restart
+	/etc/init.d/dnsmasq reload &> /dev/null || /etc/init.d/dnsmasq restart &> /dev/null || { echo "Failed to restart DnsMasq on $HOSTNAME."; return 1; }
 
 }
 
@@ -162,7 +162,7 @@ function start_dns_server {
 		fi
 	elif [ -f /usr/bin/dpkg ]; then
 		if ! dpkg -s dnsmasq > /dev/null 2>&1; then
-			aptitude install -y -q dnsmasq
+			DEBIAN_FRONTEND=noninteractive apt-get install -y dnsmasq &> /dev/null || { echo "Failed to install DnsMasq via apt-get on $HOSTNAME."; exit 1; }
 		fi
 	else
 		echo "Unable to install dnsmasq package."

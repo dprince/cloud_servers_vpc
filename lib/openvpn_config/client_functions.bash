@@ -101,7 +101,9 @@ function init_client_etc_hosts {
 	echo "$CLIENT_IP	$CLIENT_NAME.$CLIENT_DOMAIN $CLIENT_NAME" >> /etc/hosts
 
 	hostname "$CLIENT_NAME"
-	sed -e "s|^HOSTNAME.*|HOSTNAME=$CLIENT_NAME|" -i /etc/sysconfig/network
+	if [ -f /etc/sysconfig/network ]; then
+		sed -e "s|^HOSTNAME.*|HOSTNAME=$CLIENT_NAME|" -i /etc/sysconfig/network
+	fi
 	echo "OK"
 
 }
