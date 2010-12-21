@@ -1,1 +1,2 @@
 Server.server_online_timeout=360
+Server.windows_server_online_timeout=720

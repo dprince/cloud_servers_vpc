@@ -70,12 +70,6 @@ class ServerGroup < ActiveRecord::Base
 
 	end
 
-	def save_next_ip
-		self.last_used_ip_address = next_ip
-		save
-		return self.last_used_ip_address
-	end
-
 	def ssh_key_basepath
 		RAILS_ROOT+File::SEPARATOR+'tmp'+File::SEPARATOR+'ssh_keys'+File::SEPARATOR+RAILS_ENV+File::SEPARATOR+self.id.to_s
 	end
@@ -85,6 +79,5 @@ class ServerGroup < ActiveRecord::Base
 			server.make_historical
 		end
 	end
-	#handle_asynchronously :make_historical
 
 end

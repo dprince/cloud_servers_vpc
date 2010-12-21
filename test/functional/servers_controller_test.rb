@@ -35,6 +35,23 @@ class ServersControllerTest < ActionController::TestCase
 
   end
 
+  test "should get index as admin for bob" do
+
+	login_as(:admin)
+    get :index, :server_group_id => server_groups(:one)
+    assert_response :success
+    assert_not_nil assigns(:servers)
+
+  end
+
+  test "jim should not get index for bob" do
+
+	login_as(:jim)
+    get :index, :server_group_id => server_groups(:one)
+    assert_response 401
+
+  end
+
   test "should not get index for historical records" do
 
     get :index, :historical => "1"

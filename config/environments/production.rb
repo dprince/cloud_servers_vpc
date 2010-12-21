@@ -27,8 +27,6 @@ config.log_level = :warn
 # Enable threaded mode
 # config.threadsafe!
 
-ENV['AMQP_URL'] = "amqp://cloud_servers_vpc:testing@localhost/cloud_servers_vpc"
-
 #ENV['RACKSPACE_CLOUD_USERNAME'] = "test"
 #ENV['RACKSPACE_CLOUD_API_KEY'] = "test"
 
@@ -42,3 +40,6 @@ ENV['RACKSPACE_CLOUD_SERVER_NAME_PREFIX'] = ""
 # Optional EPEL_BASE_URL. Use this option to specify a specific EPEL
 # mirror to be used by Redhat/Centos images.
 # ENV['EPEL_BASE_URL'] = ""
+
+# Specify the default Resque Redis URL (defaults to localhost)
+# Resque.redis="redis://localhost:6379"

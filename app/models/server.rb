@@ -1,15 +1,16 @@
 require 'logger'
 require 'cloud_servers_util'
-require 'openvpn_config/server'
-require 'openvpn_config/client'
-require 'util/ssh'
 require 'timeout'
-require 'tempfile'
+require 'util/ip_validator'
 
 class Server < ActiveRecord::Base
 
-    cattr_accessor :server_online_timeout
+	include Util::IpValidator
+
+	cattr_accessor :server_online_timeout
+	cattr_accessor :windows_server_online_timeout
 	self.server_online_timeout = 360
+	self.windows_server_online_timeout = 720
 
 	attr_accessor :num_vpn_network_interfaces
 
@@ -24,6 +25,36 @@ class Server < ActiveRecord::Base
 	validates_format_of :name, :with => /^[A-Za-z0-9\-\.]+$/, :message => "Server name must use valid hostname characters (A-Z, a-z, 0-9, dash)."
 	validates_length_of :name, :maximum => 255
 	validates_length_of :description, :maximum => 255
+
+    def self.image_id_windows?(image_id)
+
+		if ["28","31","24","23","29","58"].include?(image_id.to_s) then
+			true
+		else
+			false
+		end
+
+    end
+
+    def self.new_for_type(params)
+
+		if Server.image_id_windows?(params[:image_id]) then
+			WindowsServer.new(params)
+		else
+			LinuxServer.new(params)
+		end
+
+    end
+
+    def Server.create_vpn_client_for_type(server)
+
+		if Server.image_id_windows?(server.image_id) then
+			Resque.enqueue(CreateWindowsVPNClient, server.id)
+		else
+			Resque.enqueue(CreateLinuxVPNClient, server.id)
+		end
+
+    end
 
     def after_initialize
         if new_record? then
@@ -41,11 +72,23 @@ class Server < ActiveRecord::Base
 		end
 
 		self.num_vpn_network_interfaces.to_i.times do |i|
-			VpnNetworkInterface.create(
-				:vpn_ip_addr => self.server_group.save_next_ip,
-				:ptp_ip_addr => self.server_group.save_next_ip,
-				:server_id => self.attributes["id"]
-			)
+			transaction do
+				sg=self.server_group
+				ips=[sg.next_ip, sg.next_ip]
+
+				if Server.image_id_windows?(self.image_id) then
+					until (!range_endpoint?(ips[0]) and !range_endpoint?(ips[1])) do
+						ips=[ips[1], sg.next_ip]
+					end
+				end
+				sg.last_used_ip_address = IPAddr.new(sg.ip_inc_last_used_ip_address.to_i, Socket::AF_INET).to_s
+				sg.save!
+				VpnNetworkInterface.create(
+					:vpn_ip_addr => ips[0],
+					:ptp_ip_addr => ips[1],
+					:server_id => self.attributes["id"]
+				)
+			end
 		end
 
 	end
@@ -81,22 +124,15 @@ class Server < ActiveRecord::Base
 			self.cloud_server_id_number = cs.id
 			self.external_ip_addr = cs.addresses[:public][0]
 			self.internal_ip_addr = cs.addresses[:private][0]
+			self.admin_password = cs.adminPass
 			save!
 	
 			# if this server is an OpenVPN server create it now
 			if self.openvpn_server then
-				if USE_MINION then
-					Minion.enqueue([ "create.openvpn.server" ], {"server_id" => self.attributes["id"]})
-				else
-					self.send_later :create_openvpn_server
-				end
+				Resque.enqueue(CreateOpenVPNServer, self.id)
 			else
 				if schedule_client_openvpn then
-					if USE_MINION then
-						Minion.enqueue([ "create.openvpn.client" ], {"server_id" => self.attributes["id"]})
-					else
-						self.send_later :create_openvpn_client
-					end
+					Server.create_vpn_client_for_type(self)
 				end
 			end
 
@@ -119,15 +155,10 @@ class Server < ActiveRecord::Base
 			end
 			save!
 			sleep 10
-			if USE_MINION then
-				Minion.enqueue([ "create.cloud.server" ], {"server_id" => self.attributes["id"], "schedule_client_openvpn" => "false"})
-			else
-				self.send_later :create_cloud_server, false
-			end
+			Resque.enqueue(CreateCloudServer, self.id, false)
 		end
 
 	end
-	#handle_asynchronously :create_cloud_server
 
 	# class level function to delete cloud servers by their cloud_server ID's
 	def delete_cloud_server(cloud_server_id)
@@ -166,16 +197,11 @@ class Server < ActiveRecord::Base
 				delete_cloud_server(self.cloud_server_id_number)
 			end
 			sleep 10
-			if USE_MINION then
-				Minion.enqueue([ "create.cloud.server" ], {"server_id" => self.attributes["id"], "schedule_client_openvpn" => "true"})
-			else
-				self.send_later :create_cloud_server, true
-			end
+			Resque.enqueue(CreateCloudServer, self.id, true)
 		rescue Exception => e
 			fail_and_raise "Failed to rebuild cloud server.", e
 		end
 	end
-	#handle_asynchronously :rebuild
 
 	def cloud_server_init
 		acct=Account.find(self.account_id)

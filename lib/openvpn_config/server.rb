@@ -24,7 +24,7 @@ class Server
 		@logger=logger
 	end
 
-	def initialize(external_ip_addr, internal_ip_addr, domain_name="rsapps.net", vpn_network="172.19.0.0", vpn_subnet="255.255.128.0", ssh_as_user="root", ssh_identity_file="#{ENV['HOME']}/.ssh/id_rsa")
+	def initialize(external_ip_addr, internal_ip_addr, domain_name="vpc", vpn_network="172.19.0.0", vpn_subnet="255.255.128.0", ssh_as_user="root", ssh_identity_file="#{ENV['HOME']}/.ssh/id_rsa")
 		@external_ip_addr=external_ip_addr
 		@internal_ip_addr=internal_ip_addr
 		@domain_name=domain_name
@@ -88,10 +88,10 @@ class Server
 
 	end
 
-	def add_vpn_client(client_hostname, client_ip, client_ptp_ip)
+	def add_vpn_client(client_hostname, client_ip, client_ptp_ip, type="linux")
 
 		script = IO.read(File.join(File.dirname(__FILE__), "server_functions.bash"))
-		script += "create_client_key '#{client_hostname}' '#{@domain_name}' '#{client_ip}' '#{client_ptp_ip}'\n"
+		script += "create_client_key '#{client_hostname}' '#{@domain_name}' '#{client_ip}' '#{client_ptp_ip}' '#{type}' '#{self.vpn_ipaddr}'\n"
 		Util::Ssh.run_cmd(@external_ip_addr, script, @ssh_as_user, @ssh_identity_file, @logger)
 		#Copy the client cert to a local temp file and return its location
 		return download_client_cert(client_hostname)

@@ -26,11 +26,7 @@ class LinuxServer < Server
 					delete_cloud_server(self.cloud_server_id_number)
 				end
 				sleep 10
-				if USE_MINION then
-					Minion.enqueue([ "create.cloud.server" ], {"server_id" => self.attributes["id"], "schedule_client_openvpn" => "false"})
-				else
-					self.send_later :create_cloud_server, false
-				end
+				Resque.enqueue(CreateCloudServer, self.id, false)
 				return
 			end
 		end
@@ -48,11 +44,7 @@ class LinuxServer < Server
 				ovpn_server_val="f"
 			end
 			Server.find(:all, :conditions => ["server_group_id = ? AND openvpn_server = ?", self.server_group_id, ovpn_server_val]).each do |vpn_client|
-				if USE_MINION then
-					Minion.enqueue([ "create.openvpn.client" ], {"server_id" => vpn_client.id})
-				else
-					vpn_client.send_later :create_openvpn_client
-				end
+				Server.create_vpn_client_for_type(vpn_client)
 			end
 		else
 			fail_and_raise "Failed to install OpenVPN on the server."
@@ -83,11 +75,7 @@ class LinuxServer < Server
 				self.retry_count += 1
 				self.save
 				sleep 20
-				if USE_MINION then
-					Minion.enqueue([ "create.openvpn.client" ], {"server_id" => self.attributes["id"]})
-				else
-					self.send_later :create_openvpn_client
-				end
+                Server.create_vpn_client_for_type(self)
 				return
 			end
 
@@ -103,11 +91,7 @@ class LinuxServer < Server
 					save!
 				end
 				sleep 10
-				if USE_MINION then
-					Minion.enqueue([ "create.cloud.server" ], {"server_id" => self.attributes["id"], "schedule_client_openvpn" => "true"})
-				else
-					self.send_later :create_cloud_server, true
-				end
+				Resque.enqueue(CreateCloudServer, self.id, true)
 				return
 			end
 		end
@@ -147,7 +131,7 @@ class LinuxServer < Server
 
 				# poll the server until progress is 100%
 				cs=cs_conn.find_server("#{self.cloud_server_id_number}")
-				until cs.progress == 100 do
+				until cs.progress == 100 and cs.status == "ACTIVE" do
 					cs=cs_conn.find_server("#{self.cloud_server_id_number}")
 					sleep 1
 				end
@@ -157,7 +141,7 @@ class LinuxServer < Server
 				if ! system(%{
 
 						COUNT=0
-						while ! ssh -i #{self.server_group.ssh_key_basepath} root@#{cs.addresses[:public][0]} /bin/true > /dev/null 2>&1; do
+						while ! ssh -o "StrictHostKeyChecking no" -i #{self.server_group.ssh_key_basepath} root@#{cs.addresses[:public][0]} /bin/true > /dev/null 2>&1; do
 							if (($COUNT > 23)); then
 								exit 1
 							fi
@@ -183,7 +167,7 @@ class LinuxServer < Server
 			Timeout::timeout(30) do
 
 				if system(%{
-						ssh -i #{self.server_group.ssh_key_basepath} root@#{self.external_ip_addr} ping -c 1 #{test_ip} > /dev/null 2>&1
+						ssh -o "StrictHostKeyChecking no" -i #{self.server_group.ssh_key_basepath} root@#{self.external_ip_addr} ping -c 1 #{test_ip} > /dev/null 2>&1
 				}) then
 					return true
 				end

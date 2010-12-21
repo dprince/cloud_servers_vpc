@@ -42,7 +42,7 @@ class ServersController < ApplicationController
     else
 
       sg=ServerGroup.find(@server_group_id)
-      if session[:user_id] and sg and session[:user_id] != sg.user_id
+      if not is_admin and session[:user_id] and sg and session[:user_id] != sg.user_id
         render :text => "Attempt to view an unauthorized record.", :status => "401"
         return false
       end
@@ -106,11 +106,7 @@ class ServersController < ApplicationController
     @server.retry_count = 0
     @server.status = "Rebuilding"
     if @server.save then
-      if USE_MINION then
-        Minion.enqueue([ "server.rebuild" ], {"server_id" => @server.id})
-      else
-        self.send_later :rebuild
-      end
+      Resque.enqueue(RebuildServer, @server.id)
       respond_to do |format|
         format.json  { render :xml => @server }
         format.xml  { render :xml => @server }
