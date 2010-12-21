@@ -192,6 +192,7 @@ class WindowsServer < Server
 		error_message="Failed to build server."
 
 		timeout=self.windows_server_online_timeout-(Time.now-self.updated_at).to_i
+		timeout = 2000 if self.image_id == 58 # FIXME remove this when image customization support and settings are added
 		timeout = 120 if timeout < 120
 
 		begin

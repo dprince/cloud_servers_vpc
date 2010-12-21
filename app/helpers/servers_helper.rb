@@ -43,6 +43,8 @@ module ServersHelper
 			"Gentoo 10.1"
 		when 28
 			"Windows Server 2008 R2 x64"
+		when 58
+			"Windows Server 2008 R2 x64 SQL Server"
 		when 55
 			"Arch 2010.05"
 		when 41
