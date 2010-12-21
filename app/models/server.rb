@@ -28,7 +28,7 @@ class Server < ActiveRecord::Base
 
     def self.image_id_windows?(image_id)
 
-		if ["28","31","24","23","29"].include?(image_id.to_s) then
+		if ["28","31","24","23","29","58"].include?(image_id.to_s) then
 			true
 		else
 			false

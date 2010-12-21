@@ -139,6 +139,11 @@ class WindowsServer < Server
 			ECHO ns-cert-type server >> c:\\client.ovpn
 			ECHO comp-lzo >> c:\\client.ovpn
 			ECHO verb 3 >> c:\\client.ovpn
+			ECHO up up.bat >> c:\\client.ovpn
+			ECHO up-delay >> c:\\client.ovpn
+			ECHO script-security 2 >> c:\\client.ovpn
+
+			ECHO c:\\windows\\System32\\netsh.exe interface SET interface "public" DISABLED > c:\\up.bat
 
 			IF EXIST c:\\progra~1\\openvpn move client.key c:\\progra~1\\openvpn\\config
 			IF EXIST c:\\progra~2\\openvpn move client.key c:\\progra~2\\openvpn\\config
@@ -148,16 +153,17 @@ class WindowsServer < Server
 
 			IF EXIST c:\\progra~1\\openvpn move ca.crt c:\\progra~1\\openvpn\\config
 			IF EXIST c:\\progra~2\\openvpn move ca.crt c:\\progra~2\\openvpn\\config
+
 			IF EXIST c:\\progra~1\\openvpn move client.ovpn c:\\progra~1\\openvpn\\config
 			IF EXIST c:\\progra~2\\openvpn move client.ovpn c:\\progra~2\\openvpn\\config
-			net start OpenVPNService
+
+			IF EXIST c:\\progra~1\\openvpn move up.bat c:\\progra~1\\openvpn\\config
+			IF EXIST c:\\progra~2\\openvpn move up.bat c:\\progra~2\\openvpn\\config
 			sc config OpenVPNService start= auto
 
-			ping 127.0.0.1 -n 10 -w 1000 > NUL
-			ipconfig | FIND "#{self.internal_ip_addr}" > NUL
-			IF ERRORLEVEL 1 EXIT 1
-
-			netsh interface SET interface "Local Area Connection" DISABLED
+			netdom COMPUTERNAME localhost /Add:#{self.name}.#{self.server_group.domain_name}
+			netdom COMPUTERNAME localhost /MakePrimary:#{self.name}.#{self.server_group.domain_name}
+			netdom RENAMECOMPUTER localhost /NewName: #{self.name} /Force /Reboot 5
 
 			}
 
