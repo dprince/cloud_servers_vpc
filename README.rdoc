@@ -8,7 +8,7 @@ A web application with a REST based HTTP interface to create groups of servers i
 
 == Features
 
--Supports Centos, Fedora, RHEL, and Ubuntu.
+-Supports Centos, Fedora, RHEL, and Ubuntu, and Windows 2008 R2.
 
 -Communication between servers is secured with OpenVPN
 
@@ -32,9 +32,10 @@ Requires a Ruby, Rubygems, and Ruby on Rails 2.3.8. The app was developed agains
 
 The application was developed with MySQL. The following gems are required:
 
-	mysql
-	daemons (1.1.0)
+	mysql (2.8.1)
 	json (1.4.3)
+	resque (1.10.0)
+	SystemTimer (1.2.1)
 
 Unpack the rails app and run the following commands to setup a working
 development application:
@@ -42,7 +43,7 @@ development application:
 	rake db:create
 	rake db:migrate
 	mkdir tmp/pids
-	./script/delayed_job start
+	rake resque:workers QUEUE=linux COUNT=3
 	./script/server
 
 At this point the web application should be running at http://localhost:3000. The default username:password is admin:cloud.
