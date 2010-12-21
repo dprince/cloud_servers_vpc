@@ -42,7 +42,7 @@ class ServersController < ApplicationController
     else
 
       sg=ServerGroup.find(@server_group_id)
-      if session[:user_id] and sg and session[:user_id] != sg.user_id
+      if not is_admin and session[:user_id] and sg and session[:user_id] != sg.user_id
         render :text => "Attempt to view an unauthorized record.", :status => "401"
         return false
       end
