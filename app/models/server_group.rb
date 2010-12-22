@@ -16,6 +16,7 @@ class ServerGroup < ActiveRecord::Base
     accepts_nested_attributes_for :servers, :update_only => true
 	has_many :ssh_public_keys, :dependent => :destroy
 	belongs_to :user
+	belongs_to :root_ssh_keypair
 
 	validates_associated :servers
 	validates_associated :ssh_public_keys
@@ -32,6 +33,11 @@ class ServerGroup < ActiveRecord::Base
 
 	def after_create
 		generate_ssh_keypair(ssh_key_basepath)
+		keypair_params={
+			:private_key => IO.read(ssh_key_basepath),
+			:public_key => IO.read(ssh_key_basepath+".pub")
+		}
+		self.root_ssh_keypair=RootSshKeypair.create(keypair_params)
 	end
 
 	def before_destroy
@@ -71,7 +77,18 @@ class ServerGroup < ActiveRecord::Base
 	end
 
 	def ssh_key_basepath
-		RAILS_ROOT+File::SEPARATOR+'tmp'+File::SEPARATOR+'ssh_keys'+File::SEPARATOR+RAILS_ENV+File::SEPARATOR+self.id.to_s
+		path=File.join(RAILS_ROOT, 'tmp', 'ssh_keys', RAILS_ENV, self.id.to_s)
+		kp=self.root_ssh_keypair	
+		if not kp.nil? then
+			# write ssh keys to disk from the DB if they don't already exist
+			if not File.exists?(path)
+				File.open(path, 'w') {|f| f.write(kp.private_key)}
+			end
+			if not File.exists?(path+".pub")
+				File.open(path+".pub", 'w') {|f| f.write(kp.public_key)}
+			end
+		end
+		path
 	end
 
 	def make_historical

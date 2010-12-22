@@ -2,6 +2,7 @@ require 'test_helper'
 
 class ServerGroupTest < ActiveSupport::TestCase
 
+	fixtures :root_ssh_keypairs
 	fixtures :server_groups
 	fixtures :servers
 	fixtures :users
@@ -19,6 +20,9 @@ class ServerGroupTest < ActiveSupport::TestCase
 		)
 		assert sg.valid?, "Server group should be valid."
 		assert sg.save!, "Server group should have saved."
+
+		assert_not_nil sg.root_ssh_keypair.public_key, "Server group has a keypair public key."
+		assert_not_nil sg.root_ssh_keypair.private_key, "Server group has a keypair private key."
 
 	end
 
@@ -134,6 +138,23 @@ class ServerGroupTest < ActiveSupport::TestCase
 		assert sg.valid?, "Server group should be valid."
 		assert sg.save!, "Server group should have saved."
 		assert_equal 1, sg.servers.size
+
+	end
+
+	test "writes ssh root keypair from DB" do
+
+		sg=server_groups(:one)
+		path=sg.ssh_key_basepath
+		assert File.delete(path), "Failed to delete private key."
+		assert File.delete(path+".pub"), "Failed to delete public key."
+
+		# another call to ssh_key_basepath should write out the keys again
+		sg.ssh_key_basepath
+		private_key = IO.read(path)
+		public_key = IO.read(path+".pub")
+
+		assert_equal sg.root_ssh_keypair.private_key, private_key, "Private keys don't match."
+		assert_equal sg.root_ssh_keypair.public_key, public_key, "Public keys don't match."
 
 	end
 
