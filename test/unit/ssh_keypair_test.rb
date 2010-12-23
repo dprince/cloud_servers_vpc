@@ -2,12 +2,15 @@ require 'test_helper'
 
 class RootSshKeypairTest < ActiveSupport::TestCase
 
-	test "create root ssh keypair" do
+	fixtures :server_groups
 
-		keypair=RootSshKeypair.new(
+	test "create ssh keypair" do
+
+		keypair=SshKeypair.new(
 			:public_key => "blah",
 			:private_key => "blah"
 		)
+		server_groups(:one).ssh_keypair=keypair
 
 		assert keypair.valid?, "Root ssh keypair should be valid."
 		assert keypair.save, "Root ssh keypair should have been saved."
@@ -16,7 +19,7 @@ class RootSshKeypairTest < ActiveSupport::TestCase
 
 	test "requires private key" do
 
-		keypair=RootSshKeypair.new(
+		keypair=SshKeypair.new(
 			:public_key => "blah"
 		)
 
@@ -27,7 +30,7 @@ class RootSshKeypairTest < ActiveSupport::TestCase
 
 	test "requires public key" do
 
-		keypair=RootSshKeypair.new(
+		keypair=SshKeypair.new(
 			:private_key => "blah"
 		)
 

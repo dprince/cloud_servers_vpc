@@ -9,7 +9,6 @@ one:
   last_used_ip_address: 172.19.0.2
   owner_name: bob
   user: bob
-  root_ssh_keypair: one
 
 two:
   name: Group 2
@@ -20,7 +19,6 @@ two:
   last_used_ip_address: 172.16.0.2
   owner_name: jim
   user: jim
-  root_ssh_keypair: two
 
 history:
   name: Group History
@@ -31,4 +29,3 @@ history:
   last_used_ip_address: 172.16.0.2
   owner_name: admin
   user: admin
-  root_ssh_keypair: history

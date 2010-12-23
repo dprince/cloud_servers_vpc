@@ -1,6 +1,7 @@
 # Read about fixtures at http://ar.rubyonrails.org/classes/Fixtures.html
 
 one:
+  server_group: one
   public_key: ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDfQrXLnXgGkWw4atUtUtFyYgznVndod5njp4aRLefDP6MP8/tdF/iU3/yTJFbHIg/DuaiH71Pg8+n++Txq+JL69/xYCO/viN64nHhy+xbiROS6/Q/Swgt0hG8tuWXk+6l/1er4r6zodosZZEgjZLcbVzJksxaFhk7V0ea3y6AELLJS5mD8bAkkxh8HtXXXyMNWfQ01z3nTWAC1Dq6/der26iqAHqvzrz2lYJ9+fdl9vxM6eOIA8YqcEcnQfZM34v9RUrUL/obUb4b99Iennf4dTlXEuheqmKuXbk2bB57Lf8DCXe52KNvOZ+ItRv0bezriSenHF5x4O3jJSvvLV/t7 dan.prince@dovetail
   private_key: >
     -----BEGIN RSA PRIVATE KEY-----
@@ -33,6 +34,7 @@ one:
 ...
 
 two:
+  server_group: two
   public_key: ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDfQrXLnXgGkWw4atUtUtFyYgznVndod5njp4aRLefDP6MP8/tdF/iU3/yTJFbHIg/DuaiH71Pg8+n++Txq+JL69/xYCO/viN64nHhy+xbiROS6/Q/Swgt0hG8tuWXk+6l/1er4r6zodosZZEgjZLcbVzJksxaFhk7V0ea3y6AELLJS5mD8bAkkxh8HtXXXyMNWfQ01z3nTWAC1Dq6/der26iqAHqvzrz2lYJ9+fdl9vxM6eOIA8YqcEcnQfZM34v9RUrUL/obUb4b99Iennf4dTlXEuheqmKuXbk2bB57Lf8DCXe52KNvOZ+ItRv0bezriSenHF5x4O3jJSvvLV/t7 dan.prince@dovetail
   private_key: >
     -----BEGIN RSA PRIVATE KEY-----
@@ -65,6 +67,7 @@ two:
 ...
 
 history:
+  server_group: history
   public_key: ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDfQrXLnXgGkWw4atUtUtFyYgznVndod5njp4aRLefDP6MP8/tdF/iU3/yTJFbHIg/DuaiH71Pg8+n++Txq+JL69/xYCO/viN64nHhy+xbiROS6/Q/Swgt0hG8tuWXk+6l/1er4r6zodosZZEgjZLcbVzJksxaFhk7V0ea3y6AELLJS5mD8bAkkxh8HtXXXyMNWfQ01z3nTWAC1Dq6/der26iqAHqvzrz2lYJ9+fdl9vxM6eOIA8YqcEcnQfZM34v9RUrUL/obUb4b99Iennf4dTlXEuheqmKuXbk2bB57Lf8DCXe52KNvOZ+ItRv0bezriSenHF5x4O3jJSvvLV/t7 dan.prince@dovetail
   private_key: >
     -----BEGIN RSA PRIVATE KEY-----

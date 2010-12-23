@@ -2,8 +2,8 @@ class CreateServerCommands < ActiveRecord::Migration
 
   def self.up
     create_table :server_commands do |t|
-      t.integer :server_id, :nil => false
-      t.text :command, :nil => false
+      t.integer :server_id, :null => false
+      t.text :command, :null => false
       t.timestamps
     end
 

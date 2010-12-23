@@ -16,7 +16,7 @@ class ServerGroup < ActiveRecord::Base
     accepts_nested_attributes_for :servers, :update_only => true
 	has_many :ssh_public_keys, :dependent => :destroy
 	belongs_to :user
-	belongs_to :root_ssh_keypair
+	has_one :ssh_keypair
 
 	validates_associated :servers
 	validates_associated :ssh_public_keys
@@ -34,10 +34,11 @@ class ServerGroup < ActiveRecord::Base
 	def after_create
 		generate_ssh_keypair(ssh_key_basepath)
 		keypair_params={
+			:server_group_id => self.attributes["id"],
 			:private_key => IO.read(ssh_key_basepath),
 			:public_key => IO.read(ssh_key_basepath+".pub")
 		}
-		self.root_ssh_keypair=RootSshKeypair.create(keypair_params)
+		self.ssh_keypair=SshKeypair.create(keypair_params)
 	end
 
 	def before_destroy
@@ -78,7 +79,7 @@ class ServerGroup < ActiveRecord::Base
 
 	def ssh_key_basepath
 		path=File.join(RAILS_ROOT, 'tmp', 'ssh_keys', RAILS_ENV, self.id.to_s)
-		kp=self.root_ssh_keypair	
+		kp=self.ssh_keypair	
 		if not kp.nil? then
 			# write ssh keys to disk from the DB if they don't already exist
 			if not File.exists?(path)
