@@ -1,0 +1,13 @@
+# Read about fixtures at http://ar.rubyonrails.org/classes/Fixtures.html
+
+one:
+  command: /bin/true
+  server: one
+
+two:
+  command: /bin/true
+  server: two
+
+historical:
+  command: /bin/true
+  server: historical

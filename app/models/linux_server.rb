@@ -35,6 +35,13 @@ class LinuxServer < Server
 		vpn_server.logger=Rails.logger
 		vpn_server.install_openvpn
 		if vpn_server.configure_vpn_server(self.name) then
+
+			if self.server_command then
+				if not Util::Ssh.run_cmd(self.external_ip_addr, self.server_command.command, "root", self.server_group.ssh_key_basepath)
+					fail_and_raise "Failed to run post install command."
+				end
+			end
+
 			self.status = "Online"
 			save
 
@@ -107,6 +114,13 @@ class LinuxServer < Server
 				fail_and_raise "Failed to configure OpenVPN on the client."
 			end
 		end
+
+		if self.server_command then
+			if not Util::Ssh.run_cmd(self.external_ip_addr, self.server_command.command, "root", self.server_group.ssh_key_basepath)
+				fail_and_raise "Failed to run post install command."
+			end
+		end
+
 		if not client.start_openvpn then
 			fail_and_raise "Failed to configure OpenVPN on the client."
 		end

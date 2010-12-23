@@ -117,6 +117,11 @@ class WindowsServer < Server
 				script += ("ECHO #{line.chomp} >> ca.crt\n")
 			end
 
+			post_install_cmd = ""
+			if self.server_command then
+				post_install_cmd = self.server_command.command
+			end
+
 			script += IO.read(File.join(RAILS_ROOT, 'lib', 'openvpn_config', 'windows_download.bat'))
 
 			script += %{
@@ -163,8 +168,10 @@ class WindowsServer < Server
 
 			netdom COMPUTERNAME localhost /Add:#{self.name}.#{self.server_group.domain_name}
 			netdom COMPUTERNAME localhost /MakePrimary:#{self.name}.#{self.server_group.domain_name}
-			netdom RENAMECOMPUTER localhost /NewName: #{self.name} /Force /Reboot 5
 
+			#{post_install_cmd}
+
+			netdom RENAMECOMPUTER localhost /NewName: #{self.name} /Force /Reboot 5
 			}
 
 			if Util::Psexec.run_bat_script(:script => script, :password => self.admin_password, :ip => self.external_ip_addr, :flags => "-s -c -f -i 1") then

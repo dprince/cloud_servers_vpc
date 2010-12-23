@@ -2,6 +2,7 @@ require 'logger'
 require 'cloud_servers_util'
 require 'timeout'
 require 'util/ip_validator'
+require 'base64'
 
 class Server < ActiveRecord::Base
 
@@ -25,6 +26,9 @@ class Server < ActiveRecord::Base
 	validates_format_of :name, :with => /^[A-Za-z0-9\-\.]+$/, :message => "Server name must use valid hostname characters (A-Z, a-z, 0-9, dash)."
 	validates_length_of :name, :maximum => 255
 	validates_length_of :description, :maximum => 255
+
+	attr_accessor :base64_command
+	has_one :server_command, :dependent => :destroy, :autosave => true
 
     def self.image_id_windows?(image_id)
 
@@ -89,6 +93,10 @@ class Server < ActiveRecord::Base
 					:server_id => self.attributes["id"]
 				)
 			end
+		end
+	
+		if base64_command then
+			ServerCommand.create(:command => Base64.decode64(base64_command), :server_id => self.attributes["id"])
 		end
 
 	end

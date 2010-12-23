@@ -13,6 +13,7 @@ class ServerTest < ActiveSupport::TestCase
 			:description => "test description",
 			:flavor_id => 1,
 			:image_id => 1,
+			:base64_command => "echo hello",
 			:account_id => users(:bob).account_id
 		)
 
@@ -21,6 +22,8 @@ class ServerTest < ActiveSupport::TestCase
 
 		assert server.valid?, "Server should be valid."
 		assert server.save, "Server should have been saved."
+		assert_equal false, server.historical, "Server should not be historical."
+		assert_not_nil server.server_command, "ServerCommand should not be nil."
 
 		server=Server.find(server.id)
 

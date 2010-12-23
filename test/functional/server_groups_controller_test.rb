@@ -79,6 +79,7 @@ class ServerGroupsControllerTest < ActionController::TestCase
       <flavor-id type="integer">1</flavor-id>
       <image-id type="integer">1</image-id>
       <openvpn-server type="boolean">true</openvpn-server>
+      <base64-command>#{Base64.encode64("echo hello > /tmp/test.txt")}</base64-command>
     </server>
     </servers>
     <ssh-public-keys type="array">
@@ -99,6 +100,9 @@ response=post :create
     end
 
     assert_response :success
+
+	server=Server.find(:first, :conditions => ["name = 'test1'"])
+	assert_equal "echo hello > /tmp/test.txt", server.server_command.command
 
   end
 
