@@ -128,6 +128,7 @@ function create_server_group() {
             id=$("id", data).text();
             $("#server-group-dialog").html("");
             $("#server-group-dialog").dialog('close');
+            $("#server-group-dialog").dialog('destroy');
             $("#tabs").tabs('load', 0);
         },
         error: function(data) {
