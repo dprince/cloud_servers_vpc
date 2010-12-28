@@ -39,6 +39,7 @@ function user_edit() {
 			id=$("id", data).text();
 			$("#td-username-"+id).html($("username", data).text());
 			$("#user-dialog").dialog('close');
+			$("#user-dialog").dialog('destroy');
 		},
 		error: function(data) {
 			$("#user-edit-error-messages").css("display", "inline");
@@ -62,6 +63,7 @@ function user_password() {
 		data: post_data,
 		success: function(data) {
 			$("#user-dialog").dialog('close');
+			$("#user-dialog").dialog('destroy');
 		},
 		error: function(data) {
 			$("#user-password-error-messages").css("display", "inline");
@@ -87,6 +89,7 @@ function user_create() {
 		success: function(data) {
 			id=$("id", data).text();
 			$("#user-dialog").dialog('close');
+			$("#user-dialog").dialog('destroy');
 			$("#tabs").tabs('load', 0);
 		},
 		error: function(data) {
@@ -165,6 +168,7 @@ function user_table_selectors() {
 				buttons: {
 					Ok: function() {
 						$(this).dialog('close');
+						$(this).dialog('destroy');
 					}
 				}
 			});
