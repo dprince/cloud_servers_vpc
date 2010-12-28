@@ -34,7 +34,7 @@ class ServerGroupsControllerTest < ActionController::TestCase
     http_basic_authorize
     assert_difference('Server.count') do
     assert_difference('ServerGroup.count') do
-      post :create, :server_group => { :name => "test1", :owner_name => "dan.prince", :domain_name => "test.rsapps.net", :description => "test1", :vpn_network => "172.19.0.0", :vpn_subnet => "255.255.128.0", :servers_attributes => {"0" => { :name => "test1", :description => "test description", :flavor_id => 1, :image_id => 1, :account_id => users(:bob).account_id }} }
+      post :create, :server_group => { :name => "test1", :owner_name => "dan.prince", :domain_name => "test.rsapps.net", :description => "test1", :vpn_network => "172.19.0.0", :vpn_subnet => "255.255.128.0", :servers_attributes => {"0" => { :name => "test1", :description => "test description", :flavor_id => 1, :image_id => 1 }} }
     end
     end
     assert_response :success
@@ -51,7 +51,7 @@ class ServerGroupsControllerTest < ActionController::TestCase
 
   end
 
-  test "should not create server_group" do
+  test "should not create server_group if not logged in" do
     assert_no_difference('ServerGroup.count') do
       post :create, :server_group => { :name => "test1", :owner_name => "dan.prince", :domain_name => "test.rsapps.net", :description => "test1", :vpn_network => "172.19.0.0", :vpn_subnet => "255.255.128.0" }
     end
@@ -103,6 +103,8 @@ response=post :create
 
 	server=Server.find(:first, :conditions => ["name = 'test1'"])
 	assert_equal "echo hello > /tmp/test.txt", server.server_command.command
+	assert_equal server.id, AsyncExec.jobs[CreateCloudServer][0]
+	assert_nil AsyncExec.jobs[CreateCloudServer][1]
 
   end
 
@@ -149,6 +151,54 @@ response=post :create
 
     assert_response :success
 
+	sg=ServerGroup.find(:first, :conditions => ["name = 'test'"])
+	assert_equal 1, sg.ssh_public_keys.size
+	server=Server.find(:first, :conditions => ["name = ? AND server_group_id = ?", "test1", sg.id])
+	assert_equal server.id, AsyncExec.jobs[CreateCloudServer][0]
+	assert_nil AsyncExec.jobs[CreateCloudServer][1]
+
+  end
+
+  test "groups cannot have multiple VPN servers via JSON request" do
+
+    http_basic_authorize
+    assert_no_difference('ServerGroup.count') do
+
+@request.env['RAW_POST_DATA'] = %{
+{
+    "name": "test",
+    "domain_name": "b.c",
+    "description": "test description",
+    "vpn_network": "172.19.0.0",
+    "vpn_subnet": "255.255.128.0",
+    "owner_name": "dan.prince",
+    "servers": [
+		{
+			"name": "test1",
+			"description": "test1",
+            "flavor_id": 4,
+            "image_id": 14,
+            "openvpn_server": "true"
+        },
+		{
+			"name": "test2",
+			"description": "test2",
+            "flavor_id": 4,
+            "image_id": 14,
+            "openvpn_server": "true"
+        }
+    ]
+}
+}
+
+@request.accept = 'application/json'
+response=post :create
+@request.env.delete('RAW_POST_DATA')
+
+    end
+
+    assert_response 422
+
   end
 
   test "should show bobs server_group" do
@@ -186,6 +236,8 @@ response=post :create
 
 	server_group=ServerGroup.find(server_groups(:one).id)
 	assert_equal true, server_group.historical
+
+	assert_equal server_group.id, AsyncExec.jobs[MakeGroupHistorical][0]
 
     assert_redirected_to server_groups_path
   end

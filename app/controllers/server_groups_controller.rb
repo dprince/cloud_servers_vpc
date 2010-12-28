@@ -1,3 +1,5 @@
+require 'async_exec'
+
 class ServerGroupsController < ApplicationController
 
   before_filter :authorize
@@ -85,13 +87,16 @@ class ServerGroupsController < ApplicationController
     			@server_group.user_id = session[:user_id]
 				if params[:server_group]["servers_attributes"] then
 					params[:server_group]["servers_attributes"].each_pair do |id, hash|
-						@server_group.servers << Server.new_for_type(hash)
+						server = Server.new_for_type(hash)
+						user=User.find(session[:user_id])
+						server.account_id = user.account_id
+						@server_group.servers << server
 					end
 				end
 			}
 			format.xml {
 				hash=Hash.from_xml(request.raw_post)
-				@server_group=server_group_from_hash(hash)
+    			@server_group=server_group_from_hash(hash)
 			}
 			format.json {
 				hash=JSON.parse(request.raw_post)
@@ -104,7 +109,7 @@ class ServerGroupsController < ApplicationController
       if @server_group.save
         flash[:notice] = 'ServerGroup was successfully created.'
 		@server_group.servers.each do |server|
-			Resque.enqueue(CreateCloudServer, server.id)
+			AsyncExec.run_job(CreateCloudServer, server.id)
 		end
         #format.html { redirect_to(@server_group) }
         format.html  { render :xml => @server_group.to_xml(:include => {:servers => {:include => :vpn_network_interfaces}}), :status => :created, :location => @server_group, :content_type => "application/xml" }
@@ -121,8 +126,6 @@ class ServerGroupsController < ApplicationController
 			end
 			@server_group.delete
 		end
-
-        #format.html { render :action => "new" }
         format.html  { render :xml => @server_group.errors.to_xml, :status => :unprocessable_entity, :content_type => "application/xml" }
         format.json  { render :json => @server_group.errors, :status => :unprocessable_entity }
         format.xml  { render :xml => @server_group.errors, :status => :unprocessable_entity }
@@ -138,7 +141,7 @@ class ServerGroupsController < ApplicationController
     xml=@server_group.to_xml
     json=@server_group.to_json
     @server_group.update_attribute('historical', true)
-	Resque.enqueue(MakeGroupHistorical, @server_group.id)
+	AsyncExec.run_job(MakeGroupHistorical, @server_group.id)
 
     respond_to do |format|
       format.html { redirect_to(server_groups_url) }

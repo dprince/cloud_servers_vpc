@@ -1,5 +1,6 @@
 require 'logger'
 require 'cloud_servers_util'
+require 'async_exec'
 require 'openvpn_config/server'
 require 'openvpn_config/client'
 require 'util/ssh'
@@ -26,7 +27,7 @@ class LinuxServer < Server
 					delete_cloud_server(self.cloud_server_id_number)
 				end
 				sleep 10
-				Resque.enqueue(CreateCloudServer, self.id, false)
+				AsyncExec.run_job(CreateCloudServer, self.id, false)
 				return
 			end
 		end
@@ -98,7 +99,7 @@ class LinuxServer < Server
 					save!
 				end
 				sleep 10
-				Resque.enqueue(CreateCloudServer, self.id, true)
+				AsyncExec.run_job(CreateCloudServer, self.id, true)
 				return
 			end
 		end

@@ -1,4 +1,5 @@
 ENV["RAILS_ENV"] = "test"
+require File.expand_path(File.dirname(__FILE__) + "/mocks/test/async_exec")
 require File.expand_path(File.dirname(__FILE__) + "/../config/environment")
 require 'test_help'
 
@@ -48,10 +49,4 @@ module AuthTestHelper
     @request.env["HTTP_AUTHORIZATION"] = ActionController::HttpAuthentication::Basic.encode_credentials(users(user_sym).username, 'cloud')
   end
 
-end
-
-module Resque
-  def enqueue(klass, *args)
-    return
-  end
 end

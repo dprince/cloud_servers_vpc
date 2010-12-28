@@ -10,6 +10,7 @@ one:
   openvpn_server: true
   retry_count: 0
   server_group: one
+  status: Online
   account: bob_account
   historical: false
 
@@ -22,6 +23,7 @@ two:
   image_id: 1
   retry_count: 0
   server_group: one
+  status: Pending
   account: bob_account
   historical: false
 
@@ -33,6 +35,8 @@ historical:
   flavor_id: 1
   image_id: 1
   retry_count: 0
+  openvpn_server: true
   server_group: history
+  status: Online
   account: admin_account
   historical: true

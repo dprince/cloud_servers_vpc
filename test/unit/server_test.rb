@@ -17,7 +17,7 @@ class ServerTest < ActiveSupport::TestCase
 			:account_id => users(:bob).account_id
 		)
 
-		group=server_groups(:one)
+		group=server_groups(:two)
 		group.servers << server
 
 		assert server.valid?, "Server should be valid."
@@ -41,7 +41,7 @@ class ServerTest < ActiveSupport::TestCase
 			:account_id => users(:bob).account_id
 		)
 
-		group=server_groups(:one)
+		group=server_groups(:two)
 		group.servers << server
 
 		assert server.valid?, "Server should be valid."
@@ -62,7 +62,7 @@ class ServerTest < ActiveSupport::TestCase
 			:account_id => users(:bob).account_id
 		)
 
-		group=server_groups(:one)
+		group=server_groups(:two)
 		group.servers << server
 
 		assert !server.valid?, "Server should not be valid."
@@ -79,7 +79,7 @@ class ServerTest < ActiveSupport::TestCase
 			:account_id => users(:bob).account_id
 		)
 
-		group=server_groups(:one)
+		group=server_groups(:two)
 		group.servers << server
 
 		assert !server.valid?, "Server should not be valid."
@@ -158,11 +158,31 @@ class ServerTest < ActiveSupport::TestCase
 			:account_id => users(:bob).account_id
 		)
 
-		group=server_groups(:one)
+		group=server_groups(:two)
 		group.servers << server
 
 		assert !server.valid?, "Server should be not be valid. (invalid hostname)"
 		assert !server.save, "Server not should have been saved. (invalid hostname)"
+
+	end
+
+	test "create duplicate VPN server fails" do
+
+		server=Server.new(
+			:name => "test1",
+			:description => "test description",
+			:flavor_id => 1,
+			:image_id => 1,
+			:openvpn_server => true,
+			:base64_command => "echo hello",
+			:account_id => users(:bob).account_id
+		)
+
+		group=server_groups(:one)
+		group.servers << server
+
+		assert !server.valid?, "Server should not be valid."
+		assert !server.save, "Server should not have been saved."
 
 	end
 

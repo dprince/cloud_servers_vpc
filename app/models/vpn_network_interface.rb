@@ -19,7 +19,6 @@ class VpnNetworkInterface < ActiveRecord::Base
 		end
 
 		# This is a requirement of the Windows TAP driver
-		# It doesn't hurt to do it for Linux machines as well
 		if self.server.type == "WindowsServer" then
 			if not subnets_match?(vpn_ip_addr, ptp_ip_addr, "255.255.255.252") then
 				errors.add_to_base("VPN IP address must be in the same /30 subnet.")

@@ -1,4 +1,5 @@
 require 'logger'
+require 'async_exec'
 require 'cloud_servers_util'
 require 'openvpn_config/server'
 require 'openvpn_config/client'
@@ -60,12 +61,12 @@ class WindowsServer < Server
 					save!
 				end
 				sleep 10
-				Resque.enqueue(CreateCloudServer, self.id, true)
+				AsyncExec.run_job(CreateCloudServer, self.id, true)
 				return
 			end
 		end
 
-		Resque.enqueue(CreateVPNCredentials, self.id)
+		AsyncExec.run_job(CreateVPNCredentials, self.id)
 
 	end
 
@@ -186,7 +187,7 @@ class WindowsServer < Server
 				self.status = "Pending"
 				self.retry_count += 1
 				self.save
-				Resque.enqueue(ConfigureWindowsVPNClient, self.id, client_key, client_cert, ca_cert)
+				AsyncExec.run_job(ConfigureWindowsVPNClient, self.id, client_key, client_cert, ca_cert)
 			end
 		end
 	

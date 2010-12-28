@@ -1,3 +1,5 @@
+require 'async_exec'
+
 class ServersController < ApplicationController
 
   before_filter :authorize
@@ -14,13 +16,13 @@ class ServersController < ApplicationController
       limit=params[:limit].nil? ? 50 : params[:limit]
     end
 
-	historical=params[:historical]
+    historical=params[:historical]
 
     if historical.blank? or historical == "false" then
-		@historical="0"
-	else
-		@historical="1"
-	end
+        @historical="0"
+    else
+        @historical="1"
+    end
 
     @server_group_id=params[:server_group_id]
     if @server_group_id.blank? then
@@ -92,6 +94,57 @@ class ServersController < ApplicationController
     end
   end
 
+  # POST /servers
+  # POST /servers.json
+  # POST /servers.xml
+  def create
+
+    respond_to do |format|
+            format.html {
+                server_params=params[:server]
+                @server = Server.new(server_params)
+            }
+            format.xml {
+                hash=Hash.from_xml(request.raw_post)
+                @server=Server.new(hash["server"])
+            }
+            format.json {
+                hash=JSON.parse(request.raw_post)
+                @server=Server.new(hash)
+            }
+    end
+
+    user=User.find(session[:user_id])
+    @server.account_id = user.account_id
+
+    respond_to do |format|
+      if @server.save
+
+        ovpn_server_val=1
+        if Server.connection.adapter_name =~ /SQLite/ then
+            ovpn_server_val="t"
+        end
+        vpn_server=Server.find(:first, :conditions => ["server_group_id = ? AND openvpn_server = ?", @server.server_group_id, ovpn_server_val])
+        if not vpn_server.nil? and vpn_server.status == "Online" then
+          AsyncExec.run_job(CreateCloudServer, @server.id, true)
+        else
+          AsyncExec.run_job(CreateCloudServer, @server.id)
+        end
+
+        flash[:notice] = 'Server was successfully created.'
+        format.html  { render :xml => @server.to_xml, :status => :created, :location => @server, :content_type => "application/xml" }
+        format.json  { render :json => @server.to_json, :status => :created, :location => @server }
+        format.xml  { render :xml => @server.to_xml, :status => :created, :location => @server }
+      else
+
+        format.html  { render :xml => @server.errors.to_xml, :status => :unprocessable_entity, :content_type => "application/xml" }
+        format.json  { render :json => @server.errors, :status => :unprocessable_entity }
+        format.xml  { render :xml => @server.errors, :status => :unprocessable_entity }
+      end
+    end
+  end
+
+
   # POST /servers/1/rebuild
   def rebuild
     @server = Server.find(params[:id])
@@ -106,7 +159,7 @@ class ServersController < ApplicationController
     @server.retry_count = 0
     @server.status = "Rebuilding"
     if @server.save then
-      Resque.enqueue(RebuildServer, @server.id)
+      AsyncExec.run_job(RebuildServer, @server.id)
       respond_to do |format|
         format.json  { render :xml => @server }
         format.xml  { render :xml => @server }
@@ -114,6 +167,24 @@ class ServersController < ApplicationController
     else
       render :text => "Failed to rebuild cloud server.", :status => 500
     end
+  end
+
+  # DELETE /servers/1
+  # DELETE /servers/1.json
+  # DELETE /servers/1.xml
+  def destroy
+    @server = Server.find(params[:id])
+    xml=@server.to_xml
+    json=@server.to_json
+    @server.update_attribute('historical', true)
+    AsyncExec.run_job(MakeServerHistorical, @server.id)
+
+    respond_to do |format|
+      format.html { redirect_to(servers_url) }
+      format.json  { render :json => json }
+      format.xml  { render :xml => xml }
+    end
+
   end
 
 private

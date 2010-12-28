@@ -1,4 +1,5 @@
 require 'logger'
+require 'async_exec'
 require 'cloud_servers_util'
 require 'timeout'
 require 'util/ip_validator'
@@ -53,9 +54,23 @@ class Server < ActiveRecord::Base
     def Server.create_vpn_client_for_type(server)
 
 		if Server.image_id_windows?(server.image_id) then
-			Resque.enqueue(CreateWindowsVPNClient, server.id)
+			AsyncExec.run_job(CreateWindowsVPNClient, server.id)
 		else
-			Resque.enqueue(CreateLinuxVPNClient, server.id)
+			AsyncExec.run_job(CreateLinuxVPNClient, server.id)
+		end
+
+    end
+
+    def validate_on_create
+
+		if self.server_group then
+			openvpn_server_count=0
+			self.server_group.servers.each do |server|
+				openvpn_server_count += 1 if server.openvpn_server
+			end
+			if openvpn_server_count == 1 and self.openvpn_server then
+				errors.add_to_base("Server groups may not have more than one VPN Server.")
+			end
 		end
 
     end
@@ -137,7 +152,7 @@ class Server < ActiveRecord::Base
 	
 			# if this server is an OpenVPN server create it now
 			if self.openvpn_server then
-				Resque.enqueue(CreateOpenVPNServer, self.id)
+				AsyncExec.run_job(CreateOpenVPNServer, self.id)
 			else
 				if schedule_client_openvpn then
 					Server.create_vpn_client_for_type(self)
@@ -163,7 +178,7 @@ class Server < ActiveRecord::Base
 			end
 			save!
 			sleep 10
-			Resque.enqueue(CreateCloudServer, self.id, false)
+			AsyncExec.run_job(CreateCloudServer, self.id, false)
 		end
 
 	end
@@ -205,7 +220,7 @@ class Server < ActiveRecord::Base
 				delete_cloud_server(self.cloud_server_id_number)
 			end
 			sleep 10
-			Resque.enqueue(CreateCloudServer, self.id, true)
+			AsyncExec.run_job(CreateCloudServer, self.id, true)
 		rescue Exception => e
 			fail_and_raise "Failed to rebuild cloud server.", e
 		end
