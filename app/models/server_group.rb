@@ -13,12 +13,15 @@ class ServerGroup < ActiveRecord::Base
 	validates_length_of :owner_name, :maximum => 255
 	validates_length_of :domain_name, :maximum => 255
 	has_many :servers
+	has_many :clients
     accepts_nested_attributes_for :servers, :update_only => true
+    accepts_nested_attributes_for :clients, :update_only => true
 	has_many :ssh_public_keys, :dependent => :destroy
 	belongs_to :user
 	has_one :ssh_keypair
 
 	validates_associated :servers
+	validates_associated :clients
 	validates_associated :ssh_public_keys
 
 	def after_initialize

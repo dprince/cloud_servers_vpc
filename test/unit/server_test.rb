@@ -5,6 +5,7 @@ class ServerTest < ActiveSupport::TestCase
 	fixtures :server_groups
 	fixtures :servers
 	fixtures :users
+	fixtures :clients
 
 	test "create server" do
 
@@ -143,8 +144,26 @@ class ServerTest < ActiveSupport::TestCase
 		group=server_groups(:one)
 		group.servers << server
 
-		assert !server.valid?, "Server should be allowed to have duplicate names."
-		assert !server.save, "Server should be allowed to have duplicate names."
+		assert !server.valid?, "Server must have unique names."
+		assert !server.save, "Server must have unique names."
+
+	end
+
+	test "verify server names are unique among clients within a group" do
+
+		server=Server.new(
+			:name => clients(:one).name,
+			:description => "test description",
+			:flavor_id => 1,
+			:image_id => 1,
+			:num_vpn_network_interfaces => 3,
+			:account_id => users(:bob).account_id
+		)
+		group=server_groups(:one)
+		group.servers << server
+
+		assert !server.valid?, "Server must have unique names."
+		assert !server.save, "Server must have unique names."
 
 	end
 

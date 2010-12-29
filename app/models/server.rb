@@ -21,8 +21,7 @@ class Server < ActiveRecord::Base
 	validates_presence_of :name, :description, :flavor_id, :image_id, :server_group_id, :account_id
 	validates_numericality_of :flavor_id, :image_id, :server_group_id
 	validates_numericality_of :cloud_server_id_number, :if => :cloud_server_id_number
-	validates_uniqueness_of :name, :scope => :server_group_id
-	has_many :vpn_network_interfaces, :dependent => :destroy
+	has_many :vpn_network_interfaces, :as => :interfacable, :dependent => :destroy
 	has_many :server_errors
 	validates_format_of :name, :with => /^[A-Za-z0-9\-\.]+$/, :message => "Server name must use valid hostname characters (A-Z, a-z, 0-9, dash)."
 	validates_length_of :name, :maximum => 255
@@ -61,6 +60,10 @@ class Server < ActiveRecord::Base
 
     end
 
+    def is_windows
+		self.type == "WindowsServer"
+	end
+
     def validate_on_create
 
 		if self.server_group then
@@ -74,6 +77,23 @@ class Server < ActiveRecord::Base
 		end
 
     end
+
+    def validate
+
+		count=0
+
+		if new_record? then
+			count=Server.count(:conditions => ["server_group_id = ? AND name = ?", self.server_group_id, self.name])
+		else
+			count=Server.count(:conditions => ["server_group_id = ? AND name = ? AND id != ?", self.server_group_id, self.name, self.id])
+		end
+		count+=Client.count(:conditions => ["server_group_id = ? AND name = ?", self.server_group_id, self.name])
+
+		if count > 0 then
+			errors.add_to_base("Server name '#{self.name}' is already used in this server group.")
+		end
+
+	end
 
     def after_initialize
         if new_record? then
@@ -105,7 +125,8 @@ class Server < ActiveRecord::Base
 				VpnNetworkInterface.create(
 					:vpn_ip_addr => ips[0],
 					:ptp_ip_addr => ips[1],
-					:server_id => self.attributes["id"]
+					:interfacable_id => self.attributes["id"],
+					:interfacable_type => 'Server'
 				)
 			end
 		end

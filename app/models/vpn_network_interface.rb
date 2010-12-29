@@ -3,8 +3,8 @@ require 'util/ip_validator'
 class VpnNetworkInterface < ActiveRecord::Base
 
 	validates_presence_of :vpn_ip_addr, :ptp_ip_addr
-	validates_numericality_of :server_id
-	belongs_to :server
+	validates_numericality_of :interfacable_id
+	belongs_to :interfacable, :polymorphic => true
 
     include Util::IpValidator
 
@@ -19,7 +19,7 @@ class VpnNetworkInterface < ActiveRecord::Base
 		end
 
 		# This is a requirement of the Windows TAP driver
-		if self.server.type == "WindowsServer" then
+		if self.interfacable and self.interfacable.is_windows then
 			if not subnets_match?(vpn_ip_addr, ptp_ip_addr, "255.255.255.252") then
 				errors.add_to_base("VPN IP address must be in the same /30 subnet.")
 			end

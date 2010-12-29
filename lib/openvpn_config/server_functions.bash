@@ -124,7 +124,7 @@ function create_client_key {
 
 	TMP_DIR_CLIENT=$(mktemp -d)
 	cd $TMP_DIR_CLIENT
-	cp $OPENVPN_KEYS_DIR/ca.crt .  || fail "Failed to copy QA cert."
+	cp $OPENVPN_KEYS_DIR/ca.crt .  || fail "Failed to copy CA cert."
 	cp $OPENVPN_KEYS_DIR/$CLIENT_NAME.crt . || fail "Failed to copy client cert."
 	cp $OPENVPN_KEYS_DIR/$CLIENT_NAME.key . || fail "Failed to copy client key"
 	tar czf $CLIENT_NAME.tar.gz * || fail "Failed to create client key tarball."
