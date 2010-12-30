@@ -6,3 +6,5 @@ contrib/rpmbuild/RPMS/
 contrib/rpmbuild/SOURCES/
 contrib/rpmbuild/SRPMS/
 cloud-test/tmp/
+test/coverage/
+rcov

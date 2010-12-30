@@ -46,13 +46,11 @@ class LinuxServer < Server
 			self.status = "Online"
 			save
 
-			ovpn_server_val=0
-			# use 'f' on SQLite
-			if Server.connection.adapter_name =~ /SQLite/ then
-				ovpn_server_val="f"
+			Server.find(:all, :conditions => ["server_group_id = ? AND openvpn_server = ?", self.server_group_id, false]).each do |server|
+				Server.create_vpn_client_for_type(server)
 			end
-			Server.find(:all, :conditions => ["server_group_id = ? AND openvpn_server = ?", self.server_group_id, ovpn_server_val]).each do |vpn_client|
-				Server.create_vpn_client_for_type(vpn_client)
+			Client.find(:all, :conditions => ["server_group_id = ?", self.server_group_id]).each do |client|
+                AsyncExec.run_job(CreateClientVPNCredentials, client.id)
 			end
 		else
 			fail_and_raise "Failed to install OpenVPN on the server."
@@ -65,12 +63,7 @@ class LinuxServer < Server
 
 		return if self.status == "Online"
 
-		ovpn_server_val=1
-		# use 't' on SQLite
-		if Server.connection.adapter_name =~ /SQLite/ then
-			ovpn_server_val="t"
-		end
-		vpn_server=Server.find(:first, :conditions => ["server_group_id = ? AND openvpn_server = ?", self.server_group_id, ovpn_server_val])
+		vpn_server=Server.find(:first, :conditions => ["server_group_id = ? AND openvpn_server = ?", self.server_group_id, true])
 
 		begin
 			loop_until_server_online
@@ -106,7 +99,7 @@ class LinuxServer < Server
 
 		vpn_server_config=OpenvpnConfig::Server.new(vpn_server.external_ip_addr, vpn_server.internal_ip_addr, self.server_group.domain_name, vpn_server.server_group.vpn_network, vpn_server.server_group.vpn_subnet, "root", self.server_group.ssh_key_basepath)
 
-		client=OpenvpnConfig::Client.new(vpn_server_config, self.external_ip_addr, "root", self.server_group.ssh_key_basepath)
+		client=OpenvpnConfig::LinuxClient.new(vpn_server_config, self.external_ip_addr, "root", self.server_group.ssh_key_basepath)
 		client.logger=Rails.logger
 		client.install_openvpn
 		self.vpn_network_interfaces.each_with_index do |vni, index|

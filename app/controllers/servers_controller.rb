@@ -89,7 +89,7 @@ class ServersController < ApplicationController
 
     respond_to do |format|
       format.html # show.html.erb
-      format.json  { render :json => @servers }
+      format.json  { render :json => @server }
       format.xml  { render :xml => @server }
     end
   end
@@ -120,11 +120,7 @@ class ServersController < ApplicationController
     respond_to do |format|
       if @server.save
 
-        ovpn_server_val=1
-        if Server.connection.adapter_name =~ /SQLite/ then
-            ovpn_server_val="t"
-        end
-        vpn_server=Server.find(:first, :conditions => ["server_group_id = ? AND openvpn_server = ?", @server.server_group_id, ovpn_server_val])
+        vpn_server=Server.find(:first, :conditions => ["server_group_id = ? AND openvpn_server = ?", @server.server_group_id, true])
         if not vpn_server.nil? and vpn_server.status == "Online" then
           AsyncExec.run_job(CreateCloudServer, @server.id, true)
         else

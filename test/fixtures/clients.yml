@@ -1,11 +1,11 @@
 one:
   name: client-one
-  description: Server 1
+  description: Client 1
   server_group: one
   status: Online
 
 two:
   name: client-two
-  description: Server 2
+  description: Client 2
   server_group: one
   status: Pending

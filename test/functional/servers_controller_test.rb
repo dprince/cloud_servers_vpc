@@ -130,7 +130,7 @@ class ServersControllerTest < ActionController::TestCase
     assert_response :success
   end
 
-  test "should create server without authorization" do
+  test "unauthorized create fails" do
     post :create, :server => {:name => "test1", :description => "test description", :flavor_id => 1, :image_id => 1, :server_group_id => server_groups(:one).id}
     assert_response 302
   end

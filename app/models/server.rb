@@ -224,12 +224,7 @@ class Server < ActiveRecord::Base
 		begin
 
 			Timeout::timeout(30) do
-				ovpn_server_val=1
-				# use 't' on SQLite
-				if Server.connection.adapter_name =~ /SQLite/ then
-					ovpn_server_val="t"
-				end
-				vpn_server=Server.find(:first, :conditions => ["server_group_id = ? AND openvpn_server = ?", self.server_group_id, ovpn_server_val])
+				vpn_server=Server.find(:first, :conditions => ["server_group_id = ? AND openvpn_server = ?", self.server_group_id, true])
 				%x{
 					ssh -i #{self.server_group.ssh_key_basepath} root@#{vpn_server.external_ip_addr} sed "/^#{self.name}.*/d" -i .ssh/known_hosts
 				}

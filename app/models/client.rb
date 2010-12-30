@@ -1,9 +1,10 @@
 require 'async_exec'
-require 'util/ip_validator'
+require 'util/cert_util'
 
 class Client < ActiveRecord::Base
 
 	include Util::IpValidator
+    include Util::CertUtil
 
 	attr_accessor :num_vpn_network_interfaces
 
@@ -59,6 +60,29 @@ class Client < ActiveRecord::Base
 			end
 		end
 	
+	end
+
+	def create_vpn_credentials
+
+		vpn_server=Server.find(:first, :conditions => ["server_group_id = ? AND openvpn_server = ?", self.server_group_id, true])
+
+		vpn_server_config=OpenvpnConfig::Server.new(vpn_server.external_ip_addr, vpn_server.internal_ip_addr, self.server_group.domain_name, vpn_server.server_group.vpn_network, vpn_server.server_group.vpn_subnet, "root", self.server_group.ssh_key_basepath)
+
+		client=OpenvpnConfig::Client.new(vpn_server_config)
+		vpn_creds=nil
+		self.vpn_network_interfaces.each_with_index do |vni, index|
+			client_name = (index == 0) ? self.name : "#{self.name}-#{index.to_s}"
+			vpn_creds=client.create_client_credentials(client_name, vni.vpn_ip_addr, vni.ptp_ip_addr, self.is_windows ? "windows" : "linux")
+
+			vni.client_key=vpn_creds[0]
+			vni.client_cert=tail_cert(vpn_creds[1])
+			vni.ca_cert=vpn_creds[2]
+			vni.save
+
+		end
+
+		update_attribute(:status, "Online")
+
 	end
 
 =begin

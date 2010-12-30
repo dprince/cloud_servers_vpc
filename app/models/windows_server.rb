@@ -4,11 +4,14 @@ require 'cloud_servers_util'
 require 'openvpn_config/server'
 require 'openvpn_config/client'
 require 'util/ssh'
+require 'util/cert_util'
 require 'timeout'
 
 class WindowsServer < Server
 
 	validates_inclusion_of :flavor_id, :in => 3..7, :message => "Windows servers must use a flavor of 1 Gig or greater."
+
+	include Util::CertUtil
 
 	def validate
 
@@ -27,12 +30,7 @@ class WindowsServer < Server
 
 		return if self.status == "Online"
 
-		ovpn_server_val=1
-		# use 't' on SQLite
-		if Server.connection.adapter_name =~ /SQLite/ then
-			ovpn_server_val="t"
-		end
-		vpn_server=Server.find(:first, :conditions => ["server_group_id = ? AND openvpn_server = ?", self.server_group_id, ovpn_server_val])
+		vpn_server=Server.find(:first, :conditions => ["server_group_id = ? AND openvpn_server = ?", self.server_group_id, true])
 
 		begin
 			loop_until_server_online
@@ -78,7 +76,7 @@ class WindowsServer < Server
 
 		vpn_server_config=OpenvpnConfig::Server.new(vpn_server.external_ip_addr, vpn_server.internal_ip_addr, self.server_group.domain_name, vpn_server.server_group.vpn_network, vpn_server.server_group.vpn_subnet, "root", self.server_group.ssh_key_basepath)
 
-		client=OpenvpnConfig::Client.new(vpn_server_config, self.external_ip_addr, "root", self.server_group.ssh_key_basepath)
+		client=OpenvpnConfig::Client.new(vpn_server_config)
 		vpn_creds=nil
 		self.vpn_network_interfaces.each_with_index do |vni, index|
 			client_name = (index == 0) ? self.name : "#{self.name}-#{index.to_s}"
@@ -91,12 +89,7 @@ class WindowsServer < Server
 
 	def configure_openvpn_client(client_key, client_cert, ca_cert)
 
-		ovpn_server_val=1
-		# use 't' on SQLite
-		if Server.connection.adapter_name =~ /SQLite/ then
-			ovpn_server_val="t"
-		end
-		vpn_server=Server.find(:first, :conditions => ["server_group_id = ? AND openvpn_server = ?", self.server_group_id, ovpn_server_val])
+		vpn_server=Server.find(:first, :conditions => ["server_group_id = ? AND openvpn_server = ?", self.server_group_id, true])
 		begin
 
 			script = ("cd c:\\ \n")
@@ -151,19 +144,14 @@ class WindowsServer < Server
 
 			ECHO c:\\windows\\System32\\netsh.exe interface SET interface "public" DISABLED > c:\\up.bat
 
-			IF EXIST c:\\progra~1\\openvpn move client.key c:\\progra~1\\openvpn\\config
 			IF EXIST c:\\progra~2\\openvpn move client.key c:\\progra~2\\openvpn\\config
 
-			IF EXIST c:\\progra~1\\openvpn move client.crt c:\\progra~1\\openvpn\\config
 			IF EXIST c:\\progra~2\\openvpn move client.crt c:\\progra~2\\openvpn\\config
 
-			IF EXIST c:\\progra~1\\openvpn move ca.crt c:\\progra~1\\openvpn\\config
 			IF EXIST c:\\progra~2\\openvpn move ca.crt c:\\progra~2\\openvpn\\config
 
-			IF EXIST c:\\progra~1\\openvpn move client.ovpn c:\\progra~1\\openvpn\\config
 			IF EXIST c:\\progra~2\\openvpn move client.ovpn c:\\progra~2\\openvpn\\config
 
-			IF EXIST c:\\progra~1\\openvpn move up.bat c:\\progra~1\\openvpn\\config
 			IF EXIST c:\\progra~2\\openvpn move up.bat c:\\progra~2\\openvpn\\config
 			sc config OpenVPNService start= auto
 
@@ -247,16 +235,6 @@ class WindowsServer < Server
 
 		return false
 
-	end
-
-	private
-	def tail_cert(raw_cert)
-		new_cert=""
-		begin_cert=false
-		raw_cert.each_line do |line|
-			begin_cert = true if line =~ /-----BEGIN CERTIFICATE-----/
-			new_cert += "#{line}\n" if begin_cert
-		end
 	end
 
 	private

@@ -10,12 +10,6 @@ class ServerGroupsController < ApplicationController
   # GET /server_groups.xml
   def index
 
-	historical_false=0
-	# use 'f' on SQLite
-	if ServerGroup.connection.adapter_name =~ /SQLite/ then
-		historical_false="f"
-	end
-
 	if request.format == Mime::XML
 	  limit=params[:limit].nil? ? 1000: params[:limit]
 	else
@@ -23,9 +17,9 @@ class ServerGroupsController < ApplicationController
 	end
 
 	if is_admin then
-		@server_groups = ServerGroup.paginate :conditions => ["historical = ?", historical_false], :page => params[:page] || 1, :per_page => limit, :order => "name", :include => [ { :user => [:account] } ]
+		@server_groups = ServerGroup.paginate :conditions => ["historical = ?", false], :page => params[:page] || 1, :per_page => limit, :order => "name", :include => [ { :user => [:account] } ]
 	else
-		@server_groups = ServerGroup.paginate :conditions => ["user_id = ? AND historical = ?", session[:user_id], historical_false], :page => params[:page] || 1, :per_page => limit, :order => "name", :include => [ { :user => [:account] } ]
+		@server_groups = ServerGroup.paginate :conditions => ["user_id = ? AND historical = ?", session[:user_id], false], :page => params[:page] || 1, :per_page => limit, :order => "name", :include => [ { :user => [:account] } ]
 	end
 
     if params[:layout] then
@@ -62,8 +56,8 @@ class ServerGroupsController < ApplicationController
 
     respond_to do |format|
       format.html # show.html.erb
-      format.json  { render :json => @server_group.to_json(:include => {:servers => {:include => :vpn_network_interfaces}}) }
-      format.xml  { render :xml => @server_group.to_xml(:include => {:servers => {:include => :vpn_network_interfaces}}) }
+      format.json  { render :json => @server_group.to_json(:include => {:servers => {:include => :vpn_network_interfaces}, :clients => {:include => :vpn_network_interfaces}}) }
+      format.xml  { render :xml => @server_group.to_xml(:include => {:servers => {:include => :vpn_network_interfaces}, :clients => {:include => :vpn_network_interfaces}}) }
     end
   end
 
@@ -93,6 +87,13 @@ class ServerGroupsController < ApplicationController
 						@server_group.servers << server
 					end
 				end
+				if params[:server_group]["client_attributes"] then
+					params[:server_group]["client_attributes"].each_pair do |id, hash|
+						client = Client.new(hash)
+						@server_group.clients << client
+					end
+				end
+
 			}
 			format.xml {
 				hash=Hash.from_xml(request.raw_post)
@@ -112,9 +113,9 @@ class ServerGroupsController < ApplicationController
 			AsyncExec.run_job(CreateCloudServer, server.id)
 		end
         #format.html { redirect_to(@server_group) }
-        format.html  { render :xml => @server_group.to_xml(:include => {:servers => {:include => :vpn_network_interfaces}}), :status => :created, :location => @server_group, :content_type => "application/xml" }
-        format.json  { render :json => @server_group.to_json(:include => {:servers => {:include => :vpn_network_interfaces}}), :status => :created, :location => @server_group }
-        format.xml  { render :xml => @server_group.to_xml(:include => {:servers => {:include => :vpn_network_interfaces}}), :status => :created, :location => @server_group }
+        format.html  { render :xml => @server_group.to_xml(:include => {:servers => {:include => :vpn_network_interfaces}, :clients => {:include => :vpn_network_interfaces}}), :status => :created, :location => @server_group, :content_type => "application/xml" }
+        format.json  { render :json => @server_group.to_json(:include => {:servers => {:include => :vpn_network_interfaces}, :clients => {:include => :vpn_network_interfaces}}), :status => :created, :location => @server_group }
+        format.xml  { render :xml => @server_group.to_xml(:include => {:servers => {:include => :vpn_network_interfaces}, :clients => {:include => :vpn_network_interfaces}}), :status => :created, :location => @server_group }
       else
 
 		#@server_group.errors.each do |error|
@@ -163,7 +164,9 @@ private
 	def server_group_from_hash(hash)
 
 		servers=[]
+		clients=[]
 		ssh_public_keys=[]
+
 		if hash["server_group"]["servers"] then
 			hash["server_group"]["servers"].each do |server_hash|
 
@@ -171,6 +174,13 @@ private
 				user=User.find(session[:user_id])
 				server.account_id = user.account_id
 				servers << server
+			end
+		end
+
+		if hash["server_group"]["clients"] then
+			hash["server_group"]["clients"].each do |client_hash|
+				client = Client.new(client_hash)
+				clients << client
 			end
 		end
 
@@ -182,10 +192,12 @@ private
 
 		group_hash=hash["server_group"]
 		group_hash.delete("servers")
+		group_hash.delete("clients")
 		group_hash.delete("ssh_public_keys")
 		group_hash[:user_id] = session[:user_id]
 		server_group = ServerGroup.create(group_hash)
 		server_group.servers << servers
+		server_group.clients << clients
 		server_group.ssh_public_keys << ssh_public_keys
 		return server_group
 	end

@@ -69,15 +69,6 @@ class ServerGroup < ActiveRecord::Base
 		if not last_used_ip_address.nil? and not is_valid_ip(last_used_ip_address) then
 			errors.add_to_base("Please specify a valid last used IP address.")
 		end
-=begin
-		openvpn_server_count=0
-		self.servers.each do |server|
-			openvpn_server_count += 1 if server.openvpn_server
-		end
-		if openvpn_server_count > 1 then
-			errors.add_to_base("Each server group cannot have more than one VPN Server.")
-		end
-=end
 
 	end
 

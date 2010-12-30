@@ -32,9 +32,11 @@ class ServerGroupsControllerTest < ActionController::TestCase
 
   test "should create server_group with server" do
     http_basic_authorize
+    assert_difference('Client.count') do
     assert_difference('Server.count') do
     assert_difference('ServerGroup.count') do
-      post :create, :server_group => { :name => "test1", :owner_name => "dan.prince", :domain_name => "test.rsapps.net", :description => "test1", :vpn_network => "172.19.0.0", :vpn_subnet => "255.255.128.0", :servers_attributes => {"0" => { :name => "test1", :description => "test description", :flavor_id => 1, :image_id => 1 }} }
+      post :create, :server_group => { :name => "test1", :owner_name => "dan.prince", :domain_name => "test.rsapps.net", :description => "test1", :vpn_network => "172.19.0.0", :vpn_subnet => "255.255.128.0", :servers_attributes => {"0" => { :name => "test1", :description => "test description", :flavor_id => 1, :image_id => 1 }}, :client_attributes => {"0" => {:name => "test2", :description => "blah blah"}} }
+    end
     end
     end
     assert_response :success
@@ -61,6 +63,7 @@ class ServerGroupsControllerTest < ActionController::TestCase
 
     http_basic_authorize
     assert_difference('SshPublicKey.count') do
+    assert_difference('Client.count') do
     assert_difference('Server.count') do
     assert_difference('ServerGroup.count') do
 
@@ -82,6 +85,12 @@ class ServerGroupsControllerTest < ActionController::TestCase
       <base64-command>#{Base64.encode64("echo hello > /tmp/test.txt")}</base64-command>
     </server>
     </servers>
+    <clients type="array">
+    <client>
+      <name>test2</name>
+      <description>test2</description>
+    </client>
+    </clients>
     <ssh-public-keys type="array">
     <ssh-public-key>
       <description>Dan's Key</description>
@@ -95,6 +104,7 @@ class ServerGroupsControllerTest < ActionController::TestCase
 response=post :create
 @request.env.delete('RAW_POST_DATA')
 
+    end
     end
     end
     end
@@ -112,6 +122,7 @@ response=post :create
 
     http_basic_authorize
     assert_difference('SshPublicKey.count') do
+    assert_difference('Client.count') do
     assert_difference('Server.count') do
     assert_difference('ServerGroup.count') do
 
@@ -132,6 +143,12 @@ response=post :create
             "openvpn_server": "true"
         }
     ],
+    "clients": [
+		{
+			"name": "test2",
+			"description": "test2"
+        }
+    ],
 	"ssh_public_keys": [
 		{
 			"description": "Dan's Key",
@@ -145,6 +162,7 @@ response=post :create
 response=post :create
 @request.env.delete('RAW_POST_DATA')
 
+    end
     end
     end
     end
