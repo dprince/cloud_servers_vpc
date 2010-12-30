@@ -122,15 +122,8 @@ function create_client_key {
 	[[ $? == 0 ]] || fail "Failed to create client key: $CLIENT_NAME."
 	echo "OK"
 
-	TMP_DIR_CLIENT=$(mktemp -d)
-	cd $TMP_DIR_CLIENT
-	cp $OPENVPN_KEYS_DIR/ca.crt .  || fail "Failed to copy CA cert."
-	cp $OPENVPN_KEYS_DIR/$CLIENT_NAME.crt . || fail "Failed to copy client cert."
-	cp $OPENVPN_KEYS_DIR/$CLIENT_NAME.key . || fail "Failed to copy client key"
-	tar czf $CLIENT_NAME.tar.gz * || fail "Failed to create client key tarball."
-	mv $CLIENT_NAME.tar.gz $OPENVPN_KEYS_DIR
-	cd - > /dev/null
-	rm -Rf $TMP_DIR_CLIENT
+	cd $OPENVPN_KEYS_DIR || fail "Failed cd to CA keys dir."
+	tar czf $CLIENT_NAME.tar.gz ca.crt $CLIENT_NAME.crt $CLIENT_NAME.key || fail "Failed to create client key tarball."
 
 	mkdir -p "$OPENVPN_CONFIG_DIR/ccd/" 2> /dev/null
 	cat > $OPENVPN_CONFIG_DIR/ccd/$CLIENT_NAME <<-EOF_CAT
