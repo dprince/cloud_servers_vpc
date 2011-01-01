@@ -124,6 +124,9 @@ class WindowsServer < Server
 			certutil -addstore "TrustedPublisher" c:\\openvpn.cer
 			openvpn-install.exe /S
 
+			del c:\\openvpn.cer
+			del c:\\openvpn-install.exe
+
 			ECHO client > c:\\client.ovpn
 			ECHO dev tun >> c:\\client.ovpn
 			ECHO proto tcp >> c:\\client.ovpn
@@ -143,6 +146,7 @@ class WindowsServer < Server
 			ECHO script-security 2 >> c:\\client.ovpn
 
 			ECHO c:\\windows\\System32\\netsh.exe interface SET interface "public" DISABLED > c:\\up.bat
+			ECHO IF ERRORLEVEL 1 c:\\windows\\System32\\netsh.exe interface SET interface "Local Area Connection" DISABLED >> c:\\up.bat
 
 			IF EXIST c:\\progra~2\\openvpn move client.key c:\\progra~2\\openvpn\\config
 

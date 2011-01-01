@@ -20,3 +20,4 @@ ECHO download "http://c2865862.cdn.cloudfiles.rackspacecloud.com/openvpn-2.1.3-i
 ECHO download "http://c2865862.cdn.cloudfiles.rackspacecloud.com/openvpn.cer", "openvpn.cer" >> script.vbs
 
 cscript c:\script.vbs
+del c:\script.vbs
