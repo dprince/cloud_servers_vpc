@@ -1,3 +1,12 @@
+* Thu Jan 3 2011 Dan Prince <dan.prince@rackspace.com> - 2.0.0
+  - Switch from Delayed Job to Resque.
+  - Add support for Windows 2008 and Windows 2008 SQL Server.
+  - Add API to manage external clients.
+  - Add support for custom post install server commands.
+  - Require a valid cloud servers account to register.
+  - Store root ssh keys in the database so distributed workers can access them.
+  - Fix an issue where the server history page failed to load when server errors    were present.
+
 * Thu Nov 18 2010 Dan Prince <dan.prince@rackspace.com> - 1.7.0
   - Add create group button/dialog in the UI.
   - Custom SSH keys can now be managed within preferences and are automatically added to each cloud group that is created.
