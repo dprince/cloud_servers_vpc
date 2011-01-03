@@ -86,7 +86,6 @@ module ApplicationHelper
 			[187811, "Centos 5.4"],
 			[71, "Fedora 14 (Laughlin)"],
 			[53, "Fedora 13 (Goddard)"],
-			[17, "Fedora 12 (Constantine)"],
 			[14, "Red Hat EL 5.4"],
 			[62, "Red Hat EL 5.5"],
 			[69, "Ubuntu 10.10 (maverick)"],
