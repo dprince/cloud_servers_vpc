@@ -4,6 +4,8 @@ class ServerErrorTest < ActiveSupport::TestCase
 
 	fixtures :server_groups
 	fixtures :servers
+	fixtures :accounts
+	fixtures :users
 
 	test "create server error" do
 
@@ -12,7 +14,7 @@ class ServerErrorTest < ActiveSupport::TestCase
 			:description => "test description",
 			:flavor_id => 1,
 			:image_id => 1,
-            :account_id => users(:bob).account_id
+            :account_id => users(:bob).account.id
 		)
 
 		server.server_errors << ServerError.new(:error_message => "test")

@@ -6,6 +6,7 @@ class ServerGroupTest < ActiveSupport::TestCase
 	fixtures :server_groups
 	fixtures :servers
 	fixtures :users
+	fixtures :accounts
 
 	test "create" do
 
@@ -132,7 +133,7 @@ class ServerGroupTest < ActiveSupport::TestCase
 				:description => "test description",
 				:flavor_id => 1,
 				:image_id => 1,
-				:account_id => users(:bob).account_id
+				:account_id => users(:bob).account.id
 			}]
 		)
 		assert sg.valid?, "Server group should be valid."

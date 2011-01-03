@@ -6,6 +6,7 @@ class ServerTest < ActiveSupport::TestCase
 	fixtures :servers
 	fixtures :users
 	fixtures :clients
+	fixtures :accounts
 
 	test "create server" do
 
@@ -15,7 +16,7 @@ class ServerTest < ActiveSupport::TestCase
 			:flavor_id => 1,
 			:image_id => 1,
 			:base64_command => "echo hello",
-			:account_id => users(:bob).account_id
+			:account_id => users(:bob).account.id
 		)
 
 		group=server_groups(:two)
@@ -39,7 +40,7 @@ class ServerTest < ActiveSupport::TestCase
 			:description => "test description",
 			:flavor_id => 1,
 			:image_id => 1,
-			:account_id => users(:bob).account_id
+			:account_id => users(:bob).account.id
 		)
 
 		group=server_groups(:two)
@@ -60,7 +61,7 @@ class ServerTest < ActiveSupport::TestCase
 			:description => "test description",
 			:flavor_id => 1,
 			:image_id => 1,
-			:account_id => users(:bob).account_id
+			:account_id => users(:bob).account.id
 		)
 
 		group=server_groups(:two)
@@ -77,7 +78,7 @@ class ServerTest < ActiveSupport::TestCase
 			:name => "test1",
 			:flavor_id => 1,
 			:image_id => 1,
-			:account_id => users(:bob).account_id
+			:account_id => users(:bob).account.id
 		)
 
 		group=server_groups(:two)
@@ -95,7 +96,7 @@ class ServerTest < ActiveSupport::TestCase
 			:description => "test description",
 			:flavor_id => 1,
 			:image_id => 1,
-			:account_id => users(:bob).account_id
+			:account_id => users(:bob).account.id
 		)
 
 		assert !server.valid?, "Server should not be valid."
@@ -111,7 +112,7 @@ class ServerTest < ActiveSupport::TestCase
 			:flavor_id => 1,
 			:image_id => 1,
 			:num_vpn_network_interfaces => 3,
-			:account_id => users(:bob).account_id
+			:account_id => users(:bob).account.id
 		)
 
 		group=server_groups(:one)
@@ -139,7 +140,7 @@ class ServerTest < ActiveSupport::TestCase
 			:flavor_id => 1,
 			:image_id => 1,
 			:num_vpn_network_interfaces => 3,
-			:account_id => users(:bob).account_id
+			:account_id => users(:bob).account.id
 		)
 		group=server_groups(:one)
 		group.servers << server
@@ -157,7 +158,7 @@ class ServerTest < ActiveSupport::TestCase
 			:flavor_id => 1,
 			:image_id => 1,
 			:num_vpn_network_interfaces => 3,
-			:account_id => users(:bob).account_id
+			:account_id => users(:bob).account.id
 		)
 		group=server_groups(:one)
 		group.servers << server
@@ -174,7 +175,7 @@ class ServerTest < ActiveSupport::TestCase
 			:description => "test description",
 			:flavor_id => 1,
 			:image_id => 1,
-			:account_id => users(:bob).account_id
+			:account_id => users(:bob).account.id
 		)
 
 		group=server_groups(:two)
@@ -194,7 +195,7 @@ class ServerTest < ActiveSupport::TestCase
 			:image_id => 1,
 			:openvpn_server => true,
 			:base64_command => "echo hello",
-			:account_id => users(:bob).account_id
+			:account_id => users(:bob).account.id
 		)
 
 		group=server_groups(:one)

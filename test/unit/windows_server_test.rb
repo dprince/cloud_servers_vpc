@@ -5,6 +5,7 @@ class ServerTest < ActiveSupport::TestCase
 	fixtures :server_groups
 	fixtures :servers
 	fixtures :users
+	fixtures :accounts
 
 	#Hard coded windows types: "28","31","24","23","29"
 	# FIXME: create images lookup table
@@ -15,7 +16,7 @@ class ServerTest < ActiveSupport::TestCase
 			:image_id => "28",
 			:description => "test description",
 			:flavor_id => 3,
-			:account_id => users(:bob).account_id
+			:account_id => users(:bob).account.id
 		)
 
 		group=server_groups(:one)
@@ -39,7 +40,7 @@ class ServerTest < ActiveSupport::TestCase
 			:description => "test description",
 			:flavor_id => 3,
 			:openvpn_server => true,
-			:account_id => users(:bob).account_id
+			:account_id => users(:bob).account.id
 		)
 
 		group=server_groups(:one)
@@ -57,7 +58,7 @@ class ServerTest < ActiveSupport::TestCase
 			:image_id => "28",
 			:description => "test description",
 			:flavor_id => 3,
-			:account_id => users(:bob).account_id
+			:account_id => users(:bob).account.id
 		)
 
 		group=server_groups(:one)
@@ -75,7 +76,7 @@ class ServerTest < ActiveSupport::TestCase
 			:image_id => "28",
 			:description => "test description",
 			:flavor_id => 2,
-			:account_id => users(:bob).account_id
+			:account_id => users(:bob).account.id
 		)
 
 		group=server_groups(:one)
@@ -94,7 +95,7 @@ class ServerTest < ActiveSupport::TestCase
             :flavor_id => 3,
             :image_id => 28,
             :num_vpn_network_interfaces => 2,
-            :account_id => users(:bob).account_id
+            :account_id => users(:bob).account.id
         )   
             
         group=server_groups(:one)

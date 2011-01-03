@@ -83,7 +83,7 @@ class ServerGroupsController < ApplicationController
 					params[:server_group]["servers_attributes"].each_pair do |id, hash|
 						server = Server.new_for_type(hash)
 						user=User.find(session[:user_id])
-						server.account_id = user.account_id
+						server.account_id = user.account.id
 						@server_group.servers << server
 					end
 				end
@@ -172,7 +172,7 @@ private
 
 				server = Server.new_for_type(server_hash)
 				user=User.find(session[:user_id])
-				server.account_id = user.account_id
+				server.account_id = user.account.id
 				servers << server
 			end
 		end

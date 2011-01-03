@@ -115,7 +115,7 @@ class ServersController < ApplicationController
     end
 
     user=User.find(session[:user_id])
-    @server.account_id = user.account_id
+    @server.account_id = user.account.id
 
     respond_to do |format|
       if @server.save
