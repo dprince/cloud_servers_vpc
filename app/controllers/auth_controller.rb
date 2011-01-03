@@ -3,8 +3,12 @@ class AuthController < ApplicationController
     before_filter :authorize, :only => :logout
 
     def index
-        respond_to do |format|
-          format.html # show.html.erb
+        if session[:user_id] then
+            redirect_to("/main")
+        else
+            respond_to do |format|
+              format.html # show.html.erb
+            end
         end
     end
 

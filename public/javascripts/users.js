@@ -90,7 +90,7 @@ function user_create() {
 			id=$("id", data).text();
 			$("#user-dialog").dialog('close');
 			$("#user-dialog").dialog('destroy');
-			$("#tabs").tabs('load', 0);
+			$(location).attr('href','/main');
 		},
 		error: function(data) {
 			$("#user-new-error-messages").css("display", "inline");

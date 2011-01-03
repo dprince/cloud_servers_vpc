@@ -1,5 +1,6 @@
 ENV["RAILS_ENV"] = "test"
 require File.expand_path(File.dirname(__FILE__) + "/mocks/test/async_exec")
+require File.expand_path(File.dirname(__FILE__) + "/mocks/test/cloud_servers_util")
 require File.expand_path(File.dirname(__FILE__) + "/../config/environment")
 require 'test_help'
 

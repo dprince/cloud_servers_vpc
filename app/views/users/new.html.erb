@@ -46,5 +46,10 @@ $(document).ready(function() {
     <%= f.label :password_confirmation %><br />
     <%= f.password_field :password_confirmation, :class => "user_new" %>
   </p>
+<hr/>
+  <p>
+  <label>Cloud Servers Username</label><br/><input type="text" name="user[account_attributes][cloud_servers_username]" size="30" value="" class="user_new"/><br/>
+  <label>Cloud Servers API Key</label><br/><input type="text" name="user[account_attributes][cloud_servers_api_key]" size="40" value="" class="user_new"/>
+  </p>
 
 <% end %>

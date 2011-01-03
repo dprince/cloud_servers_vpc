@@ -5,7 +5,12 @@ class CloudServersUtil
 	end
 
 	def initialize(username, api_key)
-		return true
+		if ENV['CLOUD_SERVERS_UTIL_INIT_MOCK_FAIL'] then
+			ENV.delete('CLOUD_SERVERS_UTIL_INIT_MOCK_FAIL')
+			raise "Invalid account specified"
+		else
+			return true
+		end
 	end
 
 	def create_cloud_server(name, image_id, flavor_id, personalities={})

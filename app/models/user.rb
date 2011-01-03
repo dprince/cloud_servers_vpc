@@ -1,4 +1,5 @@
 require 'digest/sha1'
+require 'cloud_servers_util'
 
 class User < ActiveRecord::Base
 
@@ -8,20 +9,35 @@ class User < ActiveRecord::Base
     validates_format_of :username, :with => /^[^ ]*$/, :message => "Username may not contain spaces."
     validates_confirmation_of :password, :message => "Passwords do not match.", :if => :password
     validates_length_of :password, :in => 6..32, :allow_blank => false, :message => "Password must be between 6 and 32 characters.", :if => :password
-    has_one :account
     has_many :ssh_public_keys, :dependent => :destroy, :order => "description"
+    has_one :account
+    #validates_associated :account, :if => Proc.new { |user| user.new_record? }
+    accepts_nested_attributes_for :account, :update_only => true
 
     attr_accessor :password_confirmation
 
-	def before_save
+    def before_save
 
-		if self.account.nil? then
-	
-			self.account = Account.create
+        if self.account.nil? then
+            self.account = Account.create
+        end
 
-		end
+    end
 
-	end
+    def validate_on_create
+
+        if self.account.nil? then
+            errors.add_to_base("A valid account is required.")
+        else
+            begin
+                acct=self.account
+                CloudServersUtil.new(acct.cloud_servers_username, acct.cloud_servers_api_key)
+            rescue Exception => e
+                errors.add_to_base("Invalid cloud servers username or api key specified: #{e.message}")
+            end
+        end
+
+    end
 
     def self.authenticate(username, password)
 
