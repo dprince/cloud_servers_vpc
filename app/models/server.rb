@@ -168,7 +168,7 @@ class Server < ActiveRecord::Base
 			self.cloud_server_id_number = cs.id
 			self.external_ip_addr = cs.addresses[:public][0]
 			self.internal_ip_addr = cs.addresses[:private][0]
-			self.admin_password = cs.adminPass
+			self.admin_password = cs.adminPass if is_windows
 			save!
 	
 			# if this server is an OpenVPN server create it now
