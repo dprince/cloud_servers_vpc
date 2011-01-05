@@ -71,7 +71,7 @@ The following REST API requests are available (both XML and JSON are supported).
 == Examples
 
 Example: creating a server group using Curl
-Create an XML file containing the following example data. Name the file example.json.
+Create a file containing the following example data. Name the file example.json.
 
 	{
 		"name": "main",
