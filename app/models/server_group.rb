@@ -14,8 +14,8 @@ class ServerGroup < ActiveRecord::Base
 	validates_length_of :domain_name, :maximum => 255
 	has_many :servers
 	has_many :clients
-    accepts_nested_attributes_for :servers, :update_only => true
-    accepts_nested_attributes_for :clients, :update_only => true
+	accepts_nested_attributes_for :servers, :update_only => true
+	accepts_nested_attributes_for :clients, :update_only => true
 	has_many :ssh_public_keys, :dependent => :destroy
 	belongs_to :user
 	has_one :ssh_keypair
@@ -79,7 +79,10 @@ class ServerGroup < ActiveRecord::Base
 			# write ssh keys to disk from the DB if they don't already exist
 			if not File.exists?(path)
 				FileUtils.mkdir_p(File.dirname(path))
-				File.open(path, 'w') {|f| f.write(kp.private_key)}
+				File.open(path, 'w') do |f|
+					f.write(kp.private_key)
+					f.chmod(0600)
+				end
 			end
 			if not File.exists?(path+".pub")
 				FileUtils.mkdir_p(File.dirname(path))

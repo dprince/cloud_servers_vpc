@@ -226,7 +226,7 @@ class Server < ActiveRecord::Base
 			Timeout::timeout(30) do
 				vpn_server=Server.find(:first, :conditions => ["server_group_id = ? AND openvpn_server = ?", self.server_group_id, true])
 				%x{
-					ssh -i #{self.server_group.ssh_key_basepath} root@#{vpn_server.external_ip_addr} sed "/^#{self.name}.*/d" -i .ssh/known_hosts
+					ssh -T -i #{self.server_group.ssh_key_basepath} root@#{vpn_server.external_ip_addr} sed "/^#{self.name}.*/d" -i .ssh/known_hosts
 				}
 			end
 
