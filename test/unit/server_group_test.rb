@@ -5,6 +5,7 @@ class ServerGroupTest < ActiveSupport::TestCase
 	fixtures :ssh_keypairs
 	fixtures :server_groups
 	fixtures :servers
+	fixtures :clients
 	fixtures :users
 	fixtures :accounts
 
@@ -156,6 +157,15 @@ class ServerGroupTest < ActiveSupport::TestCase
 
 		assert_equal sg.ssh_keypair.private_key, private_key, "Private keys don't match."
 		assert_equal sg.ssh_keypair.public_key, public_key, "Public keys don't match."
+
+	end
+
+	test "make server group historical" do
+
+		sg=server_groups(:one)
+		assert sg.make_historical
+		assert_equal 0, Client.count(:conditions => ["server_group_id = ?", sg.id])
+		assert_equal 0, Server.count(:conditions => ["server_group_id = ? AND historical = 0", sg.id])
 
 	end
 

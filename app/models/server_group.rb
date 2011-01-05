@@ -96,6 +96,9 @@ class ServerGroup < ActiveRecord::Base
 		self.servers.each do |server|
 			server.make_historical
 		end
+		self.clients.each do |client|
+			client.destroy
+		end
 	end
 
 end

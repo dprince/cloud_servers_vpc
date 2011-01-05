@@ -74,9 +74,9 @@ Example: creating a server group using Curl
 Create a file containing the following example data. Name the file example.json.
 
 	{
-		"name": "main",
+		"name": "mail",
 		"domain_name": "vpc",
-		"description": "Main Server Dev Group",
+		"description": "Mail Server Group",
 		"vpn_network": "172.19.0.0",
 		"vpn_subnet": "255.255.128.0",
 		"owner_name": "dan.prince",
