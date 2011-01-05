@@ -78,9 +78,11 @@ class ServerGroup < ActiveRecord::Base
 		if not kp.nil? then
 			# write ssh keys to disk from the DB if they don't already exist
 			if not File.exists?(path)
+				FileUtils.mkdir_p(File.dirname(path))
 				File.open(path, 'w') {|f| f.write(kp.private_key)}
 			end
 			if not File.exists?(path+".pub")
+				FileUtils.mkdir_p(File.dirname(path))
 				File.open(path+".pub", 'w') {|f| f.write(kp.public_key)}
 			end
 		end
