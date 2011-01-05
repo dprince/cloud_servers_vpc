@@ -1,6 +1,8 @@
-* Thu Jan 3 2011 Dan Prince <dan.prince@rackspace.com> - 2.0.0
+* Wed Jan 5 2011 Dan Prince <dan.prince@rackspace.com> - 2.0.0
   - Switch from Delayed Job to Resque.
   - Add support for Windows 2008 and Windows 2008 SQL Server.
+  - Updated the Server API so that individual servers can be added
+    to existing server groups.
   - Add API to manage external clients.
   - Add support for custom post install server commands.
   - Require a valid cloud servers account to register.

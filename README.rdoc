@@ -1,10 +1,10 @@
 = Cloud Servers VPC
 
-Secure cloud server groups
+OpenVPN server groups built on top of the Rackspace Cloud API.
 
 == Description
 
-A web application with a REST based HTTP interface to create groups of servers in the cloud using secure OpenVPN networks. Each server group is created on a unique OpenVPN network that is accessible via SSH or OpenVPN. A simple web UI is also available to view, monitor, and delete existing server groups.
+A web application with a REST based HTTP interface to create groups of servers in the cloud using secure OpenVPN networks. Each server group is created on a unique OpenVPN network that is accessible via SSH or OpenVPN. A simple web UI is also available to create, view, monitor, and manage server groups.
 
 == Features
 
@@ -12,11 +12,13 @@ A web application with a REST based HTTP interface to create groups of servers i
 
 -Communication between servers is secured with OpenVPN
 
--The eth0 network interface is disabled on VPN clients. Only the gateway VPN Server node can be used to connect to the server group.
+-Single public point of entry through the VPN server. The eth0 network interface is disabled on VPN clients. Only the gateway VPN Server node can be used to connect to the server group.
 
--Create a group of servers with a single XML HTTP POST request.
+-Ability to create a group of servers with a single HTTP POST request or by using a set of HTTP POST requests to add individual servers.
 
--Validates network access between servers
+-Ability to create and manage VPN certificates for external clients.
+
+-Validates network access between Cloud Servers using ping and ssh connectivity tests.
 
 -Easy (scriptable) access to the server group via SSH using public keys. The machine which acts as the OpenVPN server for the network acts as the SSH gateway.
 
@@ -50,60 +52,67 @@ At this point the web application should be running at http://localhost:3000. Th
 
 == API
 
-The following REST API requests are available.
+The following REST API requests are available (both XML and JSON are supported).
 
+	GET /clients.xml
+	GET /clients/1.xml
+	POST /clients.xml
+	DELETE /client/1.xml
 	GET /server_groups.xml
 	GET /server_groups/1.xml
 	POST /server_groups.xml
 	DELETE /server_groups/1.xml
 	GET /servers.xml
 	GET /server/1.xml
+	POST /servers.xml
+	DELETE /servers/1.xml
 	GET /server_errors.xml
 
 == Examples
 
 Example: creating a server group using Curl
-Create an XML file containing the following example data. Name the file example.xml.
+Create an XML file containing the following example data. Name the file example.json.
 
-	<server-group>
-	  <name>mail</name>
-	  <domain-name>mydomain.net</domain-name>
-	  <description>Mail Dev Group</description>
-	  <owner-name>dprince</owner-name>
-	  <vpn-network>172.19.0.0</vpn-network>
-	  <vpn-subnet>255.255.128.0</vpn-subnet>
-		<servers type="array">
-			<server>
-			  <name>boot1</name>
-			  <description>Boot 1</description>
-			  <flavor-id type="integer">2</flavor-id>
-			  <image-id type="integer">14</image-id>
-			  <openvpn-server type="boolean">true</openvpn-server>
-			</server>
-			<server>
-			  <name>gate1</name>
-			  <description>Gate 1</description>
-			  <flavor-id type="integer">2</flavor-id>
-			  <image-id type="integer">14</image-id>
-			</server>
-			<server>
-			  <name>relay1</name>
-			  <description>Gate 1</description>
-			  <flavor-id type="integer">2</flavor-id>
-			  <image-id type="integer">14</image-id>
-			</server>
-		</servers>
-		<ssh-public-keys type="array">
-			<ssh-public-key>
-				<description>My SSH Key</description>
-				<public-key>ssh-rsa AAAAB3NzaC1yc2EAAAABI...</public-key>
-			</ssh-public-key>
-		</ssh-public-keys>
-	</server-group>
+	{
+		"name": "main",
+		"domain_name": "vpc",
+		"description": "Main Server Dev Group",
+		"vpn_network": "172.19.0.0",
+		"vpn_subnet": "255.255.128.0",
+		"owner_name": "dan.prince",
+		"servers": [
+			{
+				"name": "login",
+				"description": "VPN Login Server",
+				"flavor_id": 3,
+				"image_id": 51,
+				"openvpn_server": "true"
+			},
+			{
+				"name": "gate1",
+				"description": "Gate Server",
+				"flavor_id": 4,
+				"image_id": 51
+			}
+		],
+		"clients": [
+			{
+				"name": "dan",
+				"description": "Dan Laptop"
+			}
+		],
+		"ssh_public_keys": [
+			{
+				"description": "Dan Laptop SSH key",
+				"public_key": "ssh-rsa AAAAB3NzaC1yc2EAAAABIwAAAQEA+yNMzUrQXa0EOfv+WJtfmLO1WdoOaD47G9qwllSUaaGPRkYzkTNdxcEPrR3XBR94ctOeWOHZ/w7ymhvwK5LLsoNBK+WgRz/mg8oHcii2GoL0fNojdwUMyFMIJxJT+iwjF/omyhyrWaaLAztAKRO7BdOkNlXMAAcMeKzQtFqdZm09ghoemu3BPYUTyDKHMp+t0P1d7mkHdd719oDfMf+5miixQeJZJCWAsGwroN7k8a46rvezDHEygBsDAF2ZpS2iGMABos/vTp1oyHkCgCqc3rM0OoKqcKB5iQ9Qaqi5ung08BXP/PHfVynXzdGMjTh4w+6jiMw7Dx2GrQIJsDolKQ== dan.prince@dovetail"
+			}
+		]
+	}
+
 Run the following example curl request:
 
-	curl -k -u username:password -d "@example.xml" http://localhost:3000/server_groups.xml
-** Where the Server Groups XML data file is named example.xml in the current working directory
+	curl -k -u username:password -d "@example.json" http://localhost:3000/server_groups.json
+** Where the Server Groups JSON data file is named example.json in the current working directory
 
 == Author
 
@@ -112,4 +121,4 @@ Dan Prince <dan.prince@rackspace.com>
 == License
 
 See COPYING for license information.
-Copyright (c) 2010, Rackspace US, Inc.
+Copyright (c) 2010-2011, Rackspace US, Inc.
