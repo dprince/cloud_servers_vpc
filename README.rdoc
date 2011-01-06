@@ -39,16 +39,63 @@ The application was developed with MySQL. The following gems are required:
 	resque (1.10.0)
 	SystemTimer (1.2.1)
 
-Unpack the rails app and run the following commands to setup a working
-development application:
+Unpack the rails app and run the following commands to create the database.
 
 	rake db:create
 	rake db:migrate
+
+Start some linux workers to configure Linux machines:
+
 	mkdir tmp/pids
 	rake resque:workers QUEUE=linux COUNT=3
+
+Start the API server:
+
 	./script/server
 
 At this point the web application should be running at http://localhost:3000. The default username:password is admin:cloud.
+
+== Windows Worker installation
+
+Windows worker machines are required when creating groups with Windows Servers. The following instructions outline how to configure a Windows worker node to work with Cloud Servers VPC.
+
+1) Install jruby
+
+2) Gem install rails 2.3.8, resque, activerecord-jdbc-adapter, jruby-openssl
+
+3) Extract Cloud Servers VPC to c:\vpc.
+
+4) Download Pstools. Extract psexec.exe to c:\psexec.exe. Add C:\ to your system environments %PATH%.
+
+5) Run psexec.exe at least once to accept the license.
+
+6) Download the mysql connector jar (version 5.0.8). Copy it into c:\vpc.
+
+7) Configure database.yml to use JDBC (example):
+
+	production:
+	  adapter: jdbc
+	  driver: com.mysql.jdbc.Driver
+	  url: jdbc:mysql://your_db_server:3306/cs_vpc_prod
+	  username: worker
+	  password: test123
+
+8) Configure the default Resque Redis URL in config\environments\production.rb:
+
+	Resque.redis="redis:://you_redis_server:6379"
+
+9) Start a worker:
+	cd c:\vpc
+	set CLASSPATH=c:\vpc\mysql-connector-java-5.0.8-bin.jar
+	set RAILS_ENV=production
+	rake resque:work QUEUE=windows
+
+== Installation w/ Chef
+
+A set of Chef Cookbooks has been created to install and manage a Cloud Servers
+VPC installation. See the following project for details: https://github.com/dprince/cs_vpc_cookbooks
+
+Roles are provided to install API servers, worker nodes, and the MySQL and Redis servers components as well.
 
 == API
 
