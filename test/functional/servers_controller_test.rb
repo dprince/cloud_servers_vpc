@@ -122,12 +122,28 @@ class ServersControllerTest < ActionController::TestCase
     assert_response 401
   end
 
-  test "should create server" do
+  test "should create server as admin" do
     http_basic_authorize
     assert_difference('Server.count') do
       post :create, :server => {:name => "test1", :description => "test description", :flavor_id => 1, :image_id => 1, :server_group_id => server_groups(:one).id}
     end
     assert_response :success
+  end
+
+  test "should create server" do
+    http_basic_authorize(:bob)
+    assert_difference('Server.count') do
+      post :create, :server => {:name => "test1", :description => "test description", :flavor_id => 1, :image_id => 1, :server_group_id => server_groups(:one).id}
+    end
+    assert_response :success
+  end
+
+  test "should not create server in another users group" do
+    http_basic_authorize(:jim)
+    assert_no_difference('Server.count') do
+      post :create, :server => {:name => "test1", :description => "test description", :flavor_id => 1, :image_id => 1, :server_group_id => server_groups(:one).id}
+    end
+    assert_response 401
   end
 
   test "unauthorized create fails" do
@@ -137,7 +153,7 @@ class ServersControllerTest < ActionController::TestCase
 
   test "should create server via XML request" do
 
-    http_basic_authorize
+    http_basic_authorize(:bob)
     assert_difference('Server.count') do
 
 @request.env['RAW_POST_DATA'] = %{
@@ -166,7 +182,7 @@ response=post :create
 
   test "should create server where VPN server is online via JSON request" do
 
-    http_basic_authorize
+    http_basic_authorize(:bob)
     assert_difference('Server.count') do
 
 @request.env['RAW_POST_DATA'] = %{
@@ -197,7 +213,7 @@ response=post :create
 
   test "should create server via JSON request" do
 
-    http_basic_authorize
+    http_basic_authorize(:jim)
     assert_difference('Server.count') do
 
 @request.env['RAW_POST_DATA'] = %{
@@ -228,7 +244,7 @@ response=post :create
 
   test "should create openvpn server via JSON request" do
 
-    http_basic_authorize
+    http_basic_authorize(:jim)
     assert_difference('Server.count') do
 
 @request.env['RAW_POST_DATA'] = %{
@@ -258,7 +274,7 @@ response=post :create
   end
 
   test "should destroy server" do
-    http_basic_authorize
+    http_basic_authorize(:bob)
     delete :destroy, :id => servers(:one).to_param
 
     server=Server.find(servers(:one).id)
@@ -275,7 +291,7 @@ response=post :create
     assert_equal false, server.historical
   end
 
-  test "should not destroy server" do
+  test "should not destroy server if not authenticated" do
     delete :destroy, :id => servers(:one).to_param
     server=Server.find(servers(:one).id)
     assert_equal false, server.historical

@@ -3,7 +3,7 @@ require 'async_exec'
 class ClientsController < ApplicationController
 
   before_filter :authorize
-  before_filter :require_admin_or_self, :except => :index
+  before_filter :require_admin_or_self, :except => [:index, :create]
 
   # GET /clients
   # GET /clients.json
@@ -81,6 +81,11 @@ class ClientsController < ApplicationController
                 hash=JSON.parse(request.raw_post)
                 @client=Client.new(hash)
             }
+    end
+
+    if not @client.server_group.nil? and session[:user_id] != @client.server_group.user_id and not is_admin then
+      render :text => "Attempt to create client in a group you don't own.", :status => "401"
+      return false
     end
 
     respond_to do |format|

@@ -3,7 +3,7 @@ require 'async_exec'
 class ServersController < ApplicationController
 
   before_filter :authorize
-  before_filter :require_admin_or_self, :except => :index
+  before_filter :require_admin_or_self, :except => [:index, :create]
 
   # GET /servers
   # GET /servers.json
@@ -112,6 +112,11 @@ class ServersController < ApplicationController
                 hash=JSON.parse(request.raw_post)
                 @server=Server.new(hash)
             }
+    end
+
+    if not @server.server_group.nil? and session[:user_id] != @server.server_group.user_id and not is_admin then
+      render :text => "Attempt to create server in a group you don't own.", :status => "401"
+      return false
     end
 
     user=User.find(session[:user_id])

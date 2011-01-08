@@ -91,12 +91,28 @@ class ClientsControllerTest < ActionController::TestCase
     assert_response 401
   end
 
-  test "should create client" do
+  test "should create client as admin" do
     http_basic_authorize
     assert_difference('Client.count') do
       post :create, :client => {:name => "test1", :description => "test description", :server_group_id => server_groups(:one).id}
     end
     assert_response :success
+  end
+
+  test "should create client" do
+    http_basic_authorize(:bob)
+    assert_difference('Client.count') do
+      post :create, :client => {:name => "test1", :description => "test description", :server_group_id => server_groups(:one).id}
+    end
+    assert_response :success
+  end
+
+  test "should not create client in another users group" do
+    http_basic_authorize(:jim)
+    assert_no_difference('Client.count') do
+      post :create, :client => {:name => "test1", :description => "test description", :server_group_id => server_groups(:one).id}
+    end
+    assert_response 401
   end
 
   test "unauthorized create fails" do
@@ -106,7 +122,7 @@ class ClientsControllerTest < ActionController::TestCase
 
   test "should create client via XML request" do
 
-    http_basic_authorize
+    http_basic_authorize(:bob)
     assert_difference('Client.count') do
 
 @request.env['RAW_POST_DATA'] = %{
@@ -129,7 +145,7 @@ response=post :create
 
   test "should create client where VPN server is online via JSON request" do
 
-    http_basic_authorize
+    http_basic_authorize(:bob)
     assert_difference('Client.count') do
 
 @request.env['RAW_POST_DATA'] = %{
@@ -158,7 +174,7 @@ response=post :create
   test "should create client via JSON request" do
 
     AsyncExec.jobs.clear
-    http_basic_authorize
+    http_basic_authorize(:jim)
     assert_difference('Client.count') do
 
 @request.env['RAW_POST_DATA'] = %{
