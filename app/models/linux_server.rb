@@ -206,6 +206,7 @@ class LinuxServer < Server
 		# append the public key from the ServerGroup
 		authorized_keys += IO.read(self.server_group.ssh_key_basepath+".pub")
 		tmp_auth_keys=Tempfile.new "cs_auth_keys"
+		tmp_auth_keys.chmod(0600)
 		tmp_auth_keys.write(authorized_keys)
 		tmp_auth_keys.flush
 		@tmp_files << tmp_auth_keys
@@ -219,10 +220,11 @@ class LinuxServer < Server
 userid: #{ENV['RACKSPACE_CLOUD_USERNAME']}
 api_key: #{ENV['RACKSPACE_CLOUD_API_KEY']}
 		}
-		tmp_cloud_key=Tempfile.new "cs_auth_keys"
+		tmp_cloud_key=Tempfile.new "cs_cloud_keys"
+		tmp_cloud_key.chmod(0600)
 		tmp_cloud_key.write(cloud_key_config)
 		tmp_cloud_key.flush
-		@tmp_files << tmp_auth_keys
+		@tmp_files << tmp_cloud_key
 		personalities.store(tmp_cloud_key.path, "/root/.rackspace_cloud")
 
 		return personalities
