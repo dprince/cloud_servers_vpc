@@ -30,6 +30,7 @@ module Bootstrap
 		elif [ -f /etc/debian_version ]; then
 			DEBIAN_FRONTEND=noninteractive apt-get install -y openvpn &> /dev/null || { echo "Failed to install OpenVPN via apt-get on $HOSTNAME."; exit 1; }
 			DEBIAN_FRONTEND=noninteractive apt-get install -y chkconfig &> /dev/null || { echo "Failed to install chkconfig via apt-get on $HOSTNAME."; exit 1; }
+			sed -e "s|.*HashKnownHosts.*|    HashKnownHosts no|g" -i /etc/ssh/ssh_config
 		else
 			echo "Unable to install openvpn package."
 			exit 1

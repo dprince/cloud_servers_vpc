@@ -1,5 +1,9 @@
+* Mon Jan 21 2011 Dan Prince <dan.prince@rackspace.com> - 2.0.2
+  - Fix rebuild issues on Ubuntu 10.10 (maverick). Disable HashKnownHosts in ssh_config by default.
+  - Don't recreate openvpn keys on a rebuild.
+
 * Mon Jan 10 2011 Dan Prince <dan.prince@rackspace.com> - 2.0.1
-  - Fix an issue where the API was to restrictive and users were not able
+  - Fix an issue where the API was too restrictive and users were not able
     create servers and clients in groups they owned.
   - Append .tar.gz to cert tarball names.
   - Auth key permission fix (chmod auth key temp files 0600).

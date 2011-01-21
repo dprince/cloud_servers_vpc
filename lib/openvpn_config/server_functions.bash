@@ -113,6 +113,8 @@ function create_client_key {
 	local CLIENT_TYPE=$5
 	local VPN_SERVER_IP=$6 #172.19.0.1 for example
 
+	[ -f "$OPENVPN_KEYS_DIR/$CLIENT_NAME.tar.gz" ] && return 0;
+
 	echo -n "Creating client key for: $CLIENT_NAME..."
 	cd $OPENVPN_CONFIG_DIR/easy-rsa
 	bash <<-EOF_BASH
