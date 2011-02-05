@@ -14,18 +14,21 @@ module Bootstrap
 			epel_base_url_add_command="sed -e \"s|#baseurl=EPEL_BASE_URL|baseurl=#{ENV['EPEL_BASE_URL']}|g\" -i /etc/yum.repos.d/epel.repo"
         end
 
-		#script = "rpm -Uvh http://download.fedora.redhat.com/pub/epel/5/x86_64/epel-release-5-3.noarch.rpm && yum install -y openvpn"
         script=<<-SCRIPT_EOF
 		if [ -f /etc/fedora-release ]; then
 			yum install -y openvpn
 		elif [ -f /etc/redhat-release ]; then
-			cat > /etc/pki/rpm-gpg/RPM-GPG-KEY-EPEL <<-"EOF_CAT"
-			#{IO.read(File.join(File.dirname(__FILE__), "RPM-GPG-KEY-EPEL"))}
-			EOF_CAT
-			cat > /etc/yum.repos.d/epel.repo <<-"EOF_CAT"
-			#{IO.read(File.join(File.dirname(__FILE__), "epel.repo"))}
-			EOF_CAT
-			#{epel_base_url_add_command}
+			if [ -n "#{ENV['EPEL_BASE_URL']}" ]; then
+				cat > /etc/pki/rpm-gpg/RPM-GPG-KEY-EPEL <<-"EOF_CAT"
+				#{IO.read(File.join(File.dirname(__FILE__), "RPM-GPG-KEY-EPEL"))}
+				EOF_CAT
+				cat > /etc/yum.repos.d/epel.repo <<-"EOF_CAT"
+				#{IO.read(File.join(File.dirname(__FILE__), "epel.repo"))}
+				EOF_CAT
+				#{epel_base_url_add_command}
+			else
+				rpm -Uvh http://download.fedora.redhat.com/pub/epel/5/x86_64/epel-release-5-4.noarch.rpm
+			fi
 			yum install -y openvpn
 		elif [ -f /etc/debian_version ]; then
 			DEBIAN_FRONTEND=noninteractive apt-get install -y openvpn &> /dev/null || { echo "Failed to install OpenVPN via apt-get on $HOSTNAME."; exit 1; }
