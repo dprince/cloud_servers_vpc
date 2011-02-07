@@ -3,7 +3,7 @@
 # Specifies gem version of Rails to use when vendor/rails is not present
 RAILS_GEM_VERSION = '2.3.8' unless defined? RAILS_GEM_VERSION
 
-CLOUD_SERVERS_VPC_VERSION="0.0-master"
+CLOUD_SERVERS_VPC_VERSION="2.0.3"
 
 # Bootstrap the Rails environment, frameworks, and default configuration
 require File.join(File.dirname(__FILE__), 'boot')
