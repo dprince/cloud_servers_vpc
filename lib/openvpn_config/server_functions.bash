@@ -54,7 +54,7 @@ function create_ca {
 	export KEY_CITY="Blacksburg"
 	export KEY_ORG="Rackspace"
 	export KEY_EMAIL="cobra@snakeoil.com"
-	export KEY_OU="Infrastructure"
+	export KEY_OU="Cloud"
 	#export KEY_CN="$CA_COMMON_NAME"
 	export KEY_NAME="$CA_COMMON_NAME"
 	export KEY_DIR="$OPENVPN_KEYS_DIR"
