@@ -1,3 +1,7 @@
+* Mon Feb 6 2011 Dan Prince <dan.prince@rackspace.com> - 2.0.3
+  - Remove mirrorlist settings from custom EPEL repo config.
+  - If EPEL_BASE_URL is not set download the RPM from Fedora mirrors.
+
 * Mon Jan 21 2011 Dan Prince <dan.prince@rackspace.com> - 2.0.2
   - Fix rebuild issues on Ubuntu 10.10 (maverick). Disable HashKnownHosts in ssh_config by default.
   - Don't recreate openvpn keys on a rebuild.
