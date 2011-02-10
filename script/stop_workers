@@ -13,7 +13,7 @@ if [ $ret -eq 0 ]; then
             echo "Timeout error occurred trying to stop workers."
             exit 1
         else
-            rm -f /opt/cloud-servers-vpc/tmp/pids/*
+            rm -f $(dirname $0)/../tmp/pids/*
                 echo "Successfully stopped workers."
             exit 0
         fi
