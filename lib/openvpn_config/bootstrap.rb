@@ -16,7 +16,7 @@ module Bootstrap
 
         script=<<-SCRIPT_EOF
 		if [ -f /etc/fedora-release ]; then
-			yum install -y openvpn
+			yum install -y openvpn ntpdate
 		elif [ -f /etc/redhat-release ]; then
 			if [ -n "#{ENV['EPEL_BASE_URL']}" ]; then
 				cat > /etc/pki/rpm-gpg/RPM-GPG-KEY-EPEL <<-"EOF_CAT"
@@ -29,15 +29,19 @@ module Bootstrap
 			else
 				rpm -Uvh http://download.fedora.redhat.com/pub/epel/5/x86_64/epel-release-5-4.noarch.rpm
 			fi
-			yum install -y openvpn
+			yum install -y openvpn ntp
 		elif [ -f /etc/debian_version ]; then
-			DEBIAN_FRONTEND=noninteractive apt-get install -y openvpn &> /dev/null || { echo "Failed to install OpenVPN via apt-get on $HOSTNAME."; exit 1; }
+			DEBIAN_FRONTEND=noninteractive apt-get install -y openvpn ntpdate &> /dev/null || { echo "Failed to install OpenVPN via apt-get on $HOSTNAME."; exit 1; }
 			DEBIAN_FRONTEND=noninteractive apt-get install -y chkconfig &> /dev/null || { echo "Failed to install chkconfig via apt-get on $HOSTNAME."; exit 1; }
 			sed -e "s|.*HashKnownHosts.*|    HashKnownHosts no|g" -i /etc/ssh/ssh_config
 		else
 			echo "Unable to install openvpn package."
 			exit 1
 		fi
+
+		# Run ntpdate to sync server time
+		ntpdate pool.ntp.org
+
 		SCRIPT_EOF
 return Util::Ssh.run_cmd(@external_ip_addr, script, @ssh_as_user, @ssh_identity_file, @logger)
 
