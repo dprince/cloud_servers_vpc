@@ -74,6 +74,7 @@ class ServerGroupsController < ApplicationController
 					:name => sg_params[:name],
 					:vpn_network => sg_params[:vpn_network],
 					:vpn_subnet => sg_params[:vpn_subnet],
+					:vpn_device => sg_params[:vpn_device],
 					:domain_name => sg_params[:domain_name],
 					:owner_name => sg_params[:owner_name],
 					:user_id => session[:user_id]

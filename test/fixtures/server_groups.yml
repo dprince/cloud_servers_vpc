@@ -6,6 +6,7 @@ one:
   description: Group 1 Description
   vpn_network: 172.19.0.0
   vpn_subnet: 255.255.128.0
+  vpn_device: tun
   last_used_ip_address: 172.19.0.2
   owner_name: bob
   user: bob
@@ -16,6 +17,7 @@ two:
   description: Group 2 Description
   vpn_network: 172.16.0.0
   vpn_subnet: 255.255.128.0
+  vpn_device: tun
   last_used_ip_address: 172.16.0.2
   owner_name: jim
   user: jim
@@ -26,6 +28,7 @@ history:
   description: Group 2 Description
   vpn_network: 172.16.0.0
   vpn_subnet: 255.255.128.0
+  vpn_device: tun
   last_used_ip_address: 172.16.0.2
   owner_name: admin
   user: admin

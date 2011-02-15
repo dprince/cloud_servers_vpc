@@ -74,7 +74,7 @@ class WindowsServer < Server
 
 		vpn_server=Server.find(:first, :conditions => ["server_group_id = ? AND openvpn_server = ?", self.server_group_id, 1])
 
-		vpn_server_config=OpenvpnConfig::Server.new(vpn_server.external_ip_addr, vpn_server.internal_ip_addr, self.server_group.domain_name, vpn_server.server_group.vpn_network, vpn_server.server_group.vpn_subnet, "root", self.server_group.ssh_key_basepath)
+		vpn_server_config=OpenvpnConfig::Server.new(vpn_server.external_ip_addr, vpn_server.internal_ip_addr, self.server_group.domain_name, vpn_server.server_group.vpn_network, vpn_server.server_group.vpn_subnet, vpn_server.server_group.vpn_device, "root", self.server_group.ssh_key_basepath)
 
 		client=OpenvpnConfig::Client.new(vpn_server_config)
 		vpn_creds=nil

@@ -32,7 +32,7 @@ class LinuxServer < Server
 			end
 		end
 
-		vpn_server=OpenvpnConfig::Server.new(self.external_ip_addr, self.internal_ip_addr, self.server_group.domain_name, self.server_group.vpn_network, self.server_group.vpn_subnet, "root", self.server_group.ssh_key_basepath)
+		vpn_server=OpenvpnConfig::Server.new(self.external_ip_addr, self.internal_ip_addr, self.server_group.domain_name, self.server_group.vpn_network, self.server_group.vpn_subnet, self.server_group.vpn_device, "root", self.server_group.ssh_key_basepath)
 		vpn_server.logger=Rails.logger
 		vpn_server.install_openvpn
 		if vpn_server.configure_vpn_server(self.name) then
@@ -97,7 +97,7 @@ class LinuxServer < Server
 			end
 		end
 
-		vpn_server_config=OpenvpnConfig::Server.new(vpn_server.external_ip_addr, vpn_server.internal_ip_addr, self.server_group.domain_name, vpn_server.server_group.vpn_network, vpn_server.server_group.vpn_subnet, "root", self.server_group.ssh_key_basepath)
+		vpn_server_config=OpenvpnConfig::Server.new(vpn_server.external_ip_addr, vpn_server.internal_ip_addr, self.server_group.domain_name, vpn_server.server_group.vpn_network, vpn_server.server_group.vpn_subnet, vpn_server.server_group.vpn_device, "root", self.server_group.ssh_key_basepath)
 
 		client=OpenvpnConfig::LinuxClient.new(vpn_server_config, self.external_ip_addr, "root", self.server_group.ssh_key_basepath)
 		client.logger=Rails.logger

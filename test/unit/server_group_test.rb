@@ -22,9 +22,27 @@ class ServerGroupTest < ActiveSupport::TestCase
 		)
 		assert sg.valid?, "Server group should be valid."
 		assert sg.save!, "Server group should have saved."
+		assert_equal "tun",  sg.vpn_device
 
 		assert_not_nil sg.ssh_keypair.public_key, "Server group has a keypair public key."
 		assert_not_nil sg.ssh_keypair.private_key, "Server group has a keypair private key."
+
+	end
+
+	test "invalid vpn device" do
+
+		sg=ServerGroup.new(
+			:name => "test1",
+			:user_id => users(:admin).id,
+			:owner_name => "dan",
+			:domain_name => "test.rsapps.net",
+			:description => "test1",
+			:vpn_network => "172.19.0.0",
+			:vpn_subnet => "255.255.128.0",
+			:vpn_device => "asdf"
+		)
+		assert !sg.valid?, "Server group is invalid (incorrect VPN device)."
+		assert !sg.save, "Server group should not have saved."
 
 	end
 

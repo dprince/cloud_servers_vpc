@@ -8,6 +8,7 @@ class ServerGroup < ActiveRecord::Base
 	include Util::SshKeygen
 
 	validates_presence_of :name, :domain_name, :description, :vpn_network, :vpn_subnet, :last_used_ip_address, :owner_name, :user_id
+	validates_inclusion_of :vpn_device, :in => %w( tun tap), :message => "VPN device must be either 'tun' or 'tap'.", :if => :vpn_device
 	validates_length_of :name, :maximum => 255
 	validates_length_of :description, :maximum => 255
 	validates_length_of :owner_name, :maximum => 255

@@ -1,3 +1,6 @@
+* Mon Feb 15 2011 Dan Prince <dan.prince@rackspace.com> - 2.1.0
+  - Add support for 'tap' OpenVPN devices (configured per server group)
+
 * Mon Feb 6 2011 Dan Prince <dan.prince@rackspace.com> - 2.0.3
   - Remove mirrorlist settings from custom EPEL repo config.
   - If EPEL_BASE_URL is not set download the RPM from Fedora mirrors.

@@ -75,6 +75,7 @@ class ServerGroupsControllerTest < ActionController::TestCase
   <domain-name>test.rsapps.net</domain-name>
   <vpn-network>172.19.0.0</vpn-network>
   <vpn-subnet>255.255.128.0</vpn-subnet>
+  <vpn-device>tap</vpn-device>
     <servers type="array">
     <server>
       <name>test1</name>
@@ -133,6 +134,7 @@ response=post :create
     "description": "test description",
     "vpn_network": "172.19.0.0",
     "vpn_subnet": "255.255.128.0",
+    "vpn_device": "tap",
     "owner_name": "dan.prince",
     "servers": [
 		{
@@ -170,6 +172,7 @@ response=post :create
     assert_response :success
 
 	sg=ServerGroup.find(:first, :conditions => ["name = 'test'"])
+	assert_equal "tap", sg.vpn_device
 	assert_equal 1, sg.ssh_public_keys.size
 	server=Server.find(:first, :conditions => ["name = ? AND server_group_id = ?", "test1", sg.id])
 	assert_equal server.id, AsyncExec.jobs[CreateCloudServer][0]

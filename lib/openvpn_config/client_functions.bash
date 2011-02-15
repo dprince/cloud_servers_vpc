@@ -1,6 +1,7 @@
 #!/bin/bash
 set -u
 
+export OPENVPN_DEVICE=${OPENVPN_DEVICE:-"tun"}
 export OPENVPN_CONFIG_DIR=${OPENVPN_CONFIG_DIR:-"/etc/openvpn"}
 
 function fail {
@@ -25,7 +26,7 @@ mkdir -p "$OPENVPN_CONFIG_DIR/" 2> /dev/null
 echo -n "Creating openvpn client config file..."
 cat > "$OPENVPN_CONFIG_DIR/$CLIENT_NAME.conf" <<-EOF_CAT
 client
-dev tun
+dev tap
 proto tcp
 
 #Change my.publicdomain.com to your public domain or IP address

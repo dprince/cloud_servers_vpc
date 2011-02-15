@@ -3,6 +3,7 @@ set -u
 
 export OPENVPN_CONFIG_DIR=${OPENVPN_CONFIG_DIR:-"/etc/openvpn"}
 export OPENVPN_KEYS_DIR=${OPENVPN_KEYS_DIR:-"/etc/openvpn/keys"}
+export OPENVPN_DEVICE=${OPENVPN_DEVICE:-"tun"}
 
 function clean {
 	echo -n "Cleaning the openvpn config directory: $OPENVPN_CONFIG_DIR..."
@@ -100,9 +101,9 @@ function create_server_key {
 
 function create_client_key {
 
-	if (( $# != 6 )); then
+	if (( $# != 7 )); then
 		echo "Failed to create client key."
-		echo "usage: create_client_key <client name> <client domain> <client ip> <client pptp ip> <client type> <vpn_server_ip>"
+		echo "usage: create_client_key <client name> <client domain> <client ip> <client pptp ip> <client type> <vpn_server_ip> <vpn_subnet>"
 		exit 1
 	fi
 
@@ -112,6 +113,7 @@ function create_client_key {
 	local CLIENT_INTERNAL_PTP_IP=$4
 	local CLIENT_TYPE=$5
 	local VPN_SERVER_IP=$6 #172.19.0.1 for example
+	local VPN_SUBNET=$7 #255.255.128.0
 
 	[ -f "$OPENVPN_KEYS_DIR/$CLIENT_NAME.tar.gz" ] && return 0;
 
@@ -128,9 +130,17 @@ function create_client_key {
 	tar czf $CLIENT_NAME.tar.gz ca.crt $CLIENT_NAME.crt $CLIENT_NAME.key || fail "Failed to create client key tarball."
 
 	mkdir -p "$OPENVPN_CONFIG_DIR/ccd/" 2> /dev/null
-	cat > $OPENVPN_CONFIG_DIR/ccd/$CLIENT_NAME <<-EOF_CAT
-		ifconfig-push $CLIENT_INTERNAL_IP $CLIENT_INTERNAL_PTP_IP
-	EOF_CAT
+	if [[ "$OPENVPN_DEVICE" = "tun" ]]; then
+		# NOTE: In tun mode we both client IPs (VPN and PTP)
+		cat > $OPENVPN_CONFIG_DIR/ccd/$CLIENT_NAME <<-EOF_CAT
+			ifconfig-push $CLIENT_INTERNAL_IP $CLIENT_INTERNAL_PTP_IP
+		EOF_CAT
+	else
+		# NOTE: In tap mode we push the IP/Subnet
+		cat > $OPENVPN_CONFIG_DIR/ccd/$CLIENT_NAME <<-EOF_CAT
+			ifconfig-push $CLIENT_INTERNAL_IP $VPN_SUBNET
+		EOF_CAT
+	fi
 	if [[ "$CLIENT_TYPE" == "windows" ]]; then
 		cat >> $OPENVPN_CONFIG_DIR/ccd/$CLIENT_NAME <<-EOF_CAT
 			push "dhcp-option DNS $VPN_SERVER_IP"
@@ -215,7 +225,7 @@ function create_server_config {
 cat > "$OPENVPN_CONFIG_DIR/server.conf" <<-EOF_CAT
 port 1194
 proto tcp
-dev tun
+dev $OPENVPN_DEVICE
 ca keys/ca.crt
 cert keys/$SERVER_KEY_NAME.crt
 key keys/$SERVER_KEY_NAME.key
@@ -269,9 +279,11 @@ cat > $IPTABLES_CONFIG <<-"EOF_CAT"
 -A FORWARD -j CLOUD_CONTROL
 -A CLOUD_CONTROL -i lo -j ACCEPT
 
-#accept and forward traffic from tun0
+#accept and forward traffic from tun/tap
 -A CLOUD_CONTROL -i tun+ -j ACCEPT
+-A CLOUD_CONTROL -i tap+ -j ACCEPT
 -A FORWARD -i tun+ -j ACCEPT
+-A FORWARD -i tap+ -j ACCEPT
 
 -A CLOUD_CONTROL -p icmp --icmp-type any -j ACCEPT
 -A CLOUD_CONTROL -m state --state ESTABLISHED,RELATED -j ACCEPT
