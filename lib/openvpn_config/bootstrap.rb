@@ -40,7 +40,11 @@ module Bootstrap
 		fi
 
 		# Run ntpdate to sync server time
-		ntpdate pool.ntp.org
+		if [ -z "#{ENV['NTP_SERVER']}" ]; then
+			ntpdate pool.ntp.org
+		else
+			ntpdate "#{ENV['NTP_SERVER']}"
+		fi
 
 		SCRIPT_EOF
 return Util::Ssh.run_cmd(@external_ip_addr, script, @ssh_as_user, @ssh_identity_file, @logger)
