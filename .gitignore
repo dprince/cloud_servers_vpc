@@ -8,3 +8,4 @@ contrib/rpmbuild/SRPMS/
 cloud-test/tmp/
 test/coverage/
 rcov
+tmp/*
