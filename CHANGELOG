@@ -1,6 +1,6 @@
 * Mon Feb 15 2011 Dan Prince <dan.prince@rackspace.com> - 2.1.0
   - Add support for 'tap' OpenVPN devices (configured per server group)
-  - Run ntpdate when installating OpenVPN on linux clients. Fixes issues
+  - Run ntpdate when installing OpenVPN on linux. Fixes issues
     that can occur when time is out of sync on some of the stock images.
   - Fix an issue where some worker scripts were hard coded to use
     /opt/cloud-servers-vpc. 
