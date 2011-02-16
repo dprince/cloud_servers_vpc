@@ -26,7 +26,7 @@ mkdir -p "$OPENVPN_CONFIG_DIR/" 2> /dev/null
 echo -n "Creating openvpn client config file..."
 cat > "$OPENVPN_CONFIG_DIR/$CLIENT_NAME.conf" <<-EOF_CAT
 client
-dev tap
+dev $OPENVPN_DEVICE
 proto tcp
 
 #Change my.publicdomain.com to your public domain or IP address
