@@ -102,15 +102,15 @@ class ServersController < ApplicationController
     respond_to do |format|
             format.html {
                 server_params=params[:server]
-                @server = Server.new(server_params)
+                @server = Server.new_for_type(server_params)
             }
             format.xml {
                 hash=Hash.from_xml(request.raw_post)
-                @server=Server.new(hash["server"])
+                @server=Server.new_for_type(hash["server"])
             }
             format.json {
                 hash=JSON.parse(request.raw_post)
-                @server=Server.new(hash)
+                @server=Server.new_for_type(hash)
             }
     end
 
@@ -133,9 +133,9 @@ class ServersController < ApplicationController
         end
 
         flash[:notice] = 'Server was successfully created.'
-        format.html  { render :xml => @server.to_xml, :status => :created, :location => @server, :content_type => "application/xml" }
-        format.json  { render :json => @server.to_json, :status => :created, :location => @server }
-        format.xml  { render :xml => @server.to_xml, :status => :created, :location => @server }
+        format.html  { render :xml => @server.to_xml, :status => :created, :location => "/servers/#{@server.id}", :content_type => "application/xml" }
+        format.json  { render :json => @server.to_json, :status => :created, :location => "/servers/#{@server.id}" }
+        format.xml  { render :xml => @server.to_xml, :status => :created, :location => "/servers/#{@server.id}" }
       else
 
         format.html  { render :xml => @server.errors.to_xml, :status => :unprocessable_entity, :content_type => "application/xml" }
@@ -181,7 +181,7 @@ class ServersController < ApplicationController
     AsyncExec.run_job(MakeServerHistorical, @server.id)
 
     respond_to do |format|
-      format.html { redirect_to(servers_url) }
+      format.html { redirect_to("/servers") }
       format.json  { render :json => json }
       format.xml  { render :xml => xml }
     end

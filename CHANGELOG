@@ -1,3 +1,7 @@
+* Tues April 12 2011 Dan Prince <dan.prince@rackspace.com> - 2.1.1
+  - Fix an issue with handling POST requests to /servers which prevented Windows
+    instances from being created.
+
 * Mon Feb 15 2011 Dan Prince <dan.prince@rackspace.com> - 2.1.0
   - Add support for 'tap' OpenVPN devices (configured per server group)
   - Run ntpdate when installing OpenVPN on linux. Fixes issues
