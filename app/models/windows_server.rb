@@ -128,7 +128,7 @@ class WindowsServer < Server
 			del c:\\openvpn-install.exe
 
 			ECHO client > c:\\client.ovpn
-			ECHO dev tun >> c:\\client.ovpn
+			ECHO dev #{vpn_server.server_group.vpn_device} >> c:\\client.ovpn
 			ECHO proto tcp >> c:\\client.ovpn
 			ECHO remote #{vpn_server.internal_ip_addr} 1194 >> c:\\client.ovpn
 			ECHO resolv-retry ininite >> c:\\client.ovpn
