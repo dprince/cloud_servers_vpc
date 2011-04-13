@@ -63,51 +63,19 @@ class ServerGroupsControllerTest < ActionController::TestCase
 
     http_basic_authorize
     assert_difference('SshPublicKey.count') do
-    assert_difference('Client.count') do
-    assert_difference('Server.count') do
-    assert_difference('ServerGroup.count') do
+        assert_difference('Client.count') do
+            assert_difference('Server.count') do
+                assert_difference('ServerGroup.count') do
 
-@request.env['RAW_POST_DATA'] = %{
-<server-group>
-  <name>Group 1</name>
-  <description>Group 1 Description</description>
-  <owner_name>dan.prince</owner_name>
-  <domain-name>test.rsapps.net</domain-name>
-  <vpn-network>172.19.0.0</vpn-network>
-  <vpn-subnet>255.255.128.0</vpn-subnet>
-  <vpn-device>tap</vpn-device>
-    <servers type="array">
-    <server>
-      <name>test1</name>
-      <description>test1</description>
-      <flavor-id type="integer">1</flavor-id>
-      <image-id type="integer">1</image-id>
-      <openvpn-server type="boolean">true</openvpn-server>
-      <base64-command>#{Base64.encode64("echo hello > /tmp/test.txt")}</base64-command>
-    </server>
-    </servers>
-    <clients type="array">
-    <client>
-      <name>test2</name>
-      <description>test2</description>
-    </client>
-    </clients>
-    <ssh-public-keys type="array">
-    <ssh-public-key>
-      <description>Dan's Key</description>
-      <public-key>ssh-rsa AAAAB3NzaC1yc2EAAAABIwAAAQEA+yNMzUrQXa0EOfv+WJtfmLO1WdoOaD47G9qwllSUaaGPRkYzkTNdxcEPrR3XBR94ctOeWOHZ/w7ymhvwK5LLsoNBK+WgRz/mg8oHcii2GoL0fNojdwUMyFMIJxJT+iwjF/omyhyrWaaLAztAKRO7BdOkNlXMAAcMeKzQtFqdZm09ghoemu3BPYUTyDKHMp+t0P1d7mkHdd719oDfMf+5miixQeJZJCWAsGwroN7k8a46rvezDHEygBsDAF2ZpS2iGMABos/vTp1oyHkCgCqc3rM0OoKqcKB5iQ9Qaqi5ung08BXP/PHfVynXzdGMjTh4w+6jiMw7Dx2GrQIJsDolKQ== dan.prince@dovetail</public-key>
-    </ssh-public-key>
-    </ssh-public-keys>
-</server-group>
-}
+                    @request.env['RAW_POST_DATA'] = get_xml_request(1)
 
-@request.accept = 'text/xml'
-response=post :create
-@request.env.delete('RAW_POST_DATA')
+                    @request.accept = 'text/xml'
+                    response=post :create
+                    @request.env.delete('RAW_POST_DATA')
 
-    end
-    end
-    end
+                end
+            end
+        end
     end
 
     assert_response :success
@@ -116,6 +84,23 @@ response=post :create
 	assert_equal "echo hello > /tmp/test.txt", server.server_command.command
 	assert_equal server.id, AsyncExec.jobs[CreateCloudServer][0]
 	assert_nil AsyncExec.jobs[CreateCloudServer][1]
+
+  end
+
+  test "should not create server_group w/ Windows VPN server via XML request" do
+
+    http_basic_authorize
+    assert_no_difference('ServerGroup.count') do
+
+        @request.env['RAW_POST_DATA'] = get_xml_request(28)
+
+        @request.accept = 'text/xml'
+        response=post :create
+        @request.env.delete('RAW_POST_DATA')
+
+    end
+
+    assert_response 422
 
   end
 
@@ -275,6 +260,42 @@ response=post :create
 
 	server_group=ServerGroup.find(server_groups(:one).id)
 	assert_equal false, server_group.historical
+  end
+
+  def get_xml_request(image_id)
+return %{
+<server-group>
+  <name>Group 1</name>
+  <description>Group 1 Description</description>
+  <owner_name>dan.prince</owner_name>
+  <domain-name>test.rsapps.net</domain-name>
+  <vpn-network>172.19.0.0</vpn-network>
+  <vpn-subnet>255.255.128.0</vpn-subnet>
+  <vpn-device>tap</vpn-device>
+    <servers type="array">
+    <server>
+      <name>test1</name>
+      <description>test1</description>
+      <flavor-id type="integer">1</flavor-id>
+      <image-id type="integer">#{image_id}</image-id>
+      <openvpn-server type="boolean">true</openvpn-server>
+      <base64-command>#{Base64.encode64("echo hello > /tmp/test.txt")}</base64-command>
+    </server>
+    </servers>
+    <clients type="array">
+    <client>
+      <name>test2</name>
+      <description>test2</description>
+    </client>
+    </clients>
+    <ssh-public-keys type="array">
+    <ssh-public-key>
+      <description>Dan's Key</description>
+      <public-key>ssh-rsa AAAAB3NzaC1yc2EAAAABIwAAAQEA+yNMzUrQXa0EOfv+WJtfmLO1WdoOaD47G9qwllSUaaGPRkYzkTNdxcEPrR3XBR94ctOeWOHZ/w7ymhvwK5LLsoNBK+WgRz/mg8oHcii2GoL0fNojdwUMyFMIJxJT+iwjF/omyhyrWaaLAztAKRO7BdOkNlXMAAcMeKzQtFqdZm09ghoemu3BPYUTyDKHMp+t0P1d7mkHdd719oDfMf+5miixQeJZJCWAsGwroN7k8a46rvezDHEygBsDAF2ZpS2iGMABos/vTp1oyHkCgCqc3rM0OoKqcKB5iQ9Qaqi5ung08BXP/PHfVynXzdGMjTh4w+6jiMw7Dx2GrQIJsDolKQ== dan.prince@dovetail</public-key>
+    </ssh-public-key>
+    </ssh-public-keys>
+</server-group>
+}
   end
 
 end

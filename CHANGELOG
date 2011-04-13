@@ -1,3 +1,7 @@
+* Tues April 13 2011 Dan Prince <dan.prince@rackspace.com> - 2.1.2
+  - Fix an issue with Windows server image ID detection. Both strings and 
+    symbols are now handled correctly.
+
 * Tues April 12 2011 Dan Prince <dan.prince@rackspace.com> - 2.1.1
   - Fix an issue with handling POST requests to /servers which prevented Windows
     instances from being created.

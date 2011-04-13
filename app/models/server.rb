@@ -42,7 +42,11 @@ class Server < ActiveRecord::Base
 
     def self.new_for_type(params)
 
-		if Server.image_id_windows?(params[:image_id]) then
+        image_id = params[:image_id]
+        if image_id.nil? then
+            image_id = params["image_id"]
+        end
+		if Server.image_id_windows?(image_id) then
 			WindowsServer.new(params)
 		else
 			LinuxServer.new(params)
