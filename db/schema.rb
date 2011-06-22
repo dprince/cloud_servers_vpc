@@ -9,7 +9,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 25) do
+ActiveRecord::Schema.define(:version => 26) do
 
   create_table "accounts", :force => true do |t|
     t.string   "cloud_servers_username"
@@ -63,6 +63,7 @@ ActiveRecord::Schema.define(:version => 25) do
     t.boolean  "historical",           :default => false
     t.integer  "user_id"
     t.string   "vpn_device",           :default => "tun"
+    t.string   "vpn_proto",            :default => "tcp"
   end
 
   add_index "server_groups", ["historical"], :name => "index_server_groups_on_historical"

@@ -4,6 +4,7 @@ set -u
 export OPENVPN_CONFIG_DIR=${OPENVPN_CONFIG_DIR:-"/etc/openvpn"}
 export OPENVPN_KEYS_DIR=${OPENVPN_KEYS_DIR:-"/etc/openvpn/keys"}
 export OPENVPN_DEVICE=${OPENVPN_DEVICE:-"tun"}
+export OPENVPN_PROTO=${OPENVPN_PROTO:-"tcp"}
 
 function clean {
 	echo -n "Cleaning the openvpn config directory: $OPENVPN_CONFIG_DIR..."
@@ -224,7 +225,7 @@ function create_server_config {
 
 cat > "$OPENVPN_CONFIG_DIR/server.conf" <<-EOF_CAT
 port 1194
-proto tcp
+proto $OPENVPN_PROTO
 dev $OPENVPN_DEVICE
 ca keys/ca.crt
 cert keys/$SERVER_KEY_NAME.crt

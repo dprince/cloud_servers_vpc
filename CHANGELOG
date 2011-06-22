@@ -1,3 +1,7 @@
+* Tues June 21 2011 Dan Prince <dan.prince@rackspace.com> - 2.2.0
+  - Add configurable support for using the 'udp' protocol for VPN connections.
+    TCP is the default.
+
 * Tues April 13 2011 Dan Prince <dan.prince@rackspace.com> - 2.1.2
   - Fix an issue with Windows server image ID detection. Both strings and 
     symbols are now handled correctly.

@@ -2,6 +2,7 @@
 set -u
 
 export OPENVPN_DEVICE=${OPENVPN_DEVICE:-"tun"}
+export OPENVPN_PROTO=${OPENVPN_PROTO:-"tcp"}
 export OPENVPN_CONFIG_DIR=${OPENVPN_CONFIG_DIR:-"/etc/openvpn"}
 
 function fail {
@@ -27,7 +28,7 @@ echo -n "Creating openvpn client config file..."
 cat > "$OPENVPN_CONFIG_DIR/$CLIENT_NAME.conf" <<-EOF_CAT
 client
 dev $OPENVPN_DEVICE
-proto tcp
+proto $OPENVPN_PROTO
 
 #Change my.publicdomain.com to your public domain or IP address
 remote $SERVER_IP 1194

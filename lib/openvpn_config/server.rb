@@ -17,6 +17,7 @@ class Server
 	attr_accessor :vpn_network
 	attr_accessor :vpn_subnet
 	attr_accessor :vpn_device
+	attr_accessor :vpn_proto
 	attr_accessor :domain_name
 
 	include OpenvpnConfig::Bootstrap
@@ -25,13 +26,14 @@ class Server
 		@logger=logger
 	end
 
-	def initialize(external_ip_addr, internal_ip_addr, domain_name="vpc", vpn_network="172.19.0.0", vpn_subnet="255.255.128.0", vpn_device="tun", ssh_as_user="root", ssh_identity_file="#{ENV['HOME']}/.ssh/id_rsa")
+	def initialize(external_ip_addr, internal_ip_addr, domain_name="vpc", vpn_network="172.19.0.0", vpn_subnet="255.255.128.0", vpn_device="tun", vpn_proto="tcp", ssh_as_user="root", ssh_identity_file="#{ENV['HOME']}/.ssh/id_rsa")
 		@external_ip_addr=external_ip_addr
 		@internal_ip_addr=internal_ip_addr
 		@domain_name=domain_name
 		@vpn_network=vpn_network
 		@vpn_subnet=vpn_subnet
 		@vpn_device=vpn_device
+		@vpn_proto=vpn_proto
 		@ssh_as_user=ssh_as_user
 		@ssh_identity_file=ssh_identity_file
 
@@ -57,6 +59,7 @@ class Server
 
 		script=<<-SCRIPT_EOF
 			OPENVPN_DEVICE=#{@vpn_device}
+			OPENVPN_PROTO=#{@vpn_proto}
 			#{IO.read(File.join(File.dirname(__FILE__), "server_functions.bash"))}
 			cat > /root/.ssh/id_rsa <<-"EOF_CAT"
 			#{IO.read(@ssh_identity_file)}
@@ -94,6 +97,7 @@ class Server
 	def add_vpn_client(client_hostname, client_ip, client_ptp_ip, type="linux")
 
 		script = "OPENVPN_DEVICE=#{@vpn_device}\n"
+		script += "OPENVPN_PROTO=#{@vpn_proto}\n"
 		script += IO.read(File.join(File.dirname(__FILE__), "server_functions.bash"))
 		script += "create_client_key '#{client_hostname}' '#{@domain_name}' '#{client_ip}' '#{client_ptp_ip}' '#{type}' '#{self.vpn_ipaddr}' '#{self.vpn_subnet}'\n"
 		Util::Ssh.run_cmd(@external_ip_addr, script, @ssh_as_user, @ssh_identity_file, @logger)

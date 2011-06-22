@@ -48,6 +48,7 @@ class LinuxClient
 			cd /etc/openvpn/
 			tar xzf /etc/openvpn/cert.tar.gz
 			OPENVPN_DEVICE=#{@server.vpn_device}
+			OPENVPN_PROTO=#{@server.vpn_proto}
 			#{IO.read(File.join(File.dirname(__FILE__), "client_functions.bash"))}
 			init_client_etc_hosts '#{client_hostname}' '#{@server.domain_name}' '#{internal_vpn_ip}'
 			create_client_config #{@server.internal_ip_addr} #{@server.vpn_ipaddr} #{client_hostname} #{@server.domain_name}

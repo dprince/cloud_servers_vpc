@@ -74,7 +74,7 @@ class WindowsServer < Server
 
 		vpn_server=Server.find(:first, :conditions => ["server_group_id = ? AND openvpn_server = ?", self.server_group_id, 1])
 
-		vpn_server_config=OpenvpnConfig::Server.new(vpn_server.external_ip_addr, vpn_server.internal_ip_addr, self.server_group.domain_name, vpn_server.server_group.vpn_network, vpn_server.server_group.vpn_subnet, vpn_server.server_group.vpn_device, "root", self.server_group.ssh_key_basepath)
+		vpn_server_config=OpenvpnConfig::Server.new(vpn_server.external_ip_addr, vpn_server.internal_ip_addr, self.server_group.domain_name, vpn_server.server_group.vpn_network, vpn_server.server_group.vpn_subnet, vpn_server.server_group.vpn_device, vpn_server.server_group.vpn_proto, "root", self.server_group.ssh_key_basepath)
 
 		client=OpenvpnConfig::Client.new(vpn_server_config)
 		vpn_creds=nil
@@ -129,7 +129,7 @@ class WindowsServer < Server
 
 			ECHO client > c:\\client.ovpn
 			ECHO dev #{vpn_server.server_group.vpn_device} >> c:\\client.ovpn
-			ECHO proto tcp >> c:\\client.ovpn
+			ECHO proto #{vpn_server.server_group.vpn_proto} >> c:\\client.ovpn
 			ECHO remote #{vpn_server.internal_ip_addr} 1194 >> c:\\client.ovpn
 			ECHO resolv-retry ininite >> c:\\client.ovpn
 			ECHO nobind >> c:\\client.ovpn
