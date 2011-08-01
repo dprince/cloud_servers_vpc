@@ -25,6 +25,11 @@ local DOMAIN_NAME=$4 #Example mydomain.net
 
 mkdir -p "$OPENVPN_CONFIG_DIR/" 2> /dev/null
 echo -n "Creating openvpn client config file..."
+SCRIPT_SECURITY=""
+openvpn --version | grep ' 2.1' &> /dev/null
+if [ $? -eq 0 ]; then
+	SCRIPT_SECURITY="script-security 3 system"
+fi
 cat > "$OPENVPN_CONFIG_DIR/$CLIENT_NAME.conf" <<-EOF_CAT
 client
 dev $OPENVPN_DEVICE
@@ -37,6 +42,8 @@ resolv-retry infinite
 nobind
 persist-key
 persist-tun
+
+$SCRIPT_SECURITY
 
 ca ca.crt
 cert $CLIENT_NAME.crt
