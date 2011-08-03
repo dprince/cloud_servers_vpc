@@ -82,12 +82,15 @@ module ApplicationHelper
 	def select_for_images(name)
 
 		image_arr=[
+			[75, "Debian 6.0 (Squeeze)"],
 			[51, "CentOS 5.5"],
 			[187811, "Centos 5.4"],
+			[78, "Fedora 15 (Lovelock)"],
 			[71, "Fedora 14 (Laughlin)"],
 			[53, "Fedora 13 (Goddard)"],
 			[14, "Red Hat EL 5.4"],
 			[62, "Red Hat EL 5.5"],
+			[76, "Ubuntu 11.04 (natty)"],
 			[69, "Ubuntu 10.10 (maverick)"],
 			[49, "Ubuntu 10.04 LTS (lucid)"],
 			[14362, "Ubuntu 9.10 (karmic)"],

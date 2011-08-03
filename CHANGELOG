@@ -1,3 +1,6 @@
+* Tues Aug 2 2011 Dan Prince <dan.prince@rackspace.com> - 2.3.0
+  - Updates to support Debian Squeeze, Ubuntu Natty, and Fedora 15.
+
 * Tues June 21 2011 Dan Prince <dan.prince@rackspace.com> - 2.2.0
   - Add configurable support for using the 'udp' protocol for VPN connections.
     TCP is the default.

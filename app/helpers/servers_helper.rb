@@ -7,6 +7,8 @@ module ServersHelper
 			"CentOS 5.5"
 		when 187811
 			"CentOS 5.4"
+		when 78
+			"Fedora 15 (Lovelock)"
 		when 71
 			"Fedora 14 (Laughlin)"
 		when 53
@@ -19,6 +21,8 @@ module ServersHelper
 			"Red Hat EL 5.4"
 		when 62 
 			"Red Hat EL 5.5"
+		when 76
+			"Ubuntu 11.04 (natty)"
 		when 69
 			"Ubuntu 10.10 (maverick)"
 		when 49
@@ -31,6 +35,8 @@ module ServersHelper
 			"Ubuntu 8.04.2 LTS (hardy)"
 		when 4
 			"Debian 5.0 (lenny)"
+		when 75
+			"Debian 6.0 (squeeze)"
 		when 23
 			"Windows Server 2003 R2 SP2 x64"
 		when 24
