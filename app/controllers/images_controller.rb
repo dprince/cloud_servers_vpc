@@ -94,7 +94,7 @@ class ImagesController < ApplicationController
 
   end
 
-  # POST /images/1/sync
+  # POST /images/sync
   def sync
     user=User.find(session[:user_id])
     AsyncExec.run_job(SyncImages, user.id)

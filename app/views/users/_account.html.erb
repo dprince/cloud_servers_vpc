@@ -44,6 +44,11 @@ function my_account() {
         }
     });
 
+    $.ajax({
+        url: "/images/sync",
+        type: 'POST'
+    });
+
 }
 
 </script>
