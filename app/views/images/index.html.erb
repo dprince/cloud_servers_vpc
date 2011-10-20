@@ -1,0 +1,22 @@
+<div id="images" class="ui-widget">
+
+<script>
+
+    globalRefreshURL="/images"
+    globalRefreshDivId="#images-table"
+
+    $(document).ready(function() {
+        image_selectors();
+    });
+
+</script>
+
+<h3>Images</h3>
+
+<%= link_to 'Sync Images', { :controller => "images", :action => "sync" }, { :id => "images-sync-link", :class => "images-sync" } %><br/><br/>
+
+<div id="images-table">
+    <%= render :partial => 'table' %>
+</div>
+
+</div>

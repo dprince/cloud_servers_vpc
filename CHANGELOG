@@ -1,3 +1,6 @@
+* Thu Oct 20 2011 Dan Prince <dan.prince@rackspace.com> - 2.4.0
+  - Custom image snapshot support.
+
 * Tues Aug 2 2011 Dan Prince <dan.prince@rackspace.com> - 2.3.0
   - Updates to support Debian Squeeze, Ubuntu Natty, and Fedora 15.
 

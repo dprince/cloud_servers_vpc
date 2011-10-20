@@ -1,0 +1,13 @@
+# Read about fixtures at http://ar.rubyonrails.org/classes/Fixtures.html
+
+bob_image:
+  name: Test
+  image_ref: 1
+  os_type: linux
+  account: bob_account
+
+bob_windows_image:
+  name: Windows
+  image_ref: 28
+  os_type: windows
+  account: bob_account

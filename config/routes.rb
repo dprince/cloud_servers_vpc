@@ -5,6 +5,9 @@ ActionController::Routing::Routes.draw do |map|
 
   map.resources :clients
 
+  map.resources :images
+  map.resources :images, :member => { :discover => :post }
+
   map.resources :servers
   map.resources :servers, :member => { :rebuild => :post }
 

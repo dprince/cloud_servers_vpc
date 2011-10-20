@@ -32,7 +32,8 @@ class Server < ActiveRecord::Base
 
     def self.image_id_windows?(image_id)
 
-		if ["28","31","24","23","29","58"].include?(image_id.to_s) then
+        image = Image.find(:first, :conditions => ["image_ref = ?", image_id])
+		if image and image.os_type == "windows" then
 			true
 		else
 			false

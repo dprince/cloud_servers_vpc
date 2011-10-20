@@ -49,6 +49,18 @@ class CloudServersUtil
 
 	end
 
+	def all_images
+
+		if block_given? then
+			@cs_conn.images.each do |image|
+				yield image
+			end
+		else
+			@cs_conn.images
+		end
+
+	end
+
 	def account_limits
 		@cs_conn.limits
 	end

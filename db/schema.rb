@@ -9,7 +9,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 26) do
+ActiveRecord::Schema.define(:version => 27) do
 
   create_table "accounts", :force => true do |t|
     t.string   "cloud_servers_username"
@@ -27,6 +27,16 @@ ActiveRecord::Schema.define(:version => 26) do
     t.boolean  "is_windows",      :default => false,     :null => false
     t.integer  "server_group_id",                        :null => false
     t.string   "status",          :default => "Pending", :null => false
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  create_table "images", :force => true do |t|
+    t.string   "name",                          :null => false
+    t.string   "image_ref",                     :null => false
+    t.string   "os_type"
+    t.integer  "account_id",                    :null => false
+    t.boolean  "is_active",  :default => false, :null => false
     t.datetime "created_at"
     t.datetime "updated_at"
   end
