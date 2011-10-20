@@ -1,7 +1,6 @@
 class ImagesController < ApplicationController
 
-  #before_filter :require_admin, :only => [:index]
-  #before_filter :authorize, :except => [:create, :new]
+  before_filter :authorize
 
   # GET /images
   # GET /images.json
@@ -14,7 +13,8 @@ class ImagesController < ApplicationController
       limit=params[:limit].nil? ? 50 : params[:limit]
     end
 
-    @images  = Image.paginate :page => params[:page] || 1, :per_page => limit, :order => "name"
+    user=User.find(session[:user_id])
+    @images  = Image.paginate :page => params[:page] || 1, :conditions => ["account_id = ?", user.account.id],:per_page => limit, :order => "name"
 
     if params[:layout] then
         respond_to do |format|
@@ -35,7 +35,10 @@ class ImagesController < ApplicationController
   # GET /images/1.xml
   def show
     @image = Image.find(params[:id])
-    @account = @image.account
+    if @image.account.user_id != session[:user_id] then
+        render :text => "Attempt to view an unauthorized record.", :status => "401"
+        return false
+    end
 
     respond_to do |format|
       format.html # show.html.erb
@@ -47,6 +50,10 @@ class ImagesController < ApplicationController
   # GET /images/1/edit
   def edit
     @image = Image.find(params[:id])
+    if @image.account.user_id != session[:user_id] then
+        render :text => "Attempt to edit an unauthorized record.", :status => "401"
+        return false
+    end
   end
 
   # PUT /images/1
@@ -54,14 +61,11 @@ class ImagesController < ApplicationController
   # PUT /images/1.xml
   def update
 
-    if not is_admin
-      if params[:image] and params[:image][:is_admin] == true then
-        render :text => "Attempt to view an unauthorized record.", :status => "401"
-        return false
-      end
-    end
-
     @image = Image.find(params[:id])
+    if @image.account.user_id != session[:user_id] then
+        render :text => "Attempt to update an unauthorized record.", :status => "401"
+        return false
+    end
 
     respond_to do |format|
       if @image.update_attributes(params[:image])
@@ -81,6 +85,10 @@ class ImagesController < ApplicationController
   # DELETE /images/1.xml
   def destroy
     @image = Image.find(params[:id])
+    if @image.account.user_id != session[:user_id] then
+        render :text => "Attempt to delete an unauthorized record.", :status => "401"
+        return false
+    end
     @image.destroy
     head :ok
 

@@ -21,16 +21,34 @@ class ImagesControllerTest < ActionController::TestCase
     assert_response :success
   end
 
-  test "admin update image" do
-    login_as(:admin)
+  test "should not show bob's image to jim" do
+    login_as(:jim)
+    get :show, :id => images(:bob_image).to_param
+    assert_response 401
+  end
+
+  test "bob update image" do
+    login_as(:bob)
     put :update, :id => images(:bob_image).to_param, :image => {:name => "test1"}
     assert_redirected_to image_path(assigns(:image))
+  end
+
+  test "jim can't update bobs image" do
+    login_as(:jim)
+    put :update, :id => images(:bob_image).to_param, :image => {:name => "test1"}
+    assert_response 401
   end
 
   test "image destroy himself" do
     login_as(:bob)
     delete :destroy, :id => images(:bob_image).to_param
     assert_response :success
+  end
+
+  test "jim can't destroy bobs image" do
+    login_as(:jim)
+    delete :destroy, :id => images(:bob_image).to_param
+    assert_response 401
   end
 
 end
