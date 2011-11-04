@@ -99,17 +99,23 @@ class ServersController < ApplicationController
   # POST /servers.xml
   def create
 
+    user=User.find(session[:user_id])
+    account_id = user.account.id
+
     respond_to do |format|
             format.html {
-                server_params=params[:server]
+                server_params = params[:server]
+                server_params[:account_id] = account_id
                 @server = Server.new_for_type(server_params)
             }
             format.xml {
-                hash=Hash.from_xml(request.raw_post)
-                @server=Server.new_for_type(hash["server"])
+                hash=Hash.from_xml(request.raw_post)["server"]
+                hash[:account_id] = account_id
+                @server=Server.new_for_type(hash)
             }
             format.json {
                 hash=JSON.parse(request.raw_post)
+                hash[:account_id] = account_id
                 @server=Server.new_for_type(hash)
             }
     end
@@ -119,7 +125,6 @@ class ServersController < ApplicationController
       return false
     end
 
-    user=User.find(session[:user_id])
     @server.account_id = user.account.id
 
     respond_to do |format|

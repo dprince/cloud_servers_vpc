@@ -11,3 +11,15 @@ bob_windows_image:
   image_ref: 28
   os_type: windows
   account: bob_account
+
+admin_image:
+  name: Test
+  image_ref: 1
+  os_type: linux
+  account: admin_account
+
+admin_windows_image:
+  name: Windows
+  image_ref: 28
+  os_type: windows
+  account: admin_account

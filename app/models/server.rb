@@ -30,9 +30,9 @@ class Server < ActiveRecord::Base
 	attr_accessor :base64_command
 	has_one :server_command, :dependent => :destroy, :autosave => true
 
-    def self.image_id_windows?(image_id)
+    def self.image_id_windows?(image_ref, account_id)
 
-        image = Image.find(:first, :conditions => ["image_ref = ?", image_id])
+        image = Image.find(:first, :conditions => ["image_ref = ? AND account_id = ?", image_ref, account_id])
 		if image and image.os_type == "windows" then
 			true
 		else
@@ -47,7 +47,11 @@ class Server < ActiveRecord::Base
         if image_id.nil? then
             image_id = params["image_id"]
         end
-		if Server.image_id_windows?(image_id) then
+        account_id = params[:account_id]
+        if account_id.nil? then
+            account_id = params["account_id"]
+        end
+		if Server.image_id_windows?(image_id, account_id) then
 			WindowsServer.new(params)
 		else
 			LinuxServer.new(params)
@@ -57,7 +61,7 @@ class Server < ActiveRecord::Base
 
     def Server.create_vpn_client_for_type(server)
 
-		if Server.image_id_windows?(server.image_id) then
+		if Server.image_id_windows?(server.image_id, server.account_id) then
 			AsyncExec.run_job(CreateWindowsVPNClient, server.id)
 		else
 			AsyncExec.run_job(CreateLinuxVPNClient, server.id)
@@ -120,7 +124,7 @@ class Server < ActiveRecord::Base
 				sg=self.server_group
 				ips=[sg.next_ip, sg.next_ip]
 
-				if Server.image_id_windows?(self.image_id) then
+				if Server.image_id_windows?(self.image_id, self.account_id) then
 					until (!range_endpoint?(ips[0]) and !range_endpoint?(ips[1])) do
 						ips=[ips[1], sg.next_ip]
 					end

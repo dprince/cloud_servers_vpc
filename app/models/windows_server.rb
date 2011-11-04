@@ -131,7 +131,7 @@ class WindowsServer < Server
 			ECHO dev #{vpn_server.server_group.vpn_device} >> c:\\client.ovpn
 			ECHO proto #{vpn_server.server_group.vpn_proto} >> c:\\client.ovpn
 			ECHO remote #{vpn_server.internal_ip_addr} 1194 >> c:\\client.ovpn
-			ECHO resolv-retry ininite >> c:\\client.ovpn
+			ECHO resolv-retry infinite >> c:\\client.ovpn
 			ECHO nobind >> c:\\client.ovpn
 			ECHO persist-key >> c:\\client.ovpn
 			ECHO persist-tun >> c:\\client.ovpn

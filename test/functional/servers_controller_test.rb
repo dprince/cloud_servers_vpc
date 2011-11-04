@@ -8,6 +8,7 @@ class ServersControllerTest < ActionController::TestCase
   fixtures :server_groups
   fixtures :accounts
   fixtures :users
+  fixtures :images
 
   test "should not get index" do
     get :index

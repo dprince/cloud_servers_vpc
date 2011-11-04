@@ -83,9 +83,9 @@ class ServerGroupsController < ApplicationController
     			@server_group.user_id = session[:user_id]
 				if params[:server_group]["servers_attributes"] then
 					params[:server_group]["servers_attributes"].each_pair do |id, hash|
-						server = Server.new_for_type(hash)
 						user=User.find(session[:user_id])
-						server.account_id = user.account.id
+						hash[:account_id] = user.account.id
+						server = Server.new_for_type(hash)
 						@server_group.servers << server
 					end
 				end
@@ -171,10 +171,9 @@ private
 
 		if hash["server_group"]["servers"] then
 			hash["server_group"]["servers"].each do |server_hash|
-
-				server = Server.new_for_type(server_hash)
 				user=User.find(session[:user_id])
-				server.account_id = user.account.id
+				server_hash[:account_id] = user.account.id
+				server = Server.new_for_type(server_hash)
 				servers << server
 			end
 		end

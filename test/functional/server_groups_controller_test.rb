@@ -2,6 +2,11 @@ require 'test_helper'
 
 class ServerGroupsControllerTest < ActionController::TestCase
 
+  fixtures :server_groups
+  fixtures :accounts
+  fixtures :users
+  fixtures :images
+
   include AuthTestHelper
 
   test "should not get index" do
