@@ -26,25 +26,25 @@
 
 <% @servers.each do |server| %>
   <tr class="<%= cycle "tr0", "tr1" %>">
-    <td><%= chop_for_html(server.server_group.name, 20) %>(<%= server.server_group.id %>)</td>
-    <td><%= chop_for_html(server.server_group.owner_name) %></td>
-    <td><%= chop_for_html(server.account.cloud_servers_username) %></td>
-    <td><%= chop_for_html(server.name) %></td>
+    <td><%= raw chop_for_html(server.server_group.name, 20) %>(<%= server.server_group.id %>)</td>
+    <td><%= raw chop_for_html(server.server_group.owner_name) %></td>
+    <td><%= raw chop_for_html(server.account.cloud_servers_username) %></td>
+    <td><%= raw chop_for_html(server.name) %></td>
     <td><%= timestamp(server.created_at.in_time_zone) %></td>
-    <td><%=h server.cloud_server_id_number %></td>
-    <td><%=h flavor_name(server.flavor_id) %></td>
-    <td><%= chop_for_html(image_name(server.image_id), 15) %></td>
-    <td align="center"><%= check_or_blank(server.openvpn_server) %></td>
-    <td nowrap><%= status_image(server.status) %></td>
+    <td><%= server.cloud_server_id_number %></td>
+    <td><%= flavor_name(server.flavor_id) %></td>
+    <td><%= raw chop_for_html(image_name(server.image_id), 15) %></td>
+    <td align="center"><%= raw check_or_blank(server.openvpn_server) %></td>
+    <td nowrap><%= raw status_image(server.status) %></td>
     <td>
 		<% if server.retry_count > 0 then %>
-		<%= link_to "#{server.retry_count}&nbsp;(view)", "/servers/#{server.id}", { :class => "show-server-history-errors" } %>
+		<%= link_to "#{server.retry_count} (view)", "/servers/#{server.id}", { :class => "show-server-history-errors" } %>
 		<% else %>
-			<%=h server.retry_count %>
+			<%= server.retry_count %>
 		<% end %>
 	</td>
 	<% if server.error_message then %>
-		<td><%= chop_for_html(server.error_message) %></td>
+		<td><%= raw chop_for_html(server.error_message) %></td>
 	<% else %>
 		<td>&nbsp;</td>
 	<% end %>

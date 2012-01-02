@@ -11,7 +11,7 @@ class AuthControllerTest < ActionController::TestCase
 
   test "should login" do
     post :login, :username => "admin", :password => "cloud"
-    assert_redirected_to "/main"
+    assert_redirected_to "/main#index"
   end
 
   test "failed login" do

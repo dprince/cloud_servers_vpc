@@ -11,7 +11,8 @@ module Util
 		# initialize the starting IP address
 		# defaults to class B private address range
 		def init_ip(ip_address="172.16.0.0")
-			@ip_inc_last_used_ip_address=IPAddr.new(ip_address)
+			@ip_inc_last_used_ip_address=IPAddr.new(ip_address, Socket::AF_INET)
+			return true
 		end
 	
 		# increment the existing IP Address and return a printable

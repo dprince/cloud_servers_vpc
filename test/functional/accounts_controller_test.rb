@@ -10,7 +10,7 @@ class AccountsControllerTest < ActionController::TestCase
   test "should create account" do
     login_as(:bob)
     assert_difference('Account.count') do
-      post :create, :account => {:cloud_servers_username => "blah", :cloud_servers_api_key => "ABABABABABAB"}
+      post :create, :account => {:cloud_servers_username => "blah", :cloud_servers_api_key => "ABABABABABAB"}, :format => :json
     end
     assert_response :success
   end

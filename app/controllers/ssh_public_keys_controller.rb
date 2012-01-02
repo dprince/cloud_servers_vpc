@@ -17,8 +17,8 @@ class SshPublicKeysController < ApplicationController
     @ssh_public_keys = SshPublicKey.paginate :page => params[:page] || 1, :per_page => limit, :conditions => ["user_id = ?", session[:user_id]], :order => "description DESC"
 
     respond_to do |format|
-      format.json  { render :json => @ssh_public_keys }
       format.xml  { render :xml => @ssh_public_keys }
+      format.any  { render :json => @ssh_public_keys }
     end
   end
 
@@ -44,11 +44,11 @@ class SshPublicKeysController < ApplicationController
 
     respond_to do |format|
       if @ssh_public_key.save
-        format.json  { render :json => @ssh_public_key, :status => :created, :location => @ssh_public_key }
         format.xml  { render :xml => @ssh_public_key, :status => :created, :location => @ssh_public_key }
+        format.any  { render :json => @ssh_public_key, :status => :created, :location => @ssh_public_key }
       else
-        format.json  { render :json => @ssh_public_key.errors, :status => :unprocessable_entity }
         format.xml  { render :xml => @ssh_public_key.errors, :status => :unprocessable_entity }
+        format.any  { render :json => @ssh_public_key.errors, :status => :unprocessable_entity }
       end
     end
   end
@@ -65,8 +65,8 @@ class SshPublicKeysController < ApplicationController
         format.json  { render :json => @ssh_public_key }
         format.xml  { render :xml => @ssh_public_key }
       else
-        format.json  { render :json => @ssh_public_key.errors, :status => :unprocessable_entity }
         format.xml  { render :xml => @ssh_public_key.errors, :status => :unprocessable_entity }
+        format.any  { render :json => @ssh_public_key.errors, :status => :unprocessable_entity }
       end
     end
   end

@@ -24,15 +24,15 @@
 <% @server_groups.each do |server_group| %>
   <tr id="server-group-tr-<%= server_group.id %>" class="<%= cycle "tr0", "tr1" %>">
     <td><%= server_group.id %></td>
-    <td><%= chop_for_html(server_group.name) %></td>
-    <td><%= chop_for_html(server_group.description) %></td>
+    <td><%= raw chop_for_html(server_group.name) %></td>
+    <td><%= raw chop_for_html(server_group.description) %></td>
 <% if server_group.user.account.cloud_servers_username then %>
-    <td><%= chop_for_html(server_group.user.account.cloud_servers_username) %></td>
+    <td><%= raw chop_for_html(server_group.user.account.cloud_servers_username) %></td>
 <% else %>
     <td>&nbsp;</td>
 <% end %>
-    <td><%= chop_for_html(server_group.owner_name) %></td>
-    <td><%= status_image_for_group(server_group) %></td>
+    <td><%= raw chop_for_html(server_group.owner_name) %></td>
+    <td><%= raw status_image_for_group(server_group) %></td>
     <td><%= timestamp(server_group.created_at.in_time_zone) %></td>
     <td><%= server_group.servers.size %></td>
 <!--

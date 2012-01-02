@@ -21,9 +21,7 @@ $(document).ready(function() {
 
 </script>
 
-<% form_for(@image, :html => { :id => "image-edit-form", :onsubmit => "image_edit(); return false;"}) do |f| %>
-
-  <%= f.error_messages %>
+<%= form_for(@image, :html => { :id => "image-edit-form", :onsubmit => "image_edit(); return false;"}) do |f| %>
 
   <p>
     <%= f.label :name %><br />

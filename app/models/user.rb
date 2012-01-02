@@ -16,7 +16,8 @@ class User < ActiveRecord::Base
 
     attr_accessor :password_confirmation
 
-    def before_save
+    before_save :handle_before_save
+    def handle_before_save
 
         if self.account.nil? then
             self.account = Account.create
@@ -24,16 +25,17 @@ class User < ActiveRecord::Base
 
     end
 
-    def validate_on_create
+    validate :handle_validate_on_create, :on => :create
+    def handle_validate_on_create
 
         if self.account.nil? then
-            errors.add_to_base("A valid account is required.")
+            errors[:base] << "A valid account is required."
         else
             begin
                 acct=self.account
                 CloudServersUtil.new(acct.cloud_servers_username, acct.cloud_servers_api_key)
             rescue Exception => e
-                errors.add_to_base("Invalid cloud servers username or api key specified: #{e.message}")
+                errors[:base] << "Invalid cloud servers username or api key specified: #{e.message}"
             end
         end
 

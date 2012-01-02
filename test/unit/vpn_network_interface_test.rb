@@ -4,7 +4,6 @@ class VpnNetworkInterfaceTest < ActiveSupport::TestCase
 
 	fixtures :servers
 	fixtures :server_groups
-	fixtures :vpn_network_interfaces
 
 	test "create a VPN network interface" do
 

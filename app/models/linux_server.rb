@@ -213,7 +213,7 @@ class LinuxServer < Server
 
 		personalities={}
 		personalities.store(tmp_auth_keys.path, "/root/.ssh/authorized_keys")
-		personalities.store(File.join(RAILS_ROOT, 'config', 'root_ssh_config'), "/root/.ssh/config")
+		personalities.store(File.join(Rails.root, 'config', 'root_ssh_config'), "/root/.ssh/config")
 		
 		# create a .rackspace_cloud file with username/password info
 		cloud_key_config=%{

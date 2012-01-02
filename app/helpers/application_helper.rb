@@ -1,4 +1,3 @@
-# Methods added to this helper will be available to all templates in the application.
 module ApplicationHelper
 
 	def yes_no(val)
@@ -6,7 +5,7 @@ module ApplicationHelper
 	end
 
 	def check_or_blank(val)
-		val ? "<img class=\"check_image\" src=\"images/check.png\" />" : "&nbsp;"
+		val ? "<img class=\"check_image\" src=\"/assets/check.png\" />" : "&nbsp;"
 	end
 
 	def status_image(status, show_image=true)
@@ -18,7 +17,7 @@ module ApplicationHelper
 		end
 
 		if show_image then
-			return "<img class=\"status_image\" src=\"/images/#{image_name}.png\"/>&nbsp;#{status}"
+			return "<img class=\"status_image\" src=\"/assets/#{image_name}.png\"/>&nbsp;#{status}"
 		else
 			return status
 		end
@@ -48,7 +47,7 @@ module ApplicationHelper
 			status="Online"
 		end
 
-		return "<img class=\"status_image\" src=\"/images/#{image_name}.png\"/>&nbsp;#{status}"
+		return "<img class=\"status_image\" src=\"/assets/#{image_name}.png\"/>&nbsp;#{status}"
 
     end
 

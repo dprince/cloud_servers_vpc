@@ -8,7 +8,7 @@ class UpdateVpnNetworkInterfaces < ActiveRecord::Migration
         add_column :vpn_network_interfaces, :client_cert, :text
         add_column :vpn_network_interfaces, :ca_cert, :text
 
-		add_index :vpn_network_interfaces, [:interfacable_id, :interfacable_type]
+		add_index :vpn_network_interfaces, [:interfacable_id, :interfacable_type], :name => 'idx_vpn_network_interfaces_id_type'
 
     end
 
