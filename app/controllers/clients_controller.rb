@@ -46,8 +46,8 @@ class ClientsController < ApplicationController
     end
 
     respond_to do |format|
-      format.json  { render :json => @clients }
       format.xml  { render :xml => @clients }
+      format.any  { render :json => @clients }
     end
 
   end
@@ -58,8 +58,8 @@ class ClientsController < ApplicationController
   def show
     @client = Client.find(:first, :conditions => ["id = ?", params[:id]], :include => :vpn_network_interfaces )
     respond_to do |format|
-      format.json  { render :json => @client.to_json(:include => :vpn_network_interfaces) }
       format.xml  { render :xml => @client.to_xml(:include => :vpn_network_interfaces) }
+      format.any  { render :json => @client.to_json(:include => :vpn_network_interfaces) }
     end
   end
 
@@ -97,12 +97,12 @@ class ClientsController < ApplicationController
         end
 
         flash[:notice] = 'Client was successfully created.'
-        format.json  { render :json => @client.to_json, :status => :created, :location => @client }
         format.xml  { render :xml => @client.to_xml, :status => :created, :location => @client }
+        format.any  { render :json => @client.to_json, :status => :created, :location => @client }
       else
 
-        format.json  { render :json => @client.errors, :status => :unprocessable_entity }
         format.xml  { render :xml => @client.errors, :status => :unprocessable_entity }
+        format.any  { render :json => @client.errors, :status => :unprocessable_entity }
       end
     end
   end
@@ -117,8 +117,8 @@ class ClientsController < ApplicationController
     @client.destroy
 
     respond_to do |format|
-      format.json  { render :json => json }
       format.xml  { render :xml => xml }
+      format.any  { render :json => json }
     end
 
   end

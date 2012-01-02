@@ -167,8 +167,8 @@ class ServersController < ApplicationController
     if @server.save then
       AsyncExec.run_job(RebuildServer, @server.id)
       respond_to do |format|
-        format.json  { render :xml => @server }
         format.xml  { render :xml => @server }
+        format.any  { render :xml => @server }
       end 
     else
       render :text => "Failed to rebuild cloud server.", :status => 500

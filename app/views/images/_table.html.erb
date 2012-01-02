@@ -19,10 +19,10 @@
 
 <% @images.each do |image| %>
   <tr id="tr-image-<%= image.id %>" class="<%= cycle "tr0", "tr1" %>">
-    <td id="td-name-<%= image.id %>"><%= chop_for_html(image.name, 60) %></td>
-    <td id="td-ref-<%= image.id %>"><%= chop_for_html(image.image_ref, 60) %></td>
-    <td id="td-type-<%= image.id %>"><%= chop_for_html(image.os_type) %></td>
-    <td id="td-active-<%= image.id %>"><%= check_or_blank(image.is_active) %></td>
+    <td id="td-name-<%= image.id %>"><%= raw chop_for_html(image.name, 60) %></td>
+    <td id="td-ref-<%= image.id %>"><%= raw chop_for_html(image.image_ref, 60) %></td>
+    <td id="td-type-<%= image.id %>"><%= raw chop_for_html(image.os_type) %></td>
+    <td id="td-active-<%= image.id %>"><%= raw check_or_blank(image.is_active) %></td>
     <td><%= link_to 'Edit', edit_image_path(image), { :class => "image-edit" } %></td>
   </tr>
 <% end %>

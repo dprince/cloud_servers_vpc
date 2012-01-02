@@ -13,10 +13,11 @@ class WindowsServer < Server
 
 	include Util::CertUtil
 
-	def validate
+	validate :handle_validate
+	def handle_validate
 
 		if openvpn_server then
-			errors.add_to_base("Windows is not currently supported as an OpenVPN server.")
+			errors[:base] << "Windows is not currently supported as an OpenVPN server."
 		end
 
 	end
@@ -116,7 +117,7 @@ class WindowsServer < Server
 				post_install_cmd = self.server_command.command
 			end
 
-			script += IO.read(File.join(RAILS_ROOT, 'lib', 'openvpn_config', 'windows_download.bat'))
+			script += IO.read(File.join(Rails.root, 'lib', 'openvpn_config', 'windows_download.bat'))
 
 			script += %{
 			cd c:\\

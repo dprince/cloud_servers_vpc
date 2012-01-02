@@ -17,7 +17,7 @@
 
 <% @users.each do |user| %>
   <tr id="tr-user-<%= user.id %>" class="<%= cycle "tr0", "tr1" %>">
-    <td id="td-username-<%= user.id %>"><%= chop_for_html(user.username) %></td>
+    <td id="td-username-<%= user.id %>"><%= raw chop_for_html(user.username) %></td>
     <td id="td-admin-<%= user.id %>"><%= yes_no(user.is_admin) %></td>
     <td><%= link_to 'Password', "/users/#{user.id}/password", { :class => "user-password" } %></td>
     <td><%= link_to 'Edit', edit_user_path(user), { :class => "user-edit" } %></td>

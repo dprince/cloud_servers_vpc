@@ -4,7 +4,7 @@ class AuthController < ApplicationController
 
     def index
         if session[:user_id] then
-            redirect_to("/main")
+            redirect_to("/main#index")
         else
             respond_to do |format|
               format.html # show.html.erb
@@ -18,7 +18,7 @@ class AuthController < ApplicationController
             if user and user.is_active then
                 session[:user_id] = user.id
                 flash[:notice] = nil
-                redirect_to("/main")
+                redirect_to("/main#index")
             else
                 render :text => "Authentication failed.", :status => 401
             end

@@ -16,7 +16,8 @@ class Client < ActiveRecord::Base
 	validates_length_of :name, :maximum => 255
 	validates_length_of :description, :maximum => 255
 
-	def validate
+	validate :handle_validate
+	def handle_validate
 
 		count=0
 
@@ -28,12 +29,13 @@ class Client < ActiveRecord::Base
 		count+=Server.count(:conditions => ["server_group_id = ? AND name = ?", self.server_group_id, self.name])
 
 		if count > 0 then
-			errors.add_to_base("Client name '#{self.name}' is already used in this server group.")
+			errors[:base] << "Client name '#{self.name}' is already used in this server group."
 		end
 
 	end
 
-	def after_create
+    after_create :handle_after_create
+	def handle_after_create
 
 		if self.num_vpn_network_interfaces.nil?
 			self.num_vpn_network_interfaces=1
@@ -59,7 +61,6 @@ class Client < ActiveRecord::Base
 				)
 			end
 		end
-	
 	end
 
 	def create_vpn_credentials

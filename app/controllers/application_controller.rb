@@ -1,6 +1,3 @@
-# Filters added to this controller apply to all controllers in the application.
-# Likewise, all the methods added will be available for all controllers.
-
 class ApplicationController < ActionController::Base
 
 	helper :all # include all helpers, all the time
@@ -28,7 +25,7 @@ class ApplicationController < ActionController::Base
 			return true if user.is_active
 		end
 
-		redirect_to(:controller => "/")
+		redirect_to("/")
 		return false
 
 	end

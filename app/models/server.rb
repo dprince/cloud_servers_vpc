@@ -73,7 +73,8 @@ class Server < ActiveRecord::Base
 		self.type == "WindowsServer"
 	end
 
-    def validate_on_create
+    validate :handle_validate_on_create, :on => :create
+    def handle_validate_on_create
 
 		if self.server_group then
 			openvpn_server_count=0
@@ -81,13 +82,14 @@ class Server < ActiveRecord::Base
 				openvpn_server_count += 1 if server.openvpn_server
 			end
 			if openvpn_server_count == 1 and self.openvpn_server then
-				errors.add_to_base("Server groups may not have more than one VPN Server.")
+				errors[:base] << "Server groups may not have more than one VPN Server."
 			end
 		end
 
     end
 
-    def validate
+    validate :handle_validate
+    def handle_validate
 
 		count=0
 
@@ -99,19 +101,21 @@ class Server < ActiveRecord::Base
 		count+=Client.count(:conditions => ["server_group_id = ? AND name = ?", self.server_group_id, self.name])
 
 		if count > 0 then
-			errors.add_to_base("Server name '#{self.name}' is already used in this server group.")
+			errors[:base] << "Server name '#{self.name}' is already used in this server group."
 		end
 
 	end
 
-    def after_initialize
+    after_initialize :handle_after_initialize
+    def handle_after_initialize
         if new_record? then
             self.historical = false
         end
 		@tmp_files=[]
     end
 
-	def after_create
+	after_create :handle_after_create
+	def handle_after_create
 
 		if self.openvpn_server then
 			self.num_vpn_network_interfaces=0

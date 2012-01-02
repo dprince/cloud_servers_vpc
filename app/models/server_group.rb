@@ -26,7 +26,8 @@ class ServerGroup < ActiveRecord::Base
 	validates_associated :clients
 	validates_associated :ssh_public_keys
 
-	def after_initialize
+    after_initialize :handle_after_initialize
+	def handle_after_initialize
 		if not self.last_used_ip_address.nil? then
 			init_ip(self.last_used_ip_address)
 		end
@@ -36,7 +37,8 @@ class ServerGroup < ActiveRecord::Base
 		end
 	end
 
-	def after_create
+	after_create :handle_after_create
+	def handle_after_create
 		generate_ssh_keypair(ssh_key_basepath)
 		keypair_params={
 			:server_group_id => self.attributes["id"],
@@ -46,36 +48,39 @@ class ServerGroup < ActiveRecord::Base
 		self.ssh_keypair=SshKeypair.create(keypair_params)
 	end
 
-	def before_destroy
+	before_destroy :handle_before_destroy
+	def handle_before_destroy
 		FileUtils.rm_rf(self.ssh_key_basepath)
 		FileUtils.rm_rf(self.ssh_key_basepath+".pub")
 	end
 
-	def before_validation_on_create
+	before_validation :handle_before_validation_on_create, :on => :create
+	def handle_before_validation_on_create
 		if not vpn_network.nil? and is_valid_ip(vpn_network) then
 			self.last_used_ip_address = self.vpn_network.chomp("0")+"2"
 			init_ip(self.last_used_ip_address)
 		end
 	end
 
-	def validate
+	validate :handle_validate
+	def handle_validate
 
 		if not vpn_network.nil? and not is_valid_ip(vpn_network) then
-			errors.add_to_base("Please specify a valid VPN network.")
+			errors[:base] << "Please specify a valid VPN network."
 		end
 
 		if not vpn_subnet.nil? and not is_valid_ip(vpn_subnet) then
-			errors.add_to_base("Please specify a valid VPN subnet.")
+			errors[:base] << "Please specify a valid VPN subnet."
 		end
 
 		if not last_used_ip_address.nil? and not is_valid_ip(last_used_ip_address) then
-			errors.add_to_base("Please specify a valid last used IP address.")
+			errors[:base] << "Please specify a valid last used IP address."
 		end
 
 	end
 
 	def ssh_key_basepath
-		path=File.join(RAILS_ROOT, 'tmp', 'ssh_keys', RAILS_ENV, self.id.to_s)
+		path=File.join(Rails.root, 'tmp', 'ssh_keys', Rails.env, self.id.to_s)
 		kp=self.ssh_keypair	
 		if not kp.nil? then
 			# write ssh keys to disk from the DB if they don't already exist

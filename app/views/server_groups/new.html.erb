@@ -29,8 +29,7 @@ $(document).ready(function() {
     </div>
 </div>
 
-<% form_for(@server_group, :html => { :id => "server-group-create-form", :onsubmit => "create_server_group(); return false;" } ) do |f| %>
-  <%= f.error_messages %>
+<%= form_for(@server_group, :html => { :id => "server-group-create-form", :onsubmit => "create_server_group(); return false;" } ) do |f| %>
 
   <input id="server-group-create-form-row-count" type="hidden" name="server_tr_count" value="0"/>
 
@@ -66,9 +65,9 @@ $(document).ready(function() {
   <tr class="tr0">
     <td>&nbsp;</td>
     <td><input type="text" value="" name="server_group[servers_attributes][0][name]" /><input type="hidden" value="N/A" name="server_group[servers_attributes][0][description]" /><input id="server-group-create-account-input" type="hidden" value="<%= @account.id %>" name="server_group[servers_attributes][0][account_id]" /></td>
-    <td><%= select_for_images("server_group[servers_attributes][0][image_id]") %></td>
-    <td><%= select_for_flavors("server_group[servers_attributes][0][flavor_id]") %></td>
-    <td align="center"><input type="hidden" name="server_group[servers_attributes][0][openvpn_server]" value="true"/><img src="images/check.png"/></td>
+    <td><%= raw select_for_images("server_group[servers_attributes][0][image_id]") %></td>
+    <td><%= raw select_for_flavors("server_group[servers_attributes][0][flavor_id]") %></td>
+    <td align="center"><input type="hidden" name="server_group[servers_attributes][0][openvpn_server]" value="true"/><img src="assets/check.png"/></td>
   </tr>
 
 </table>

@@ -38,9 +38,8 @@ class ServerErrorsController < ApplicationController
     end
 
     respond_to do |format|
-      #format.html # index.html.erb
-      format.json  { render :json => @server_errors }
       format.xml  { render :xml => @server_errors }
+      format.any  { render :json => @server_errors }
     end
   end
 

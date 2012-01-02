@@ -61,7 +61,7 @@ function my_account() {
     </div>
 </div>
 
-<% form_for(@account, :html => { :id => "my-account-form", :onsubmit => "my_account(); return false;"}) do |f| %>
+<%= form_for(@account, :html => { :id => "my-account-form", :onsubmit => "my_account(); return false;"}) do |f| %>
 
   <p>
     <%= f.label :cloud_servers_username %><br />

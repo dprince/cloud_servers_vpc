@@ -21,9 +21,7 @@ $(document).ready(function() {
 
 </script>
 
-<% form_for(@user, :html => { :id => "user-create-form", :onsubmit => "user_create(); return false;"}) do |f| %>
-
-  <%= f.error_messages %>
+<%= form_for(@user, :html => { :id => "user-create-form", :onsubmit => "user_create(); return false;"}) do |f| %>
 
   <p>
     <%= f.label :username %><br />
