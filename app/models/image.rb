@@ -34,21 +34,20 @@ class Image < ActiveRecord::Base
  
   end
 
+  # image id defaults for Cloud Servers (legacy)
   def self.legacy_defaults(image_id)
 
     image_arr={
-      75 => "linux", #"Debian 6.0 (Squeeze)"
-      51 => "linux", #"CentOS 5.5"
-      187811 => "linux", #"Centos 5.4"]
-      78 => "linux", # "Fedora 15 (Lovelock)"]
-      71 => "linux", # "Fedora 14 (Laughlin)"]
-      53 => "linux", # "Fedora 13 (Goddard)"]
-      14 => "linux", # "Red Hat EL 5.4"]
-      62 => "linux", # "Red Hat EL 5.5"]
-      76 => "linux", # "Ubuntu 11.04 (natty)"]
-      69 => "linux", #"Ubuntu 10.10 (maverick)"]
-      49 => "linux", #"Ubuntu 10.04 LTS (lucid)"]
-      14362 => "linux", #"Ubuntu 9.10 (karmic)"]
+      104 => "linux", #"Debian 6.0 (Squeeze)"
+      114 => "linux", #"Centos 5.6"]
+      118 => "linux", #"Centos 6.0"]
+      116 => "linux", # "Fedora 15 (Lovelock)"]
+      106 => "linux", # "Fedora 14 (Laughlin)"]
+      110 => "linux", # "Red Hat EL 5.5"]
+      111 => "linux", # "Red Hat EL 6.0"]
+      119 => "linux", # "Ubuntu 11.10 (oneiric)"]
+      115 => "linux", # "Ubuntu 11.04 (natty)"]
+      112 => "linux", #"Ubuntu 10.04 LTS (lucid)"]
       28 => "windows", #"Windows Server 2008 R2 x64"]
       58 => "windows" #"Windows Server 2008 R2 x64 SQL Server"]
     }
