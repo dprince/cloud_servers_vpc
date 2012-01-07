@@ -16,8 +16,8 @@ class AccountTest < ActiveSupport::TestCase
 	test "create account" do
 
 		account=Account.new(
-			:cloud_servers_username => "blah",
-			:cloud_servers_api_key => "ABABABABABAB"
+			:username => "blah",
+			:api_key => "ABABABABABAB"
 		)
 		assert account.valid?, "Account should be valid."
 		assert account.save, "Account should have been saved."

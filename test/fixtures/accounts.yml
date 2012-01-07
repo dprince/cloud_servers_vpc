@@ -1,16 +1,19 @@
 # Read about fixtures at http://ar.rubyonrails.org/classes/Fixtures.html
 
 admin_account:
-  cloud_servers_username: blahblah
-  cloud_servers_api_key: ABABABABABA
+  username: blahblah
+  api_key: ABABABABABA
   user: admin
+  connection_type: rackspace
 
 bob_account:
-  cloud_servers_username: blahblah
-  cloud_servers_api_key: ABABABABABA
+  username: blahblah
+  api_key: ABABABABABA
   user: bob
+  connection_type: rackspace
 
 jim_account:
-  cloud_servers_username: blahblah
-  cloud_servers_api_key: ABABABABABA
+  username: blahblah
+  api_key: ABABABABABA
   user: jim
+  connection_type: rackspace

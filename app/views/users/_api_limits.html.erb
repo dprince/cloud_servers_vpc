@@ -11,8 +11,6 @@ function load_my_api_limits() {
 			var obj = jQuery.parseJSON(data);
 			limit_html="<ul>";
 			limit_html+="<li>Max total RAM (GB): <b>"+parseInt(obj.absolute.maxTotalRAMSize)/1024+"</b></li>";
-			limit_html+="<li>Max number of shared IP groups: <b>"+obj.absolute.maxIPGroups+"</b></li>";
-			limit_html+="<li>Max number of members per shared IP group: <b>"+obj.absolute.maxIPGroupMembers+"</b></li>";
 			limit_html+="</ul>";
 			limit_html+="<table style=\"margin-left: 20px;\" border=\"1\">";
 			limit_html+="<tr>";

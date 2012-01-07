@@ -2,7 +2,7 @@ ENV["RAILS_ENV"] = "test"
 require File.expand_path('../../config/environment', __FILE__)
 require 'rails/test_help'
 require File.expand_path(File.dirname(__FILE__) + "/mocks/test/async_exec")
-require File.expand_path(File.dirname(__FILE__) + "/mocks/test/cloud_servers_util")
+require File.expand_path(File.dirname(__FILE__) + "/mocks/test/rackspace_connection")
 
 class ActiveSupport::TestCase
   # Setup all fixtures in test/fixtures/*.(yml|csv) for all tests in alphabetical order.

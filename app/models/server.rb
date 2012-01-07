@@ -1,6 +1,5 @@
 require 'logger'
 require 'async_exec'
-require 'cloud_servers_util'
 require 'timeout'
 require 'util/ip_validator'
 require 'base64'
@@ -19,8 +18,6 @@ class Server < ActiveRecord::Base
 	belongs_to :server_group
 	belongs_to :account
 	validates_presence_of :name, :description, :flavor_id, :image_id, :server_group_id, :account_id
-	validates_numericality_of :flavor_id, :image_id, :server_group_id
-	validates_numericality_of :cloud_server_id_number, :if => :cloud_server_id_number
 	has_many :vpn_network_interfaces, :as => :interfacable, :dependent => :destroy
 	has_many :server_errors
 	validates_format_of :name, :with => /^[A-Za-z0-9\-\.]+$/, :message => "Server name must use valid hostname characters (A-Z, a-z, 0-9, dash)."
@@ -172,16 +169,23 @@ class Server < ActiveRecord::Base
 				server_name_prefix=ENV['RACKSPACE_CLOUD_SERVER_NAME_PREFIX']
 			end
 			
-			cs_conn=self.cloud_server_init
+			conn = self.account_connection
 
 			retry_suffix=self.retry_count > 0 ? "#{rand(10)}-#{self.retry_count}" : "#{rand(10)}"
-			cs=cs_conn.create_cloud_server("#{server_name_prefix}#{self.name}-#{self.server_group_id}-#{retry_suffix}", self.image_id, self.flavor_id, generate_personalities)
+			server_id, admin_password = conn.create_server("#{server_name_prefix}#{self.name}-#{self.server_group_id}-#{retry_suffix}", self.image_id, self.flavor_id, generate_personalities)
 			@tmp_files.each {|f| f.close(true)} #Remove tmp personalities files
 			#harvest server ID and IP information
-			self.cloud_server_id_number = cs.id
-			self.external_ip_addr = cs.addresses[:public][0]
-			self.internal_ip_addr = cs.addresses[:private][0]
-			self.admin_password = cs.adminPass if is_windows
+			self.cloud_server_id_number = server_id
+			self.admin_password = admin_password if is_windows
+			save!
+
+			server = conn.get_server(server_id)
+			until server[:public_ip] and server[:private_ip] do
+				server = conn.get_server(server_id)
+				sleep 1
+			end
+			self.external_ip_addr = server[:public_ip]
+			self.internal_ip_addr = server[:private_ip]
 			save!
 	
 			# if this server is an OpenVPN server create it now
@@ -196,13 +200,13 @@ class Server < ActiveRecord::Base
 		rescue Exception => e
 			self.retry_count += 1
 			self.status = "Pending" # keep status set to pending
-
+#
 			long_error_message=nil
 			begin
 				long_error_message="#{e.message}: #{e.response_body}"
 			rescue
 			end
-
+#
 			if e and e.message and long_error_message then
 				self.add_error_message("Failed to create cloud server: #{e.message}", long_error_message)
 			elsif e and e.message then
@@ -213,6 +217,7 @@ class Server < ActiveRecord::Base
 			save!
 			sleep 10
 			AsyncExec.run_job(CreateCloudServer, self.id, false)
+
 		end
 
 	end
@@ -224,8 +229,7 @@ class Server < ActiveRecord::Base
 		until deleted or retry_count >= 3 do
 			begin
 				retry_count += 1
-				cs_conn=self.cloud_server_init
-				cs_conn.destroy_server(cloud_server_id)
+				self.account_connection.destroy_server(cloud_server_id)
 				deleted = true
 			rescue
 				# ignore all exceptions on delete
@@ -255,9 +259,9 @@ class Server < ActiveRecord::Base
 		end
 	end
 
-	def cloud_server_init
+	def account_connection
 		acct=Account.find(self.account_id)
-		CloudServersUtil.new(acct.cloud_servers_username, acct.cloud_servers_api_key)
+		acct.get_connection
 	end
 
 	def add_error_message(message, long_error_message=message)

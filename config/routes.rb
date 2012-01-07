@@ -31,7 +31,7 @@ CloudServersVpc::Application.routes.draw do
 
   resources :servers
   resources :servers do
-    collection do
+    member do
       post 'rebuild'
     end
   end
@@ -44,7 +44,7 @@ CloudServersVpc::Application.routes.draw do
 
   resources :users
   resources :users do
-    collection do
+    member do
       get 'password'
     end
   end

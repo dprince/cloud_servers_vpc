@@ -1,5 +1,4 @@
 require 'logger'
-require 'cloud_servers_util'
 require 'async_exec'
 require 'openvpn_config/server'
 require 'openvpn_config/client'
@@ -70,8 +69,7 @@ class LinuxServer < Server
 
 			# server is online but can't ping OpenVPN servers .10 IP
 			if not ping_test(vpn_server.internal_ip_addr) then
-				cs_conn=self.cloud_server_init
-				cs_conn.reboot_server(self.cloud_server_id_number)
+				self.account_connection.reboot_server(self.cloud_server_id_number)
 				self.add_error_message("Server failed ping test.")
 				self.retry_count += 1
 				self.save
@@ -127,20 +125,20 @@ class LinuxServer < Server
 
 	# method to block until a server is online
 	def loop_until_server_online
-		cs_conn=self.cloud_server_init
+		conn = self.account_connection
 
-		error_message="Failed to build server."
+		error_message = "Failed to build server."
 
-		timeout=self.server_online_timeout-(Time.now-self.updated_at).to_i
+		timeout = self.server_online_timeout-(Time.now-self.updated_at).to_i
 		timeout = 120 if timeout < 120
 
 		begin
 			Timeout::timeout(timeout) do
 
 				# poll the server until progress is 100%
-				cs=cs_conn.find_server("#{self.cloud_server_id_number}")
-				until cs.progress == 100 and cs.status == "ACTIVE" do
-					cs=cs_conn.find_server("#{self.cloud_server_id_number}")
+				cs = conn.get_server(self.cloud_server_id_number)
+				until cs[:progress] == 100 and cs[:status] == "ACTIVE" do
+					cs = conn.get_server(self.cloud_server_id_number)
 					sleep 1
 				end
 
@@ -149,7 +147,7 @@ class LinuxServer < Server
 				if ! system(%{
 
 						COUNT=0
-						while ! ssh -o "StrictHostKeyChecking no" -T -i #{self.server_group.ssh_key_basepath} root@#{cs.addresses[:public][0]} /bin/true > /dev/null 2>&1; do
+						while ! ssh -o "StrictHostKeyChecking no" -T -i #{self.server_group.ssh_key_basepath} root@#{cs[:public_ip]} /bin/true > /dev/null 2>&1; do
 							if (($COUNT > 23)); then
 								exit 1
 							fi

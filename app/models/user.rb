@@ -1,5 +1,4 @@
 require 'digest/sha1'
-require 'cloud_servers_util'
 
 class User < ActiveRecord::Base
 
@@ -33,9 +32,9 @@ class User < ActiveRecord::Base
         else
             begin
                 acct=self.account
-                CloudServersUtil.new(acct.cloud_servers_username, acct.cloud_servers_api_key)
+                acct.get_connection
             rescue Exception => e
-                errors[:base] << "Invalid cloud servers username or api key specified: #{e.message}"
+                errors[:base] << "Unable to connect with cloud account credentials: #{e.message}"
             end
         end
 

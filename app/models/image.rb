@@ -8,7 +8,7 @@ class Image < ActiveRecord::Base
 
   def self.sync(user)
     acct=user.account
-    conn = CloudServersUtil.new(acct.cloud_servers_username, acct.cloud_servers_api_key)
+    conn = acct.get_connection
     
     image_refs = []
 

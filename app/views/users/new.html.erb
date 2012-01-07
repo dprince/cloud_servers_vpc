@@ -24,30 +24,28 @@ $(document).ready(function() {
 <%= form_for(@user, :html => { :id => "user-create-form", :onsubmit => "user_create(); return false;"}) do |f| %>
 
   <p>
-    <%= f.label :username %><br />
-    <%= f.text_field :username, :class => "user_new" %>
+    <%= f.label :username %>:<%= f.text_field :username, :class => "user_new" %>
   </p>
 
   <p>
-    <%= f.label :first_name %><br />
-    <%= f.text_field :first_name, :class => "user_new" %>
+    <%= f.label :first_name %>:<%= f.text_field :first_name, :class => "user_new" %>
   </p>
 
   <p>
-    <%= f.label :last_name %><br />
-    <%= f.text_field :last_name, :class => "user_new" %>
+    <%= f.label :last_name %>:<%= f.text_field :last_name, :class => "user_new" %>
   </p>
 <hr/>
   <p>
-    <%= f.label :password %><br />
-    <%= f.password_field :password, :class => "user_new" %><br />
-    <%= f.label :password_confirmation %><br />
-    <%= f.password_field :password_confirmation, :class => "user_new" %>
+    <%= f.label :password %>:<%= f.password_field :password, :class => "user_new" %><br />
+    <%= f.label :password_confirmation %>:<%= f.password_field :password_confirmation, :class => "user_new" %>
   </p>
 <hr/>
+<b>API Credentials</b>
   <p>
-  <label>Cloud Servers Username</label><br/><input type="text" name="user[account_attributes][cloud_servers_username]" size="30" value="" class="user_new"/><br/>
-  <label>Cloud Servers API Key</label><br/><input type="text" name="user[account_attributes][cloud_servers_api_key]" size="40" value="" class="user_new"/>
+  <label>Account Type</label>:<input checked="checked" type="radio" name="user[account_attributes][connection_type]" value="rackspace" class="user_new"/>Rackspace / <input type="radio" name="user[account_attributes][connection_type]" value="openstack" class="user_new"/>Openstack<br/><br/>
+  <label>Username:</label><br/><input type="text" name="user[account_attributes][username]" size="30" value="" class="user_new"/><br/>
+  <label>API Key:</label><br/><input type="text" name="user[account_attributes][api_key]" size="60" value="" class="user_new"/><br />
+  <label>API URL(required for OpenStack/optional for Rackspace):</label><br/><input type="text" name="user[account_attributes][auth_url]" size="80" value="" class="user_new"/>
   </p>
 
 <% end %>

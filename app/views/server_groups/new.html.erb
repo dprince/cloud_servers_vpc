@@ -10,7 +10,7 @@ $(document).ready(function() {
       }
   );
 
-<% if @account.cloud_servers_api_key.blank? then %>
+<% if @account.api_key.blank? then %>
   $("#server-group-error-messages").css("display", "inline");
   $("#server-group-error-messages-content").html("Please enter your cloud servers account credentials under 'settings'.");
 <% end %>
