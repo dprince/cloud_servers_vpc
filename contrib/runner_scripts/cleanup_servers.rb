@@ -8,22 +8,21 @@ end
 Account.find(:all, :conditions => ["cloud_servers_username IS NOT NULL AND cloud_servers_username != '' and cloud_servers_api_key IS NOT NULL and cloud_servers_api_key != ''"], :group => "cloud_servers_api_key").each do |acct|
 
 	begin
-	cs_conn=CloudServersUtil.new(acct.cloud_servers_username, acct.cloud_servers_api_key)
-	cs_conn.all_servers do |cs|
+	conn = acct.get_connection
+	conn.all_servers do |server|
 
-		exp=Regexp.new("^#{CS_NAME_PREFIX}")
-		if cs[:name] =~ exp then
+		exp = Regexp.new("^#{CS_NAME_PREFIX}")
+		if server[:name] =~ exp then
 
-			server=Server.find(:first, :conditions => ["cloud_server_id_number = ? AND historical = 0", cs[:id]])
+			server = Server.find(:first, :conditions => ["cloud_server_id_number = ? AND historical = 0", server[:id]])
 
 			if server.nil? then
 
 				begin
-					puts "Account: #{acct.cloud_servers_username}, Deleting cloud server ID: #{cs[:id]} #{cs[:name]}"
+					puts "Account: #{acct.cloud_servers_username}, Deleting cloud server ID: #{server[:id]} #{server[:name]}"
 					Timeout::timeout(30) do
-						cs_server=cs_conn.find_server(cs[:id])
-						cs_server.update(:name => "deleted_#{cs[:id]}")
-						cs_server.delete!
+						conn.update_server(server[:id], {:name => "deleted_#{server[:id]}"})
+						conn.delete_server(server[:id])
 					end
 				rescue
 				end

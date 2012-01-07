@@ -35,7 +35,7 @@ class ServerGroupsControllerTest < ActionController::TestCase
   end
 =end
 
-  test "should create server_group with server" do
+  test "should create server_group with server and client" do
     http_basic_authorize
     assert_difference('Client.count') do
     assert_difference('Server.count') do
@@ -48,13 +48,30 @@ class ServerGroupsControllerTest < ActionController::TestCase
 
   end
 
+  test "should create server_group with image uuid" do
+
+    image_id = '11b2a5bf-590c-4dd4-931f-a65751a4db0e'
+
+    http_basic_authorize
+    assert_difference('Client.count') do
+    assert_difference('Server.count') do
+    assert_difference('ServerGroup.count') do
+      post :create, :server_group => { :name => "test1", :owner_name => "dan.prince", :domain_name => "test.rsapps.net", :description => "test1", :vpn_network => "172.19.0.0", :vpn_subnet => "255.255.128.0", :servers_attributes => {"0" => { :name => "test1", :description => "test description", :flavor_id => "2", :image_id => image_id }}, :client_attributes => {"0" => {:name => "test2", :description => "blah blah"}} }
+    end
+    end
+    end
+    assert_response :success
+
+	assert_equal 1, Server.count(:conditions => ["image_id = ?", image_id])
+
+  end
+
   test "should create server_group" do
     http_basic_authorize
     assert_difference('ServerGroup.count') do
       post :create, :server_group => { :name => "test1", :owner_name => "dan.prince", :domain_name => "test.rsapps.net", :description => "test1", :vpn_network => "172.19.0.0", :vpn_subnet => "255.255.128.0" }
     end
     assert_response :success
-    #assert_redirected_to server_group_path(assigns(:server_group))
 
   end
 
@@ -89,6 +106,34 @@ class ServerGroupsControllerTest < ActionController::TestCase
 	assert_equal "echo hello > /tmp/test.txt", server.server_command.command
 	assert_equal server.id, AsyncExec.jobs[CreateCloudServer][0]
 	assert_nil AsyncExec.jobs[CreateCloudServer][1]
+
+  end
+
+  test "should create server_group via XML request with image uuid" do
+
+    image_id = '22b2a5bf-590c-4dd4-931f-a65751a4db0c'
+
+    http_basic_authorize
+    assert_difference('SshPublicKey.count') do
+        assert_difference('Client.count') do
+            assert_difference('Server.count') do
+                assert_difference('ServerGroup.count') do
+
+                    @request.env['RAW_POST_DATA'] = get_xml_request(image_id)
+
+                    @request.accept = 'text/xml'
+                    response=post :create
+                    @request.env.delete('RAW_POST_DATA')
+
+                end
+            end
+        end
+    end
+
+    assert_response :success
+
+	server=Server.find(:first, :conditions => ["image_id = ?", image_id])
+	assert_equal server.id, AsyncExec.jobs[CreateCloudServer][0]
 
   end
 
@@ -281,8 +326,8 @@ return %{
     <server>
       <name>test1</name>
       <description>test1</description>
-      <flavor-id type="integer">1</flavor-id>
-      <image-id type="integer">#{image_id}</image-id>
+      <flavor-id>1</flavor-id>
+      <image-id>#{image_id}</image-id>
       <openvpn-server type="boolean">true</openvpn-server>
       <base64-command>#{Base64.encode64("echo hello > /tmp/test.txt")}</base64-command>
     </server>

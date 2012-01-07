@@ -32,18 +32,18 @@ class UsersControllerTest < ActionController::TestCase
 
   test "should create user with account" do
     assert_difference('User.count') do
-      post :create, :user => {:username => "test1", :first_name => "Mr.", :last_name => "Big", :password => "test123", :account_attributes => {:cloud_servers_username => 'blah123', :cloud_servers_api_key => 'AABBCCDD'} }
+      post :create, :user => {:username => "test1", :first_name => "Mr.", :last_name => "Big", :password => "test123", :account_attributes => {:username => 'blah123', :api_key => 'AABBCCDD'} }
     end
     user=User.find(:first, :conditions => ["username = ?", "test1"])
-    assert_equal "blah123", user.account.cloud_servers_username, "Cloud Servers username was not set."
-    assert_equal "AABBCCDD", user.account.cloud_servers_api_key, "Cloud Servers api key was not set."
+    assert_equal "blah123", user.account.username, "Cloud Servers username was not set."
+    assert_equal "AABBCCDD", user.account.api_key, "Cloud Servers api key was not set."
     assert_redirected_to user_path(assigns(:user))
   end
 
   test "should not create user with invalid account" do
     assert_no_difference('User.count') do
       ENV['CLOUD_SERVERS_UTIL_INIT_MOCK_FAIL']="true"
-      post :create, :user => {:username => "test1", :first_name => "Mr.", :last_name => "Big", :password => "test123", :account_attributes => {:cloud_servers_username => 'blah123', :cloud_servers_api_key => 'AABBCCDD'} }
+      post :create, :user => {:username => "test1", :first_name => "Mr.", :last_name => "Big", :password => "test123", :account_attributes => {:username => 'blah123', :api_key => 'AABBCCDD'} }
     end
   end
 

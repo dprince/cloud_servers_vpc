@@ -29,14 +29,14 @@
   <tr class="<%= cycle "tr0", "tr1" %>">
     <td><%= raw chop_for_html(server.server_group.name, 20) %>(<%= server.server_group.id %>)</td>
     <td><%= raw chop_for_html(server.server_group.owner_name) %></td>
-    <td><%= raw chop_for_html(server.account.cloud_servers_username) %></td>
+    <td><%= raw chop_for_html(server.account.username) %></td>
     <td><%= raw chop_for_html(server.name) %></td>
 	<% if server.external_ip_addr or server.internal_ip_addr %> 
 		<td><%= server.external_ip_addr %>/<%= server.internal_ip_addr %></td>
 	<% else %>
 		<td>N/A</td>
 	<% end %>
-    <td><%= server.cloud_server_id_number %></td>
+    <td><%= raw chop_for_html(server.cloud_server_id_number, 15) %></td>
     <td><%= flavor_name(server.flavor_id) %></td>
     <td><%= raw chop_for_html(image_name(server.image_id), 15) %></td>
     <td align="center"><%= raw check_or_blank(server.openvpn_server) %></td>

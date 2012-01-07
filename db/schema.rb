@@ -11,14 +11,16 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 27) do
+ActiveRecord::Schema.define(:version => 29) do
 
   create_table "accounts", :force => true do |t|
-    t.string   "cloud_servers_username"
-    t.string   "cloud_servers_api_key"
+    t.string   "username"
+    t.string   "api_key"
     t.datetime "created_at"
     t.datetime "updated_at"
     t.integer  "user_id"
+    t.string   "connection_type", :default => "rackspace"
+    t.string   "auth_url",        :default => ""
   end
 
   add_index "accounts", ["user_id"], :name => "index_accounts_on_user_id"
@@ -85,9 +87,9 @@ ActiveRecord::Schema.define(:version => 27) do
     t.string   "description",                                       :null => false
     t.string   "external_ip_addr"
     t.string   "internal_ip_addr"
-    t.integer  "cloud_server_id_number"
-    t.integer  "flavor_id",                                         :null => false
-    t.integer  "image_id",                                          :null => false
+    t.string   "cloud_server_id_number"
+    t.string   "flavor_id",                                         :null => false
+    t.string   "image_id",                                          :null => false
     t.integer  "server_group_id",                                   :null => false
     t.boolean  "openvpn_server",         :default => false,         :null => false
     t.string   "status",                 :default => "Pending",     :null => false

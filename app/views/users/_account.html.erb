@@ -26,7 +26,7 @@ function my_account() {
         success: function(data) {
             $("#my-account-error-messages").css("display", "none");
             $("#my-account-error-messages-content").html("");
-            if ($("cloud-servers-username", data).text() != "") {
+            if ($("username", data).text() != "") {
                 reset_settings_message();
                 append_settings_message('Cloud Servers Account information updated.');
             } else {
@@ -64,10 +64,14 @@ function my_account() {
 <%= form_for(@account, :html => { :id => "my-account-form", :onsubmit => "my_account(); return false;"}) do |f| %>
 
   <p>
-    <%= f.label :cloud_servers_username %><br />
-    <%= f.text_field :cloud_servers_username, :class => "myaccount" %><br />
-    <%= f.label :cloud_servers_api_key %><br />
-    <%= f.text_field :cloud_servers_api_key, :class => "myaccount" %><br />
+    <%= f.label :connection_type %>: <%= f.radio_button :connection_type, 'rackspace', :checked => true %>Rackspace / <%= f.radio_button :connection_type, 'openstack' %>OpenStack<br />
+    <br />
+    <%= f.label :username %>:<br />
+    <%= f.text_field :username, :class => "myaccount" %><br />
+    <%= f.label :api_key %>:<br />
+    <%= f.text_field(:api_key, {:class => "myaccount", :size => 60}) %><br />
+    <%= f.label :auth_url %>: (required for OpenStack/optional for Rackspace)<br />
+    <%= f.text_field(:auth_url, {:class => "myaccount", :size => 80}) %><br />
     <%= f.submit 'Update Account' %>
   </p>
 

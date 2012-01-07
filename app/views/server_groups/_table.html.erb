@@ -26,8 +26,8 @@
     <td><%= server_group.id %></td>
     <td><%= raw chop_for_html(server_group.name) %></td>
     <td><%= raw chop_for_html(server_group.description) %></td>
-<% if server_group.user.account.cloud_servers_username then %>
-    <td><%= raw chop_for_html(server_group.user.account.cloud_servers_username) %></td>
+<% if server_group.user.account.username then %>
+    <td><%= raw chop_for_html(server_group.user.account.username) %></td>
 <% else %>
     <td>&nbsp;</td>
 <% end %>

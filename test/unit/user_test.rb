@@ -11,7 +11,7 @@ class ServerTest < ActiveSupport::TestCase
 			:first_name => "Mr.",
 			:last_name => "Big",
 			:password => "test123",
-			:account_attributes => {:cloud_servers_username => "test", :cloud_servers_api_key => "AABBCCDD"}
+			:account_attributes => {:username => "test", :api_key => "AABBCCDD"}
 		)
 		assert user.valid?, "User should be valid."
 		assert user.save, "User should have been saved."
@@ -26,7 +26,7 @@ class ServerTest < ActiveSupport::TestCase
 			:first_name => "Mr.",
 			:last_name => "Big",
 			:password => "test123",
-			:account_attributes => {:cloud_servers_username => "test", :cloud_servers_api_key => "AABBCCDD"}
+			:account_attributes => {:username => "test", :api_key => "AABBCCDD"}
 		)
 		assert_equal false, user.valid?, "User should not be valid."
 
@@ -39,7 +39,7 @@ class ServerTest < ActiveSupport::TestCase
 			:first_name => "Mr.",
 			:last_name => "Big",
 			:password => "test123",
-			:account_attributes => {:cloud_servers_username => "test", :cloud_servers_api_key => "AABBCCDD"}
+			:account_attributes => {:username => "test", :api_key => "AABBCCDD"}
 		)
 		assert_equal false, user.valid?, "User should not be valid."
 		assert_equal false, user.save, "User should not save."
@@ -53,7 +53,7 @@ class ServerTest < ActiveSupport::TestCase
 			:first_name => "Mr.",
 			:last_name => "Big",
 			:password => "test123",
-			:account_attributes => {:cloud_servers_username => "test", :cloud_servers_api_key => "AABBCCDD"}
+			:account_attributes => {:username => "test", :api_key => "AABBCCDD"}
 		)
 		assert_equal false, user.valid?, "User should not be valid."
 		assert_equal false, user.save, "User should not save."
@@ -67,7 +67,7 @@ class ServerTest < ActiveSupport::TestCase
 			:first_name => "Test",
 			:last_name => "SshKey",
 			:password => "test123",
-			:account_attributes => {:cloud_servers_username => "test", :cloud_servers_api_key => "AABBCCDD"}
+			:account_attributes => {:username => "test", :api_key => "AABBCCDD"}
 		)
 		assert_equal true, user.save, "User should save."
 

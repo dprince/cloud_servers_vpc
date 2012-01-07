@@ -45,8 +45,8 @@ class AccountsController < ApplicationController
   def limits
 
     @account = Account.find(params[:id])
-    cs=CloudServersUtil.new(@account.cloud_servers_username, @account.cloud_servers_api_key)
-    render :text => cs.account_limits.to_json, :status => "200"
+    conn = @account.get_connection
+    render :text => conn.account_limits.to_json, :status => "200"
 
   end
 
