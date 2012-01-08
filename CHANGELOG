@@ -1,4 +1,8 @@
   - Upgrade to Rails 3.
+  - Add support for OpenStack API.
+  - Remove option to create .rackspace_cloud file on gateway server.
+  - Rename CC_AUTHORIZED_KEYS to AUTHORIZED_KEYS.
+  - Rename RACKSPACE_CLOUD_SERVER_NAME_PREFIX to SERVER_NAME_PREFIX.
 
 * Fri Nov 4 2011 Dan Prince <dan.prince@rackspace.com> - 2.4.1
   - Fix windows image detection code.
