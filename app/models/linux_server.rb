@@ -186,22 +186,24 @@ class LinuxServer < Server
 
 	end
 
-	# Generates a personalities hash (See Cloud Servers API docs for details)
+	# Generates a personalities hash suitable for use with bindings
 	private
 	def generate_personalities
 
+		# server group keys
 		auth_key_set=Set.new(self.server_group.ssh_public_keys.collect { |x| x.public_key.chomp })
+		# user keys
 		auth_key_set.merge(self.server_group.user.ssh_public_keys.collect { |x| x.public_key.chomp })
 
-		# add keys from the Server Group (added via XML API)
+		# new lines
 		authorized_keys=auth_key_set.inject("") { |sum, key| sum + key + "\n"}
 
-		# add any keys from the config files	
-		if not ENV['CC_AUTHORIZED_KEYS'].blank? then
-			authorized_keys += ENV['CC_AUTHORIZED_KEYS']
+		# add any keys from the config files
+		if not ENV['AUTHORIZED_KEYS'].blank? then
+			authorized_keys += ENV['AUTHORIZED_KEYS']
 		end
 
-		# append the public key from the ServerGroup
+		# write keys to a file
 		authorized_keys += IO.read(self.server_group.ssh_key_basepath+".pub")
 		tmp_auth_keys=Tempfile.new "cs_auth_keys"
 		tmp_auth_keys.chmod(0600)
@@ -213,18 +215,6 @@ class LinuxServer < Server
 		personalities.store(tmp_auth_keys.path, "/root/.ssh/authorized_keys")
 		personalities.store(File.join(Rails.root, 'config', 'root_ssh_config'), "/root/.ssh/config")
 		
-		# create a .rackspace_cloud file with username/password info
-		cloud_key_config=%{
-userid: #{ENV['RACKSPACE_CLOUD_USERNAME']}
-api_key: #{ENV['RACKSPACE_CLOUD_API_KEY']}
-		}
-		tmp_cloud_key=Tempfile.new "cs_cloud_keys"
-		tmp_cloud_key.chmod(0600)
-		tmp_cloud_key.write(cloud_key_config)
-		tmp_cloud_key.flush
-		@tmp_files << tmp_cloud_key
-		personalities.store(tmp_cloud_key.path, "/root/.rackspace_cloud")
-
 		return personalities
 
 	end

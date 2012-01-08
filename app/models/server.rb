@@ -165,16 +165,18 @@ class Server < ActiveRecord::Base
 
 		begin
 			server_name_prefix=""
-			if not ENV['RACKSPACE_CLOUD_SERVER_NAME_PREFIX'].blank? then
-				server_name_prefix=ENV['RACKSPACE_CLOUD_SERVER_NAME_PREFIX']
+			if not ENV['SERVER_NAME_PREFIX'].blank? then
+				server_name_prefix=ENV['SERVER_NAME_PREFIX']
 			end
 			
 			conn = self.account_connection
 
+			# Rackspace enforces unique server names. This works around that...
 			retry_suffix=self.retry_count > 0 ? "#{rand(10)}-#{self.retry_count}" : "#{rand(10)}"
 			server_id, admin_password = conn.create_server("#{server_name_prefix}#{self.name}-#{self.server_group_id}-#{retry_suffix}", self.image_id, self.flavor_id, generate_personalities)
+
 			@tmp_files.each {|f| f.close(true)} #Remove tmp personalities files
-			#harvest server ID and IP information
+
 			self.cloud_server_id_number = server_id
 			self.admin_password = admin_password if is_windows
 			save!

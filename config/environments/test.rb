@@ -38,6 +38,3 @@ CloudServersVpc::Application.configure do
   # Print deprecation notices to the stderr
   config.active_support.deprecation = :stderr
 end
-
-#ENV['RACKSPACE_CLOUD_USERNAME'] = "test"
-#ENV['RACKSPACE_CLOUD_API_KEY'] = "test"

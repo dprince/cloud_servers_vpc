@@ -59,15 +59,12 @@ CloudServersVpc::Application.configure do
   config.active_support.deprecation = :notify
 end
 
-#ENV['RACKSPACE_CLOUD_USERNAME'] = "test"
-#ENV['RACKSPACE_CLOUD_API_KEY'] = "test"
-
 # Optional prefix for cloud server names.
-ENV['RACKSPACE_CLOUD_SERVER_NAME_PREFIX'] = ""
+ENV['SERVER_NAME_PREFIX'] = ""
 
 # List any authorized ssh public keys that should get installed on the cloud
 # servers to provide keyless SSH access.
-# ENV['CC_AUTHORIZED_KEYS'] = ""
+# ENV['AUTHORIZED_KEYS'] = ""
 
 # Optional EPEL_BASE_URL. Use this option to specify a specific EPEL
 # mirror to be used by Redhat/Centos images.
