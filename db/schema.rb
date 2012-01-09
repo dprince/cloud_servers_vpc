@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 29) do
+ActiveRecord::Schema.define(:version => 30) do
 
   create_table "accounts", :force => true do |t|
     t.string   "username"
@@ -41,6 +41,15 @@ ActiveRecord::Schema.define(:version => 29) do
     t.string   "os_type"
     t.integer  "account_id",                    :null => false
     t.boolean  "is_active",  :default => false, :null => false
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  create_table "reservations", :force => true do |t|
+    t.string   "image_ref"
+    t.string   "flavor_ref"
+    t.integer  "size"
+    t.integer  "user_id"
     t.datetime "created_at"
     t.datetime "updated_at"
   end

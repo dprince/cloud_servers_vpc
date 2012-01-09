@@ -42,6 +42,8 @@ CloudServersVpc::Application.routes.draw do
 
   resources :ssh_public_keys
 
+  resources :reservations
+
   resources :users
   resources :users do
     member do
