@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 30) do
+ActiveRecord::Schema.define(:version => 31) do
 
   create_table "accounts", :force => true do |t|
     t.string   "username"
@@ -50,9 +50,29 @@ ActiveRecord::Schema.define(:version => 30) do
     t.string   "flavor_ref"
     t.integer  "size"
     t.integer  "user_id"
+    t.boolean  "historical", :default => false
     t.datetime "created_at"
     t.datetime "updated_at"
   end
+
+  create_table "reserve_servers", :force => true do |t|
+    t.integer  "reservation_id"
+    t.integer  "account_id"
+    t.string   "flavor_ref",                              :null => false
+    t.string   "image_ref",                               :null => false
+    t.string   "external_ip_addr"
+    t.string   "internal_ip_addr"
+    t.string   "cloud_server_id"
+    t.string   "status",           :default => "Pending", :null => false
+    t.string   "error_message"
+    t.boolean  "historical",       :default => false
+    t.text     "private_key"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  add_index "reserve_servers", ["cloud_server_id"], :name => "index_reserve_servers_on_cloud_server_id"
+  add_index "reserve_servers", ["historical"], :name => "index_reserve_servers_on_historical"
 
   create_table "server_commands", :force => true do |t|
     t.integer  "server_id",  :null => false

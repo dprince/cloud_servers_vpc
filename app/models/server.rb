@@ -164,32 +164,38 @@ class Server < ActiveRecord::Base
 		end
 
 		begin
-			server_name_prefix=""
-			if not ENV['SERVER_NAME_PREFIX'].blank? then
-				server_name_prefix=ENV['SERVER_NAME_PREFIX']
-			end
-			
-			conn = self.account_connection
 
-			# Rackspace enforces unique server names. This works around that...
-			retry_suffix=self.retry_count > 0 ? "#{rand(10)}-#{self.retry_count}" : "#{rand(10)}"
-			server_id, admin_password = conn.create_server("#{server_name_prefix}#{self.name}-#{self.server_group_id}-#{retry_suffix}", self.image_id, self.flavor_id, generate_personalities)
+            if not capture_reserve_server then
+				server_name_prefix=""
+				if not ENV['SERVER_NAME_PREFIX'].blank? then
+					server_name_prefix=ENV['SERVER_NAME_PREFIX']
+				end
+				
+				conn = self.account_connection
 
-			@tmp_files.each {|f| f.close(true)} #Remove tmp personalities files
+				# Rackspace enforces unique server names. This works around that...
+				retry_suffix=self.retry_count > 0 ? "#{rand(10)}-#{self.retry_count}" : "#{rand(10)}"
+				server_id, admin_password = conn.create_server("#{server_name_prefix}#{self.name}-#{self.server_group_id}-#{retry_suffix}", self.image_id, self.flavor_id, generate_personalities)
 
-			self.cloud_server_id_number = server_id
-			self.admin_password = admin_password if is_windows
-			save!
+				@tmp_files.each {|f| f.close(true)} #Remove tmp personalities files
 
-			server = conn.get_server(server_id)
-			until server[:public_ip] and server[:private_ip] do
+				self.cloud_server_id_number = server_id
+				self.admin_password = admin_password if is_windows
+				save!
+
 				server = conn.get_server(server_id)
-				sleep 1
+				Timeout::timeout(60) do
+				  until server[:public_ip] and server[:private_ip] do
+					  server = conn.get_server(server_id)
+					  raise "Server in error state." if server[:status] == 'ERROR'
+					  sleep 1
+				  end
+				  self.external_ip_addr = server[:public_ip]
+				  self.internal_ip_addr = server[:private_ip]
+				  save!
+				end
 			end
-			self.external_ip_addr = server[:public_ip]
-			self.internal_ip_addr = server[:private_ip]
-			save!
-	
+
 			# if this server is an OpenVPN server create it now
 			if self.openvpn_server then
 				AsyncExec.run_job(CreateOpenVPNServer, self.id)
@@ -224,7 +230,6 @@ class Server < ActiveRecord::Base
 
 	end
 
-	# class level function to delete cloud servers by their cloud_server ID's
 	def delete_cloud_server(cloud_server_id)
 		deleted=false
 		retry_count=0
@@ -249,7 +254,7 @@ class Server < ActiveRecord::Base
 				}
 			end
 
-			# NOTE: Cloud Servers rebuild doesn't support personalities so
+			# NOTE: Cloud Servers v1.0 rebuild doesn't support personalities so
 			# we do a delete and create instead.
 			if not self.cloud_server_id_number.nil? then
 				delete_cloud_server(self.cloud_server_id_number)

@@ -14,7 +14,7 @@ class ReservationsController < ApplicationController
       limit=params[:limit].nil? ? 50 : params[:limit]
     end
 
-    @reservations = Reservation.paginate :page => params[:page] || 1, :per_page => limit, :conditions => ["user_id = ?", session[:user_id]], :order => "id"
+    @reservations = Reservation.paginate :page => params[:page] || 1, :per_page => limit, :conditions => ["user_id = ? AND historical = ?", session[:user_id], 0], :order => "id"
 
     respond_to do |format|
       format.xml  { render :xml => @reservations }
@@ -60,7 +60,7 @@ class ReservationsController < ApplicationController
     @reservation = Reservation.find(params[:id])
 
     respond_to do |format|
-      if @reservation.update_attributes(params[:reservation])
+      if @reservation.update_attributes(params[:reservation]) and @reservation.sync
         format.html { redirect_to(@reservation, :notice => 'Reservation was successfully updated.') }
         format.json  { render :json => @reservation, :include => :image }
         format.xml  { render :xml => @reservation, :include => :image }
@@ -75,10 +75,10 @@ class ReservationsController < ApplicationController
   # DELETE /reservations/1.json
   # DELETE /reservations/1.xml
   def destroy
-    @reservation = Reservation.destroy(params[:id])
+    @reservation = Reservation.find(params[:id])
     xml=@reservation.to_xml
     json=@reservation.to_json
-    @reservation.destroy
+    @reservation.make_historical
 
     respond_to do |format|
       format.html { redirect_to(reservations_url) }

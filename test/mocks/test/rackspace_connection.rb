@@ -13,7 +13,7 @@ class RackspaceConnection
     end
   end
 
-  def create_cloud_server(name, image_id, flavor_id, personalities={})
+  def create_server(name, image_id, flavor_id, personalities={})
     server=TestCloudServer.new
     server.name = name
     server.imageId = image_id
@@ -22,17 +22,19 @@ class RackspaceConnection
     return server.id
   end
 
-  def server_details(id)
+  def get_server(id)
     server=TestCloudServer.new
-    server.name = name
-    server.imageId = image_id
-    server.flavorId = flavor_id
+    server.name = 'TEST'
+    server.imageId = 1
+    server.flavorId = 2
+    server.status = 'ACTIVE'
+    server.progress = '100'
     return {
       :id => server.id,
       :progress => server.progress,
       :status => server.status,
-      :public_ip => server.addresses[:public][0],
-      :private_ip => server.addresses[:public][0],
+      :public_ip => '1.2.3.4',
+      :private_ip => '5.6.7.8',
       :admin_password => server.adminPass
     }
   end

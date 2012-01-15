@@ -5,6 +5,7 @@ class CreateReservations < ActiveRecord::Migration
       t.string :flavor_ref
       t.integer :size
       t.integer :user_id
+      t.boolean :historical, :default => false
       t.timestamps
     end
   end

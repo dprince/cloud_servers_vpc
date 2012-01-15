@@ -100,12 +100,15 @@ function my_reservation_create() {
             $("a.my-reservations-add").show();
 
 			var reservation_id = $(data).find("reservation id:first").text();
+			var flavor_ref = $(data).find("reservation flavor-ref:first").text();
+			var size = $(data).find("reservation size:first").text();
 
 			if (method_type === 'POST') {
 
 				$("#my-reservations-list").append(
 				  "<li id=\"reservation-li-" + reservation_id +
 				  "\">" + $(data).find("reservation image name").text() +
+				  "&nbsp;(Flavor: " + flavor_ref + " Size: " + size + ")" +
 
 				  "&nbsp;<a href=\"reservations/" + reservation_id +
 				  "\" class=\"my-reservation-edit\">Edit</a>"+
@@ -114,8 +117,6 @@ function my_reservation_create() {
 				);
 
 			} else {
-			    var flavor_ref = $(data).find("reservation flavor-ref:first").text();
-			    var size = $(data).find("reservation size:first").text();
 				$("#reservation-li-" + reservation_id).html(
 				  $("reservation image name", data).text() +
 				  "&nbsp;(Flavor: " + flavor_ref + " Size: " + size + ")" +
@@ -187,7 +188,7 @@ function my_reservation_delete(href) {
 
 <ul id="my-reservations-list">
 <% @user.reservations.each do |reservation| %>
-    <li id="reservation-li-<%= reservation.id %>"><%= raw chop_for_html(reservation.image.name) %>&nbsp;(Flavor: <%= reservation.flavor_ref %>, Size: <%= reservation.size %>)&nbsp;<a href="/reservations/<%= reservation.id %>" class="my-reservation-edit">Edit</a>&nbsp;/&nbsp;<a href="/reservations/<%= reservation.id %>" class="my-reservation-delete">Delete</a></li>
+    <li id="reservation-li-<%= reservation.id %>"><%= raw chop_for_html(reservation_image_name(reservation)) %>&nbsp;(Flavor: <%= reservation.flavor_ref %>, Size: <%= reservation.size %>)&nbsp;<a href="/reservations/<%= reservation.id %>" class="my-reservation-edit">Edit</a>&nbsp;/&nbsp;<a href="/reservations/<%= reservation.id %>" class="my-reservation-delete">Delete</a></li>
 <% end %>
 <% if @user.reservations.empty? then %>
     <li id="reservation-li-none">No reservations.</li>

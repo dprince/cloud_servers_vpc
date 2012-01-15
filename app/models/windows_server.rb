@@ -240,6 +240,10 @@ class WindowsServer < Server
 
 	end
 
+    def capture_reserve_server
+		return false
+	end
+
 	private
 	def generate_personalities
 		{}

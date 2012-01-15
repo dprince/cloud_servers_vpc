@@ -30,7 +30,7 @@ CloudServersVpc::Application.configure do
 end
 
 # Optional prefix for cloud server names.
-ENV['SERVER_NAME_PREFIX'] = ""
+ENV['SERVER_NAME_PREFIX'] = "vpc"
 
 # List any authorized ssh public keys that should get installed on the cloud
 # servers to provide keyless SSH access.
