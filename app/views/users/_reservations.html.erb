@@ -1,0 +1,220 @@
+<script type="text/javascript">
+
+$(document).ready(function() {
+
+    $(".my-reservations-add").click(function(e){
+         e.preventDefault();
+		 reset_my_reservation_form();
+		 reset_my_reservations_divs();
+         $("#my-reservations-edit-form").attr("action", $(this).attr("href"));
+         $("#my-reservations-edit-div").show();
+         $("a.my-reservations-add").hide();
+
+    });
+
+    $(".my-reservations-cancel").click(function(e){
+         e.preventDefault();
+		 reset_my_reservations_divs();
+
+    });
+
+    $(".my-reservation-delete").click(function(e){
+
+       e.preventDefault();
+
+       my_reservation_delete(this);  
+	   reset_my_reservations_divs();
+
+    });
+
+    $(".my-reservation-edit").click(function(e){
+
+       e.preventDefault();
+       var id = $(this).attr("href").match(/[0-9]*$/);
+       edit_my_reservation_link(id);
+
+    });
+
+});
+
+function reset_my_reservation_form() {
+
+	 $("#my-reservations-edit-form-method").attr("value", "POST");
+	  $("#my-reservations-edit-form input[name='[reservation]id']").attr("value", "");
+	  $("#my-reservations-edit-form input[name='[reservation]image_ref']").attr("value", "");
+	  $("#my-reservations-edit-form input[name='[reservation]flavor_ref']").attr("value", "");
+	  $("#my-reservations-edit-form input[name='[reservation]size']").attr("value", "");
+
+	 $("#my-reservations-edit-form input[type=submit]").attr("value", 'Create Reservation');
+
+}
+
+function edit_my_reservation_link(id) {
+  reset_my_reservations_divs();
+  $("#my-reservations-edit-form").attr("action", "/reservations/"+id);
+  $("#my-reservations-edit-div").show();
+  $("a.my-reservations-add").hide();
+
+  $("#my-reservations-edit-form-method").attr("value", "PUT");
+  $("#my-reservations-edit-form input[type=submit]").attr("value", 'Update Reservation');
+  $("#my-reservations-edit-form input[name='[reservation]id']").attr("value", id);
+
+  $.ajax({
+      url: "/reservations/"+id+".xml",
+      type: 'GET',
+      success: function(data) {
+          size=$("size", data).text();
+          image_ref=$("image image-ref", data).text();
+          flavor_ref=$("flavor-ref", data).text();
+		  $("#my-reservations-edit-form select[name='[reservation]image_ref']").val(image_ref).attr('selected', true);
+		  $("#my-reservations-edit-form select[name='[reservation]flavor_ref']").val(flavor_ref).attr('selected', true);
+		  $("#my-reservations-edit-form input[name='[reservation]size']").attr("value", size);
+      },
+      error: function(data) {
+          alert('Error: Unable to find reservation record ID: '+id);
+      }
+  });
+
+}
+
+function reset_my_reservations_divs() {
+     reset_settings_message();
+     $("a.my-reservations-add").show();
+     $("#my-reservations-edit-div").hide();
+     $("#my-reservations-error-messages").css("display", "none");
+     $("#my-reservation-error-messages-content").html("");
+}
+
+function my_reservation_create() {
+	method_type=$("#my-reservations-edit-form-method").attr("value");
+
+    var post_data = $("#my-reservations-edit-form").serialize();
+    $.ajax({
+        url: $("#my-reservations-edit-form").attr("action")+".xml",
+        type: method_type,
+        data: post_data,
+        success: function(data) {
+            $("#my-reservations-error-messages").css("display", "none");
+            $("#my-reservations-error-messages-content").html("");
+            $("#my-reservations-edit-div").hide();
+            $("a.my-reservations-add").show();
+
+			var reservation_id = $(data).find("reservation id:first").text();
+			var flavor_ref = $(data).find("reservation flavor-ref:first").text();
+			var size = $(data).find("reservation size:first").text();
+
+			if (method_type === 'POST') {
+
+				$("#my-reservations-list").append(
+				  "<li id=\"reservation-li-" + reservation_id +
+				  "\">" + $(data).find("reservation image name").text() +
+				  "&nbsp;(Flavor: " + flavor_ref + " Size: " + size + ")" +
+
+				  "&nbsp;<a href=\"reservations/" + reservation_id +
+				  "\" class=\"my-reservation-edit\">Edit</a>"+
+				  "&nbsp;/&nbsp;<a href=\"reservations/" + reservation_id +
+				  "\" class=\"my-reservation-delete\">Delete</a></li>"
+				);
+
+			} else {
+				$("#reservation-li-" + reservation_id).html(
+				  $("reservation image name", data).text() +
+				  "&nbsp;(Flavor: " + flavor_ref + " Size: " + size + ")" +
+
+				  "&nbsp;<a href=\"reservations/" + reservation_id +
+				  "\" class=\"my-reservation-edit\">Edit</a>"+
+				  "&nbsp;/&nbsp;<a href=\"reservations/" + reservation_id +
+				  "\" class=\"my-reservation-delete\">Delete</a>"
+				);
+			}
+
+             $("#reservation-li-" + reservation_id + " a.my-reservation-delete").click(function(e){
+
+              e.preventDefault();
+
+              my_reservation_delete(this);  
+
+           });
+
+           $("#reservation-li-" + reservation_id + " a.my-reservation-edit").click(function(e){
+
+              e.preventDefault();
+              var id = $(this).attr("href").match(/[0-9]*$/);
+              edit_my_reservation_link(id);
+
+           });
+
+           $("#reservation-li-none").hide();
+           append_settings_message('Reservation saved.');
+
+        },
+        error: function(data) {
+            $("#my-reservations-error-messages").css("display", "inline");
+            err_html="<ul>";
+            $("error", data.responseXML).each (function() {
+                err_html+="<li>"+$(this).text()+"</li>";
+            });
+            err_html+="</ul>";
+            $("#my-reservations-error-messages-content").html(err_html);
+        }
+    });
+
+}
+
+function my_reservation_delete(href) {
+
+    if (!confirm("Delete reservation?")) {
+        return;
+    }
+
+    $.ajax({
+        url: $(href).attr("href")+".xml",
+        type: 'POST',
+        data: { _method: 'delete' },
+        success: function(data) {
+            id=$("id", data).text();
+            $("#reservation-li-"+id).remove();
+           reset_settings_message();
+           append_settings_message('Reservation deleted.');
+        },
+        error: function(data) {
+            alert('Error: Failed to delete record.');
+        }
+    });
+
+}
+
+</script>
+
+<ul id="my-reservations-list">
+<% @user.reservations.each do |reservation| %>
+    <li id="reservation-li-<%= reservation.id %>"><%= raw chop_for_html(reservation_image_name(reservation)) %>&nbsp;(Flavor: <%= reservation.flavor_ref %>, Size: <%= reservation.size %>)&nbsp;<a href="/reservations/<%= reservation.id %>" class="my-reservation-edit">Edit</a>&nbsp;/&nbsp;<a href="/reservations/<%= reservation.id %>" class="my-reservation-delete">Delete</a></li>
+<% end %>
+<% if @user.reservations.empty? then %>
+    <li id="reservation-li-none">No reservations.</li>
+<% end %>
+</ul>
+
+<div id="my-reservations-error-messages" class="ui-widget" style="display: none">
+    <div class="ui-state-error ui-corner-all" style="padding: .25em .25em .25em 2.5em;">
+<p><span class="ui-icon ui-icon-alert" style="float: left; margin-right: .3em;"></span>
+<div id="my-reservations-error-messages-content"></div>
+</p>
+    </div>
+</div>
+
+<div id="my-reservations-edit-div" style="display: none;">
+    <form id="my-reservations-edit-form" action="/reservations" onsubmit="my_reservation_create(); return false;">
+    <input id="my-reservations-edit-form-method" type="hidden" name="_method" value="POST"/>
+    <input type="hidden" name="[reservation]id" value=""/>
+
+    <label>Image:</label><%= raw select_for_images("[reservation]image_ref") %><br/>
+    <label>Flavor:</label><%= raw select_for_flavors("[reservation]flavor_ref") %><br/>
+    <label>Size:</label><input type="text" name="[reservation]size" value=""/><br/><br/>
+    <input type="submit" name="submit" value="Create Reservation"/><%= link_to 'Cancel', "#", { :class => "my-reservations-cancel" } %>
+
+    </form>
+
+</div>
+
+<%= link_to 'Create New Reservation', "/reservations", { :class => "my-reservations-add" } %>

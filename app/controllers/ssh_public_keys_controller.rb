@@ -1,7 +1,7 @@
 class SshPublicKeysController < ApplicationController
 
   before_filter :authorize
-  before_filter :require_admin_or_self, :only => [:update]
+  before_filter :require_admin_or_self, :only => [:show, :update, :delete]
 
   # GET /ssh_public_keys
   # GET /ssh_public_keys.json

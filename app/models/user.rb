@@ -9,6 +9,7 @@ class User < ActiveRecord::Base
     validates_confirmation_of :password, :message => "Passwords do not match.", :if => :password
     validates_length_of :password, :in => 6..32, :allow_blank => false, :message => "Password must be between 6 and 32 characters.", :if => :password
     has_many :ssh_public_keys, :dependent => :destroy, :order => "description"
+    has_many :reservations, :dependent => :destroy, :conditions => "historical = 0"
     has_one :account
     #validates_associated :account, :if => Proc.new { |user| user.new_record? }
     accepts_nested_attributes_for :account, :update_only => true

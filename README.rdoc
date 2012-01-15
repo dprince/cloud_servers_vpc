@@ -8,7 +8,7 @@ A web application with a REST based HTTP interface to create groups of servers i
 
 == Features
 
--Supports Centos, Fedora, RHEL, and Ubuntu, and Windows 2008 R2.
+-Supports Fedora, RHEL, Centos, and Ubuntu, and Windows 2008 R2.
 
 -Communication between servers is secured with OpenVPN
 
@@ -28,16 +28,9 @@ A web application with a REST based HTTP interface to create groups of servers i
 
 == Installation
 
-Requires a Ruby, Rubygems, and Ruby on Rails 2.3.8. The app was developed against Ruby 1.8.7.
+Requires a Ruby, Rubygems, and Ruby on Rails 3.1. The app was developed against Ruby 1.9.2 and MySQL.
 
-	gem install rails -v2.3.8
-
-The application was developed with MySQL. The following gems are required:
-
-	mysql (2.8.1)
-	json (1.4.3)
-	resque (1.10.0)
-	SystemTimer (1.2.1)
+	bundle install
 
 Unpack the rails app and run the following commands to create the database.
 
@@ -51,7 +44,7 @@ Start some linux workers to configure Linux machines:
 
 Start the API server:
 
-	./script/server
+	./script/rails server
 
 At this point the web application should be running at http://localhost:3000. The default username:password is admin:cloud.
 
@@ -61,7 +54,7 @@ Windows worker machines are required when creating groups with Windows Servers. 
 
 1) Install jruby
 
-2) Gem install rails 2.3.8, resque, activerecord-jdbc-adapter, jruby-openssl
+2) Gem install rails, resque, activerecord-jdbc-adapter, jruby-openssl
 
 3) Extract Cloud Servers VPC to c:\vpc.
 
@@ -89,13 +82,6 @@ Windows worker machines are required when creating groups with Windows Servers. 
 	set CLASSPATH=c:\vpc\mysql-connector-java-5.0.8-bin.jar
 	set RAILS_ENV=production
 	rake resque:work QUEUE=windows
-
-== Installation w/ Chef
-
-A set of Chef Cookbooks has been created to install and manage a Cloud Servers
-VPC installation. See the following project for details: https://github.com/dprince/cs_vpc_cookbooks
-
-Roles are provided to install API servers, worker nodes, and the MySQL and Redis servers components as well.
 
 == API
 

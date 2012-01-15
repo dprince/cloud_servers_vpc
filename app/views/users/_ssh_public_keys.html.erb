@@ -180,7 +180,7 @@ function my_ssh_public_key_delete(href) {
 
 <ul id="my-ssh-public-keys-list">
 <% @user.ssh_public_keys.each do |key| %>
-    <li id="ssh-public-key-li-<%= key.id %>"><%= chop_for_html(key.description) %>&nbsp;<a href="/ssh_public_keys/<%= key.id %>" class="my-ssh-public-key-edit">Edit</a>&nbsp;/&nbsp;<a href="/ssh_public_keys/<%= key.id %>" class="my-ssh-public-key-delete">Delete</a></li>
+    <li id="ssh-public-key-li-<%= key.id %>"><%= raw chop_for_html(key.description) %>&nbsp;<a href="/ssh_public_keys/<%= key.id %>" class="my-ssh-public-key-edit">Edit</a>&nbsp;/&nbsp;<a href="/ssh_public_keys/<%= key.id %>" class="my-ssh-public-key-delete">Delete</a></li>
 <% end %>
 <% if @user.ssh_public_keys.empty? then %>
     <li id="ssh-public-key-li-none">No SSH public keys.</li>

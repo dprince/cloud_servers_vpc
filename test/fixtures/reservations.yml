@@ -1,0 +1,11 @@
+admin_reservation:
+  user: admin
+  flavor_ref: 2
+  image_ref: 1
+  size: 4
+
+jim_reservation:
+  user: jim
+  flavor_ref: 2
+  image_ref: 1
+  size: 4

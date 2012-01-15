@@ -1,0 +1,13 @@
+reserve1:
+  flavor_ref: 2
+  image_ref: 1
+  reservation: admin_reservation
+  account: admin_account
+  status: "Active"
+
+reserve2:
+  flavor_ref: 2
+  image_ref: 1
+  reservation: admin_reservation
+  account: admin_account
+  status: "Pending"

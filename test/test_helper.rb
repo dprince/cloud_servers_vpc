@@ -25,3 +25,21 @@ module AuthTestHelper
   end
 
 end
+
+class ReserveServer
+
+  def loop_until_server_online(private_key)
+    return true
+  end
+
+end
+
+module OpenvpnConfig
+class LinuxBootstrapper
+
+  def install_openvpn
+    return true
+  end
+
+end
+end

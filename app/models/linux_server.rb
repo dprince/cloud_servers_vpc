@@ -124,7 +124,7 @@ class LinuxServer < Server
 	end
 
 	# method to block until a server is online
-	def loop_until_server_online
+	def loop_until_server_online(private_key = self.server_group.ssh_key_basepath)
 		conn = self.account_connection
 
 		error_message = "Failed to build server."
@@ -136,18 +136,18 @@ class LinuxServer < Server
 			Timeout::timeout(timeout) do
 
 				# poll the server until progress is 100%
-				cs = conn.get_server(self.cloud_server_id_number)
-				until cs[:progress] == 100 and cs[:status] == "ACTIVE" do
-					cs = conn.get_server(self.cloud_server_id_number)
+				server = conn.get_server(self.cloud_server_id_number)
+				until server[:progress] == 100 and server[:status] == "ACTIVE" do
+					server = conn.get_server(self.cloud_server_id_number)
+					raise "Server in error state." if server[:status] == 'ERROR'
 					sleep 1
 				end
 
 				error_message="Failed to ssh to the node."	
-
 				if ! system(%{
 
 						COUNT=0
-						while ! ssh -o "StrictHostKeyChecking no" -T -i #{self.server_group.ssh_key_basepath} root@#{cs[:public_ip]} /bin/true > /dev/null 2>&1; do
+						while ! ssh -o "StrictHostKeyChecking no" -T -i #{private_key} root@#{server[:public_ip]} /bin/true > /dev/null 2>&1; do
 							if (($COUNT > 23)); then
 								exit 1
 							fi
@@ -183,6 +183,61 @@ class LinuxServer < Server
 		end
 
 		return false
+
+	end
+
+	def capture_reserve_server
+
+        private_key = nil
+
+		ReserveServer.transaction do
+			reserve_server = ReserveServer.where('account_id = ? AND image_ref = ? AND flavor_ref = ? AND status = ? AND historical = ?', self.account_id, self.image_id, self.flavor_id, 'Online', 0).lock(true).first 
+            if reserve_server then
+
+				self.cloud_server_id_number = reserve_server.cloud_server_id
+				self.external_ip_addr = reserve_server.external_ip_addr
+				self.internal_ip_addr = reserve_server.internal_ip_addr
+				self.save
+
+				reserve_server.historical = true;
+				reserve_server.save!
+
+				private_key = Tempfile.new "reservation_priv_key"
+				private_key.chmod(0600)
+				private_key.write(reserve_server.private_key)
+				private_key.flush
+
+            else
+				return false
+            end
+		end
+        
+		# inject personalities into the group
+		bash_command = ""
+			generate_personalities.each_pair do |local_file, remote_dest|
+			bash_command += "echo '#{IO.read(local_file)}' >> #{remote_dest}\n"
+			bash_command += "chmod 600 #{remote_dest}\n"
+		end
+
+		begin
+			Timeout::timeout(60) do
+data=%x{
+ssh -o "StrictHostKeyChecking no" -T -i #{private_key.path} root@#{self.external_ip_addr} bash <<-"EOF_BASH"
+#{bash_command}
+EOF_BASH
+}
+				retval=$?
+				if not retval.success? then
+					fail_and_raise "Failed to inject personalities into captured server."
+				end
+
+			end
+		rescue Exception => e
+			fail_and_raise "Timeout injecting personalities into captured server."
+		end
+
+        private_key.close(true)
+		return true
 
 	end
 

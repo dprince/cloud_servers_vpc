@@ -80,8 +80,8 @@ $(document).ready(function() {
 
             $("#settings-dialog").dialog({
                 modal: true,
-                height: 500,
-                width: 700,
+                height: $(window).height()-50,
+                width: $(window).width()-50,
                 buttons: {
                     Ok: function() {
                         $(this).dialog('close');
