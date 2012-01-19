@@ -215,7 +215,7 @@ class LinuxServer < Server
 		# inject personalities into the group
 		bash_command = ""
 			generate_personalities.each_pair do |local_file, remote_dest|
-			bash_command += "echo '#{IO.read(local_file)}' >> #{remote_dest}\n"
+			bash_command += "echo '#{IO.read(local_file)}' > #{remote_dest}\n"
 			bash_command += "chmod 600 #{remote_dest}\n"
 		end
 
