@@ -120,7 +120,7 @@ class Server
 		tmp_file=Tempfile.new "cert"
 		path="#{tmp_file.path}.tar.gz"
 		tmp_file.close(true)
-		%x{scp -i \"#{@ssh_identity_file}\" #{@ssh_as_user}@#{@external_ip_addr}:/etc/openvpn/keys/#{client_name}.tar.gz #{path}}
+		%x{scp -o "StrictHostKeyChecking no" -i \"#{@ssh_identity_file}\" #{@ssh_as_user}@#{@external_ip_addr}:/etc/openvpn/keys/#{client_name}.tar.gz #{path}}
 		return path
 
 	end
