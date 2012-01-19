@@ -33,7 +33,7 @@ class LinuxClient
 		# on the server we'll generate a new client cert
 		tmp_cert=@server.add_vpn_client(client_hostname, internal_vpn_ip, pptp_vpn_ip, client_type)
 		# scp the client cert to the client machine	
-		retval=system("scp -i \"#{@ssh_identity_file}\" #{tmp_cert} #{@ssh_as_user}@#{@external_ip_addr}:/etc/openvpn/cert.tar.gz")
+		retval=system("scp -o 'StrictHostKeyChecking no' -i \"#{@ssh_identity_file}\" #{tmp_cert} #{@ssh_as_user}@#{@external_ip_addr}:/etc/openvpn/cert.tar.gz")
 		File.delete(tmp_cert) if File.exists?(tmp_cert)
 
 		if not retval then
