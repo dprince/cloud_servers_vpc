@@ -65,7 +65,7 @@ class Server
 			#{IO.read(@ssh_identity_file)}
 			EOF_CAT
 			chmod 600 /root/.ssh/id_rsa
-			/etc/init.d/openvpn stop
+			/etc/init.d/openvpn stop || systemctl stop openvpn@server.service
 			clean
 			create_ca '#{hostname}'
 			create_server_key '#{hostname}'
@@ -73,7 +73,7 @@ class Server
 			init_server_etc_hosts '#{hostname}' '#{@domain_name}' '#{self.vpn_ipaddr}'
 			configure_iptables
 			start_dns_server
-			/etc/init.d/openvpn start
+			/etc/init.d/openvpn start || systemctl restart openvpn@server.service
 			/sbin/chkconfig openvpn on
 
 			if [ -f /etc/redhat-release ]; then

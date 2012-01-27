@@ -122,6 +122,8 @@ function create_client_key {
 	cd $OPENVPN_CONFIG_DIR/easy-rsa
 	bash <<-EOF_BASH
 		. ./vars
+		export KEY_NAME=$CLIENT_NAME
+		export KEY_CN=$CLIENT_NAME
 		./pkitool $CLIENT_NAME &> /dev/null
 	EOF_BASH
 	[[ $? == 0 ]] || fail "Failed to create client key: $CLIENT_NAME."
@@ -156,7 +158,7 @@ function create_client_key {
 		echo "$CLIENT_INTERNAL_IP	$CLIENT_NAME.$CLIENT_DOMAIN $CLIENT_NAME" >> /etc/hosts
 	fi
 
-	/etc/init.d/dnsmasq reload &> /dev/null || /etc/init.d/dnsmasq restart &> /dev/null || { echo "Failed to restart DnsMasq on $HOSTNAME."; return 1; }
+	/etc/init.d/dnsmasq reload &> /dev/null || /etc/init.d/dnsmasq restart &> /dev/null || systemctl restart dnsmasq.service &> /dev/null || { echo "Failed to restart DnsMasq on $HOSTNAME."; return 1; }
 
 }
 
@@ -176,7 +178,7 @@ function start_dns_server {
 	fi
 
 	/sbin/chkconfig dnsmasq on	
-	/etc/init.d/dnsmasq start
+	/etc/init.d/dnsmasq start || systemctl restart dnsmasq.service
 	#/sbin/service dnsmasq start
 
 }

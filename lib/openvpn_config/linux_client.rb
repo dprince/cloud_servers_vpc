@@ -81,7 +81,7 @@ class LinuxClient
 
 	def start_openvpn
 
-		script = "/sbin/chkconfig openvpn on\n/etc/init.d/openvpn start\n"
+		script = "/sbin/chkconfig openvpn on\n/etc/init.d/openvpn start || systemctl start openvpn@#{@hostname}.service\n"
 		if Util::Ssh.run_cmd(@external_ip_addr, script, @ssh_as_user, @ssh_identity_file, @logger) then
 			if_down_count=0
 			1.upto(5) do
