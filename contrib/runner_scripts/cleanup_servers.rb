@@ -29,6 +29,12 @@ Account.find(:all, :conditions => ["username IS NOT NULL AND username != '' AND 
 
       end
 
+      # Check for case where group is historical but servers
+      # didn't get marked as historical
+      if server_ref and server_ref.server_group.historical then
+        server_ref.make_historical
+      end
+
     end
 
   end
