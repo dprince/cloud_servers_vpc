@@ -31,6 +31,9 @@ class Reservation < ActiveRecord::Base
         AsyncExec.run_job(MakeReserveServerHistorical, reserve_server.id)
         make_reserve_server
       end
+      if reserve_server.created_at < 1.day.ago and reserve_server.status == 'Pending' then
+        AsyncExec.run_job(MakeReserveServerHistorical, reserve_server.id)
+      end
     end
 
     # add extras
