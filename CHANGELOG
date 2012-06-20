@@ -1,3 +1,9 @@
+* Wed Jun 20 2012 Dan Prince <dprince@redhat.com> - 3.0.1
+  - Updates to better support systemd style init scripts.
+  - Add Fedora 17 into list of supported images.
+  - Fix a minor logging issue where workers wouldn't log error
+    messages when trying to start OpenVPN on clients.
+
 * Mon Jan 16 2012 Dan Prince <dan.prince@rackspace.com> - 3.0.0
   - Upgrade to Rails 3.1.
   - Add support for OpenStack API.

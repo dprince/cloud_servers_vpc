@@ -158,7 +158,11 @@ function create_client_key {
 		echo "$CLIENT_INTERNAL_IP	$CLIENT_NAME.$CLIENT_DOMAIN $CLIENT_NAME" >> /etc/hosts
 	fi
 
-	/etc/init.d/dnsmasq reload &> /dev/null || /etc/init.d/dnsmasq restart &> /dev/null || systemctl restart dnsmasq.service &> /dev/null || { echo "Failed to restart DnsMasq on $HOSTNAME."; return 1; }
+	if [ -f /etc/init.d/dnsmasq ]; then
+		/etc/init.d/dnsmasq reload &> /dev/null || /etc/init.d/dnsmasq restart &> /dev/null || { echo "Failed to restart DnsMasq on $HOSTNAME."; return 1; }
+	else
+		systemctl restart dnsmasq.service &> /dev/null || { echo "Failed to restart DnsMasq on $HOSTNAME."; return 1; }
+	fi
 
 }
 
@@ -178,8 +182,11 @@ function start_dns_server {
 	fi
 
 	/sbin/chkconfig dnsmasq on	
-	/etc/init.d/dnsmasq start || systemctl restart dnsmasq.service
-	#/sbin/service dnsmasq start
+	if [ -f /etc/init.d/dnsmasq ]; then
+		/etc/init.d/dnsmasq start
+	else
+		systemctl restart dnsmasq.service
+	fi
 
 }
 

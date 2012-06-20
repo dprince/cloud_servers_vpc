@@ -81,14 +81,27 @@ class LinuxClient
 
 	def start_openvpn
 
-		script = "/sbin/chkconfig openvpn on\n/etc/init.d/openvpn start || systemctl start openvpn@#{@hostname}.service\n"
+		script = %{
+/sbin/chkconfig openvpn on
+if [ -f /etc/init.d/openvpn ]; then
+	/etc/init.d/openvpn start
+else
+	systemctl start openvpn@#{@hostname}.service
+fi
+}
 		if Util::Ssh.run_cmd(@external_ip_addr, script, @ssh_as_user, @ssh_identity_file, @logger) then
+			@logger.info("OpenVPN started: trying to disable eth0.")
 			if_down_count=0
-			1.upto(5) do
+			1.upto(10) do
 				break if @server.if_down_eth0_client(@hostname)
 				if_down_count+=1
+                                sleep 1
+			        @logger.error("ifdown on eth0 failed...")
 			end
-			return true if if_down_count < 5
+			if if_down_count < 10
+			        @logger.info("ifdown on eth0 successful!")
+				return true
+			end
 		end
 		return false
 

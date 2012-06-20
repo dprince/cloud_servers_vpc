@@ -41,6 +41,8 @@ class Image < ActiveRecord::Base
       104 => "linux", #"Debian 6.0 (Squeeze)"
       114 => "linux", #"Centos 5.6"]
       118 => "linux", #"Centos 6.0"]
+      126 => "linux", # "Fedora 17 (Beefy Miracle)"]
+      120 => "linux", # "Fedora 16 (Verne)"]
       116 => "linux", # "Fedora 15 (Lovelock)"]
       106 => "linux", # "Fedora 14 (Laughlin)"]
       110 => "linux", # "Red Hat EL 5.5"]

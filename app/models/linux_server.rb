@@ -96,7 +96,7 @@ class LinuxServer < Server
 		end
 
 		vpn_server_config=OpenvpnConfig::Server.new(vpn_server.external_ip_addr, vpn_server.internal_ip_addr, self.server_group.domain_name, vpn_server.server_group.vpn_network, vpn_server.server_group.vpn_subnet, vpn_server.server_group.vpn_device, vpn_server.server_group.vpn_proto, "root", self.server_group.ssh_key_basepath)
-
+		vpn_server_config.logger=Rails.logger
 		client=OpenvpnConfig::LinuxClient.new(vpn_server_config, self.external_ip_addr, "root", self.server_group.ssh_key_basepath)
 		client.logger=Rails.logger
 		client.install_openvpn
@@ -114,7 +114,7 @@ class LinuxServer < Server
 		end
 
 		if not client.start_openvpn then
-			fail_and_raise "Failed to configure OpenVPN on the client."
+			fail_and_raise "Failed to start OpenVPN on the client."
 		end
 
 		# mark the client as online
@@ -170,7 +170,7 @@ class LinuxServer < Server
 	def ping_test(test_ip)
 
 		begin
-			Timeout::timeout(30) do
+			Timeout::timeout(60) do
 
 				if system(%{
 						ssh -o "StrictHostKeyChecking no" -T -i #{self.server_group.ssh_key_basepath} root@#{self.external_ip_addr} ping -c 1 #{test_ip} > /dev/null 2>&1
